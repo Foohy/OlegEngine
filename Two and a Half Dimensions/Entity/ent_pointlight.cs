@@ -12,32 +12,29 @@ using FarseerPhysics.Dynamics;
 
 namespace Two_and_a_Half_Dimensions.Entity
 {
-    class ent_spotlight : BaseEntity 
+    class ent_pointlight : BaseEntity 
     {
         public bool Enabled { get; set; }
-        public bool ExpensiveShadows { get; set; }
         public Vector3 Color { get; set; }
         public float Cutoff { get; set; }
         public float Constant { get; set; }
         public float AmbientIntensity { get; set; }
         public float DiffuseIntensity { get; set; }
+        public float Linear { get; set; }
 
-        private SpotLight light = new SpotLight();
+        private PointLight light = new PointLight();
         public override void Init()
         {
-            Utilities.window.shadows.SetLights += new ShadowTechnique.SetLightsHandler(shadows_SetLights);
             Utilities.window.effect.SetLights += new LightingTechnique.SetLightsHandler(effect_SetLights);
             AmbientIntensity = 0.2f;
             DiffuseIntensity = 0.7f;
 
             this.Enabled = true;
-            this.ExpensiveShadows = true;
         }
 
         public override void Remove()
         {
             base.Remove();
-            Utilities.window.effect.SetLights -= shadows_SetLights;
             Utilities.window.effect.SetLights -= effect_SetLights;
         }
 
@@ -47,22 +44,12 @@ namespace Two_and_a_Half_Dimensions.Entity
             {
                 light.AmbientIntensity = AmbientIntensity;
                 light.DiffuseIntensity = DiffuseIntensity;
+                light.Linear = Linear;
                 light.Color = Color;
                 light.Constant = Constant;
-                light.Cutoff = Cutoff;
-                light.Direction = this.Angle;
                 light.Position = Position;
 
-                Utilities.window.effect.AddSpotLight(light);
-            }
-        }
-
-        void shadows_SetLights(object sender, EventArgs e)
-        {
-            if (this.Enabled && this.ExpensiveShadows)
-            {
-                Matrix4 shadowmat = Matrix4.LookAt(Position, Position + Angle, Vector3.UnitY);
-                Utilities.window.shadows.AddLightMatrix(shadowmat);
+                Utilities.window.effect.AddPointLight(light);
             }
         }
     }

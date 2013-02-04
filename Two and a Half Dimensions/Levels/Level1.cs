@@ -24,13 +24,22 @@ namespace Two_and_a_Half_Dimensions.Levels
             levelmodel.mat = Resource.GetMaterial("engine/white.png", "default_lighting");
 
             //Create the physics mesh on the ground
+            //TODO: create a level format or something
             Body level = FarseerPhysics.Factories.BodyFactory.CreateRectangle(LevelManager.physWorld, 1000, 100, 1.0f);
-            level.Position = new Microsoft.Xna.Framework.Vector2(-500, -52);
+            level.Position = new Microsoft.Xna.Framework.Vector2(-400, -52);
             level.BodyType = BodyType.Static;
 
 
             BaseEntity ent = EntManager.Create<DepthScreen>();
             ent.Spawn();
+
+            //some fires too
+            Entity.BaseEntity fire = Entity.EntManager.Create<Entity.Campfire>();
+            fire.Spawn();
+            fire.SetPos(new Vector3(-2.00f, 2.421f, 15.90f));
+            fire.Scale = new Vector3(0.75f);
+            fire.SetAngle(new Vector3(0, (float)Math.PI, 0.25f));
+            //fire.SetAngle((float)(Math.PI / 16));
 
             spotlight = (ent_spotlight)EntManager.Create<ent_spotlight>();
             spotlight.Spawn();
@@ -38,6 +47,14 @@ namespace Two_and_a_Half_Dimensions.Levels
             spotlight.Color = new Vector3(1.0f, 1.0f, 1.0f);
             spotlight.Constant = 1.0f;
             spotlight.Cutoff = 20.0f;
+
+            //Make us some nice environmental lighting
+            DirectionalLight light = new DirectionalLight();
+            light.AmbientIntensity = 0.4f;
+            light.DiffuseIntensity = 0.9f;
+            light.Color = new Vector3(0.133f, 0.149f, 0.176f);
+            light.Direction = new Vector3(0.0f, -1.0f, 0.0f);
+            Utilities.window.effect.SetEnvironmentLight(light);
 
             Utilities.window.ply.SetPos(new Vector3(0, 0, 0));
             Utilities.window.shadows.Enable();
@@ -50,12 +67,29 @@ namespace Two_and_a_Half_Dimensions.Levels
             {
                 SetShadow = !SetShadow;
             }
+            if (e.Key == OpenTK.Input.Key.F3)
+            {
+                spotlight.ExpensiveShadows = !spotlight.ExpensiveShadows;
+            }
             if (e.Key == OpenTK.Input.Key.Q)
             {
                 Entity.TestBall ball = (Entity.TestBall)Entity.EntManager.Create<Entity.TestBall>();
                 //ball.radius = rand.Next(0, 3000) / (float)1000;
                 ball.Spawn();
                 ball.SetPos(new Vector2(Player.ply.Pos.X, Player.ply.Pos.Y + 3.0f));
+            }
+            if (e.Key == OpenTK.Input.Key.F12) //Debug print
+            {
+                Console.WriteLine("==========================");
+                Console.WriteLine("Position: {0}", Player.ply.Pos );
+                Console.WriteLine("Orientation: {0}", Player.ply.CamAngle);
+                Console.WriteLine("ViewNormal: {0}", Player.ply.ViewNormal);
+                Console.WriteLine("Matrix: {0}", Player.ply.camMatrix);
+                if (Player.ply.OverrideCamMatrix)
+                {
+                    Console.WriteLine("VIEW IS BEING OVERWRITTEN!");
+                }
+                Console.WriteLine("==========================");
             }
         }
 
