@@ -130,18 +130,31 @@ namespace Two_and_a_Half_Dimensions
         {
             base.OnRenderFrame(e);
             updateTitle();
-            shadows.SetLightLocations();
-            plyView = shadows.LightMVP;
-            Utilities.ProjectionMatrix = shadows.LightMVP;
+
+            //Get the positions for all the light positions that'll cast fancyshadows
+            shadows.UpdateLightPositions();
+
+            //Set them accordingly
+            //TODO: make it support multiple points (and optimize the hell out of it)
+            Matrix4 mat = shadows.GetMatrix();
+            if (shadows.Enabled)
+            {
+                shadows.SetLightMatrix(mat);
+                plyView = mat;
+                Utilities.ProjectionMatrix = mat;
+
+                //Pass 1, render in the view of the light
+                Utilities.CurrentPass = 1;
+                shadowFBO.BindForWriting();
+                GL.Clear(ClearBufferMask.DepthBufferBit);
+                RenderScene(e);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0); //Reset it to the default framebuffer
+            }
 
 
-            //Pass 1, render a light
-            Utilities.CurrentPass = 1;
-            shadowFBO.BindForWriting();
-            GL.Clear(ClearBufferMask.DepthBufferBit);
-            RenderScene(e);
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0); //Reset it to the default framebuffer
 
+
+            //Set the view to the normal camera
             plyView = ply.camMatrix;
             Utilities.ProjectionMatrix = ply.camMatrix;
 

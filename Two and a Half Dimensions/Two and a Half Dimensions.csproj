@@ -56,6 +56,7 @@
     <Compile Include="Entity\BaseEntity.cs" />
     <Compile Include="Entity\Car.cs" />
     <Compile Include="Entity\Campfire.cs" />
+    <Compile Include="Entity\ent_spotlight.cs" />
     <Compile Include="Entity\ent_static.cs" />
     <Compile Include="Entity\depthtoscreen.cs" />
     <Compile Include="Entity\TestNerd.cs" />

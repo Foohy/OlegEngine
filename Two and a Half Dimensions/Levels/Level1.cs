@@ -17,6 +17,7 @@ namespace Two_and_a_Half_Dimensions.Levels
         bool SetShadow = true;
         Vector3 Angle = new Vector3();
         Vector3 Pos = new Vector3();
+        ent_spotlight spotlight;
         public override void Preload()
         {
             levelmodel = Resource.GetMesh("Levels/level1.obj");
@@ -31,10 +32,16 @@ namespace Two_and_a_Half_Dimensions.Levels
             BaseEntity ent = EntManager.Create<DepthScreen>();
             ent.Spawn();
 
+            spotlight = (ent_spotlight)EntManager.Create<ent_spotlight>();
+            spotlight.Spawn();
+
+            spotlight.Color = new Vector3(1.0f, 1.0f, 1.0f);
+            spotlight.Constant = 1.0f;
+            spotlight.Cutoff = 20.0f;
+
             Utilities.window.ply.SetPos(new Vector3(0, 0, 0));
             Utilities.window.shadows.Enable();
             Utilities.window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            Utilities.window.shadows.SetLights += new ShadowTechnique.SetLightsHandler(shadows_SetLights);
         }
 
         void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -58,6 +65,11 @@ namespace Two_and_a_Half_Dimensions.Levels
 
             Angle = new Vector3((float)Math.Cos( Utilities.Time / 10), -(float)Math.Abs(Math.Sin( Utilities.Time / 10)), 0.0f);
 
+            if (SetShadow && spotlight != null)
+            {
+                spotlight.SetAngle( Player.ply.ViewNormal);
+                spotlight.SetPos( Player.ply.Pos );
+            }
 
             //Create a camera matrix
             //Matrix4 shadowmat = Matrix4.LookAt(Pos - (Angle * 70), Pos + Angle - (Angle * 70), Vector3.UnitY);
@@ -77,41 +89,11 @@ namespace Two_and_a_Half_Dimensions.Levels
 
             Utilities.window.effect.SetSpotlights(sp);
              * */
-            Utilities.window.effect.SetLights += new LightingTechnique.SetLightsHandler(effect_SetLights);
 
 
             if (levelmodel != null)
             {
                 levelmodel.Render(Matrix4.Identity);
-            }
-        }
-
-        void effect_SetLights(object sender, EventArgs e)
-        {
-            //how well are events perfomance wise? are they good for stuff like this?
-
-            if (SetShadow)
-            {
-                SpotLight[] sp = new SpotLight[1];
-                sp[0].AmbientIntensity = 0.4f;
-                sp[0].Color = new Vector3(1.0f, 1.0f, 1.0f);
-                sp[0].Constant = 1.0f;
-                sp[0].Cutoff = 20.0f;
-                sp[0].Direction = Player.ply.ViewNormal;
-                sp[0].Position = Player.ply.Pos;
-
-                Utilities.window.effect.SetSpotlights(sp);
-            }
-
-        }
-
-        void shadows_SetLights(object sender, EventArgs e)
-        {
-            if (SetShadow)
-            {
-                Pos = Player.ply.Pos;
-                Matrix4 shadowmat = Matrix4.LookAt(Pos, Pos + Player.ply.ViewNormal, Vector3.UnitY);
-                Utilities.window.shadows.SetLightMatrix(shadowmat);
             }
         }
     }

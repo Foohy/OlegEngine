@@ -57,6 +57,10 @@ namespace Two_and_a_Half_Dimensions
         SpotLightLocations[] spotlightLocations = new SpotLightLocations[MAX_SPOTLIGHTS];
         PointLightLocations[] pointlightLocations = new PointLightLocations[MAX_POINTLIGHTS];
 
+        DirectionalLight EnvironmentLight = new DirectionalLight();
+        List<SpotLight> Spotlights = new List<SpotLight>();
+        List<PointLight> Pointlights = new List<PointLight>();
+
         public LightingTechnique()
         {
             this.Program = 0;
@@ -124,15 +128,20 @@ namespace Two_and_a_Half_Dimensions
         public override void Render()
         {
             this.SetEyeWorldPos(Player.ply.Pos);
-            //m_pEffect->SetDirectionalLight(m_directionalLight);
-            //m_pEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
-            //this.SetMatSpecularIntensity(1.0f);
-            //this.SetMatSpecularPower(16);
-            //TEMPORARY!!
 
-            if (SetLights == null) return;
+            //Clear the lights for this frame
+            Pointlights.Clear(); 
+            Spotlights.Clear();
+
+            if (SetLights == null) return; //don't bother setting the lights if no one is out there
             SetLights(this, ev);
 
+            //Now that we have a list of all the lights to render this frame, friggin set em
+            SetPointLights(Pointlights.ToArray());
+            SetSpotlights(Spotlights.ToArray());
+            SetDirectionalLight(EnvironmentLight);
+            /*
+            //TEMPORARY!!
             if (car == null)
             {
                 Entity.BaseEntity[] ents = Entity.EntManager.GetByType<Entity.Car>();
@@ -171,13 +180,13 @@ namespace Two_and_a_Half_Dimensions
                 pl[0].Linear = 0.1f;
                 this.SetPointLights(pl);
             }
-            /*
+            
             pl[1].AmbientIntensity = 0.4f;
             pl[1].DiffuseIntensity = 0.95f;
             pl[1].Color = new Vector3(0.0f, 0.5f, 1.0f);
             pl[1].Position = new Vector3(190, 300, 0);
             pl[1].Constant = 4.0f;
-             * */
+            
 
             if (car != null)
             {
@@ -204,6 +213,22 @@ namespace Two_and_a_Half_Dimensions
 
                 this.SetSpotlights(sl);
             }
+             * */
+        }
+
+        public void AddPointLight(PointLight pl)
+        {
+            Pointlights.Add(pl);
+        }
+
+        public void AddSpotLight(SpotLight sl)
+        {
+            Spotlights.Add(sl);
+        }
+
+        public void SetEnvironmentLight( DirectionalLight light )
+        {
+            EnvironmentLight = light;
         }
 
         Vector3 day = new Vector3(1.0f, 1.0f, 0.862f);
@@ -267,7 +292,7 @@ namespace Two_and_a_Half_Dimensions
         }
 
 
-        public void SetPointLights( PointLight[] pLights )
+        private void SetPointLights(PointLight[] pLights)
         {
             GL.Uniform1(numPointLightsLocation, pLights.Length);
 
@@ -283,7 +308,7 @@ namespace Two_and_a_Half_Dimensions
             }
         }
 
-        public void SetSpotlights(SpotLight[] pLights)
+        private void SetSpotlights(SpotLight[] pLights)
         {
             GL.Uniform1(numSpotLightsLocation, pLights.Length);
 
@@ -458,7 +483,8 @@ namespace Two_and_a_Half_Dimensions
         public delegate void SetLightsHandler(object sender, EventArgs e);
         public event SetLightsHandler SetLights;
         public bool Enabled { get; private set; }
-        public Matrix4 LightMVP = Matrix4.Identity;
+
+        public List<Matrix4> _lights = new List<Matrix4>();
 
         int shadowSamplerLocation;
         int shadowMapLocation;
@@ -487,30 +513,51 @@ namespace Two_and_a_Half_Dimensions
         EventArgs ev = new EventArgs();
         public override void Render()
         {
-            GL.UseProgram(this.Program);
-            GL.UniformMatrix4(lightWVPLocation, false, ref LightMVP);
+            Matrix4 mat = GetMatrix();
+            if (this.Enabled)
+            {
+                GL.UseProgram(this.Program);
+                GL.UniformMatrix4(lightWVPLocation, false, ref mat);
+            }
         }
 
-        public void Enable()
+        public Matrix4 GetMatrix()
         {
-            Enabled = true;
+            if (_lights.Count > 0)
+            {
+                this.Enabled = true;
+                return _lights[0];
+            }
+
+            this.Enabled = false;
+            return Matrix4.Identity;
         }
 
-        public void Disable()
+        /// <summary>
+        /// Send out an event to set the positions of all the places we'll render lights from
+        /// </summary>
+        public void UpdateLightPositions()
         {
-            Enabled = false;
+            _lights.Clear();
+
+            if (SetLights == null) return; //don't bother setting the lights if no one is out there
+            SetLights(this, ev);
+        }
+
+        public void AddLightMatrix(Matrix4 mvp)
+        {
+            _lights.Add(mvp);
+        }
+
+        public void AddLightPositionDirection(Vector3 Position, Vector3 Direction)
+        {
+
         }
 
         public void SetLightMatrix(Matrix4 mvp)
         {
             GL.UseProgram(this.Program);
             GL.UniformMatrix4(lightWVPLocation, false, ref mvp);
-            LightMVP = mvp;
-        }
-
-        public void SetLightLocations()
-        {
-            SetLights(this, ev);
         }
     }
 
