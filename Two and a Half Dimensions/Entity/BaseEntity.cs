@@ -1,0 +1,115 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
+
+using FarseerPhysics.Common;
+using FarseerPhysics.Collision;
+using FarseerPhysics.Dynamics;
+
+namespace Two_and_a_Half_Dimensions.Entity
+{
+    class BaseEntity
+    {
+        public string Name { get; set; }
+        public string Class { get; set; }
+        public Mesh Model { get; set; }
+        public Material Mat { get; set; }
+        public bool DisableLighting { get; set; }
+        public OpenTK.Graphics.OpenGL.BeginMode drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
+        public bool WorldSpawn = false;
+
+        public Vector3 Position { get; private set; }
+        public Vector3 Angle { get; private set; }
+        public Vector3 Scale { get; set; }
+
+        public Fixture Physics { get; set; }
+
+        private Matrix4 modelview = Matrix4.Identity;
+        public bool _toRemove = false;
+
+        public void Spawn()
+        {
+            this.Scale = new Vector3(1, 1, 1);
+            this.DisableLighting = false;
+            this.Init();
+
+            if (this.Mat == null) this.Mat = Utilities.ErrorMat;
+        }
+
+        public virtual void Init()
+        {
+            this.Model = Resource.GetMesh("ball.obj");
+            this.Mat = Utilities.ErrorMat;
+        }
+
+        public virtual void Remove()
+        {
+            _toRemove = true;
+        }
+        public virtual void Think()
+        {
+
+        }
+        public virtual void Draw()
+        {
+            if (Model != null)
+            {
+                if (this.DisableLighting) GL.Disable(EnableCap.Lighting);
+
+                Model.mat = this.Mat;
+
+                modelview = Matrix4.CreateTranslation(Vector3.Zero);
+                modelview *= Matrix4.Scale(Scale);
+                modelview *= Matrix4.CreateRotationZ(this.Angle.Z);
+                modelview *= Matrix4.CreateRotationY(this.Angle.Y);
+                modelview *= Matrix4.CreateRotationX(this.Angle.X);
+                modelview *= Matrix4.CreateTranslation(Position);
+                
+                Model.Render(modelview);
+
+                if (this.DisableLighting) GL.Enable(EnableCap.Lighting);
+            }
+        }
+
+        #region misc
+        public void SetPos(Vector3 pos, bool setPhys = true)
+        {
+            Position = pos;
+            if (this.Physics != null && setPhys )
+            {
+                this.Physics.Body.Position = new Microsoft.Xna.Framework.Vector2(pos.X, pos.Y );
+            }
+        }
+        public void SetPos(Vector2 pos, bool setPhys = true)
+        {
+            SetPos(new Vector3(pos.X, pos.Y, Position.Z), setPhys);
+        }
+
+        public void SetAngle(Vector3 ang, bool phys = false)
+        {
+            Angle = ang;
+            if (this.Physics != null && phys)
+            {
+                this.Physics.Body.Rotation = ang.Z;
+            }
+            //Update physics position
+        }
+
+        public void SetAngle(float ang, bool phys = false)
+        {
+            this.SetAngle(new Vector3( Angle.X, Angle.Y, ang ), phys);
+        }
+
+        public void SetModel(Mesh model)
+        {
+            if (Model != null) { Model.Remove(); }
+            Model = model;
+        }
+        #endregion
+
+    }
+}
