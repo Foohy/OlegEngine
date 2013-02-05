@@ -22,13 +22,18 @@ namespace Two_and_a_Half_Dimensions.Entity
         public float AmbientIntensity { get; set; }
         public float DiffuseIntensity { get; set; }
 
+        public ShadowInfo shadowInfo;
+
         private SpotLight light = new SpotLight();
         public override void Init()
         {
+            shadowInfo = new ShadowInfo();
+            //shadowInfo.texture = Resource.GetTexture("effects/flashlight.png");
+            shadowInfo.texture = Resource.GetTexture("grass.png");
             Utilities.window.shadows.SetLights += new ShadowTechnique.SetLightsHandler(shadows_SetLights);
             Utilities.window.effect.SetLights += new LightingTechnique.SetLightsHandler(effect_SetLights);
-            AmbientIntensity = 0.2f;
-            DiffuseIntensity = 0.7f;
+            AmbientIntensity = 0.0f;
+            DiffuseIntensity = 1.0f;
 
             this.Enabled = true;
             this.ExpensiveShadows = true;
@@ -61,8 +66,8 @@ namespace Two_and_a_Half_Dimensions.Entity
         {
             if (this.Enabled && this.ExpensiveShadows)
             {
-                Matrix4 shadowmat = Matrix4.LookAt(Position, Position + Angle, Vector3.UnitY);
-                Utilities.window.shadows.AddLightMatrix(shadowmat);
+                shadowInfo.matrix = Matrix4.LookAt(Position, Position + Angle, Vector3.UnitY);
+                Utilities.window.shadows.AddLightsource(shadowInfo);
             }
         }
     }

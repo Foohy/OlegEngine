@@ -83,6 +83,7 @@ uniform vec3 gEyeWorldPos;
 uniform sampler2D sampler;
 uniform sampler2D sampler_normal;
 uniform sampler2D sampler_shadow;
+uniform sampler2D sampler_shadow_tex;
 
 // Returns a random number based on a vec3 and an int.
 float random(vec3 seed, int i){
@@ -110,8 +111,8 @@ float CalcShadowFactor(vec4 LightSpacePos)
 			//visibility -= float(0.2*(1.0-texture( sampler_shadow, vec3(ex_LightSpacePos.xy + poissonDisk[index]/700.0,  (z-0.005)/ex_LightSpacePos.w) )));
 		}
 	}
-
-	return visibility;
+	UVCoords = clamp(UVCoords, 0, 1);
+	return visibility * texture2D(sampler_shadow_tex, UVCoords ).x;
 	/*
     float Depth = texture2D(sampler_shadow, UVCoords);
     if (Depth < (z + 0.00001)) //(Depth < (z + 0.00001))
@@ -159,6 +160,7 @@ vec4 CalcPointLight(PointLight l, vec3 Normal, vec4 LightSpacePos)
 	float ShadowFactor = CalcShadowFactor( LightSpacePos );
 
     vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal, ShadowFactor);
+
     float Attenuation =  l.Atten.Constant +
                          l.Atten.Linear * Distance +
                          l.Atten.Exp * Distance * Distance;
@@ -174,6 +176,16 @@ vec4 CalcSpotLight(SpotLight l, vec3 Normal, vec4 LightSpacePos)
     if (SpotFactor > l.Cutoff) 
 	{
         vec4 Color = CalcPointLight(l.Base, Normal, LightSpacePos);
+
+		
+		vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+		vec2 UVCoords;
+		UVCoords.x = 0.5 * ProjCoords.x + 0.5;
+		UVCoords.y = 0.5 * ProjCoords.y + 0.5;
+		UVCoords = clamp(UVCoords, 0, 1);
+		Color *= texture2D(sampler_shadow_tex, UVCoords );
+
+
         return Color * (1.0 - (1.0 - SpotFactor) * 1.0/(1.0 - l.Cutoff));
     }
     else 
@@ -212,7 +224,7 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal, ex_LightSpacePos);
     }        
 	//TotalLight = CalcShadowFactor( ex_LightSpacePos );
-	gl_FragColor = texture2D( sampler, ex_UV.st) * TotalLight + (CalcShadowFactor( ex_LightSpacePos ) - 1.0f);
+	gl_FragColor = texture2D( sampler, ex_UV.st) * TotalLight;
     //gl_FragColor = vec4( ex_Normal.x, ex_Normal.y, ex_Normal.z, 1.0 );
 	//gl_FragColor = vec4( sin(_time) / 2.0 + 0.5, sin(_time) / 2.0 + 0.5, sin(_time) / 2.0 + 0.5, 1.0 );
 }

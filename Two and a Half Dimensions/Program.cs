@@ -136,12 +136,13 @@ namespace Two_and_a_Half_Dimensions
 
             //Set them accordingly
             //TODO: make it support multiple points (and optimize the hell out of it)
-            Matrix4 mat = shadows.GetMatrix();
+            ShadowInfo info = shadows.GetShadowInfo();
+            
             if (shadows.Enabled)
             {
-                shadows.SetLightMatrix(mat);
-                plyView = mat;
-                Utilities.ProjectionMatrix = mat;
+                shadows.SetLightInfo(info);
+                plyView = info.matrix;
+                Utilities.ProjectionMatrix = info.matrix;
 
                 //Pass 1, render in the view of the light
                 Utilities.CurrentPass = 1;

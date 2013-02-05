@@ -413,6 +413,7 @@ namespace Two_and_a_Half_Dimensions
         public int locBaseTexture = -1;
         public int locNormalMap = -1;
         public int locShadowMap = -1;
+        public int locShadowMapTexture = -1;
 
         public Material(string filename)
         {
@@ -473,23 +474,23 @@ namespace Two_and_a_Half_Dimensions
                 locBaseTexture = GL.GetUniformLocation(Program, "sampler");
                 locNormalMap = GL.GetUniformLocation(Program, "sampler_normal");
                 locShadowMap = GL.GetUniformLocation(Program, "sampler_shadow");
+                locShadowMapTexture = GL.GetUniformLocation(Program, "sampler_shadow_tex");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);
-                //GL.BindSampler(0, locBaseTexture);
                 GL.Uniform1(locBaseTexture, 0);
 
                 GL.ActiveTexture(TextureUnit.Texture1);
-                //GL.BindSampler(1, locNormalMap);
                 GL.Uniform1(locNormalMap, 1);
 
                 GL.ActiveTexture(TextureUnit.Texture2);
-                //GL.BindSampler(2, locShadowMap);
                 GL.Uniform1(locShadowMap, 2);
+
+                GL.ActiveTexture(TextureUnit.Texture3);
+                GL.Uniform1(locShadowMapTexture, 3);
 
                 GL.ActiveTexture(TextureUnit.Texture0);
 
-               //Console.WriteLine("VMatrix: {0}, PMatrix: {1}, MMatrixL {2}, Time: {3}", locVMatrix, locPMatrix, locMMatrix, locTime);
             }
         }
 
@@ -515,19 +516,20 @@ namespace Two_and_a_Half_Dimensions
                 locBaseTexture = GL.GetUniformLocation(Properties.ShaderProgram, "sampler");
                 locNormalMap = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_normal");
                 locShadowMap = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_shadow");
+                locShadowMapTexture = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_shadow_tex");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);
-                //GL.BindSampler(0, locBaseTexture);
                 GL.Uniform1(locBaseTexture, 0);
 
                 GL.ActiveTexture(TextureUnit.Texture1);
-                //GL.BindSampler(1, locNormalMap);
                 GL.Uniform1(locNormalMap, 1);
 
                 GL.ActiveTexture(TextureUnit.Texture2);
-                //GL.BindSampler(2, locShadowMap);
                 GL.Uniform1(locShadowMap, 2);
+
+                GL.ActiveTexture(TextureUnit.Texture3);
+                GL.Uniform1(locShadowMapTexture, 3);
 
                 GL.ActiveTexture(TextureUnit.Texture0);
 

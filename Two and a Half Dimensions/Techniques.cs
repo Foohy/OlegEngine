@@ -484,10 +484,11 @@ namespace Two_and_a_Half_Dimensions
         public event SetLightsHandler SetLights;
         public bool Enabled { get; private set; }
 
-        public List<Matrix4> _lights = new List<Matrix4>();
+        public List<ShadowInfo> _lights = new List<ShadowInfo>();
 
         int shadowSamplerLocation;
         int shadowMapLocation;
+        int shadowTextureLocation;
 
         public int lightWVPLocation;
 
@@ -496,6 +497,7 @@ namespace Two_and_a_Half_Dimensions
             int prog = Resource.GetProgram("default_lighting");
             shadowSamplerLocation = GL.GetUniformLocation(prog, "sampler_shadow");
             lightWVPLocation = GL.GetUniformLocation(prog, "gLightWVP");
+            shadowTextureLocation = GL.GetUniformLocation(prog, "sampler_shadow_tex");
 
             if (!GL.IsProgram(prog) ||
                 shadowMapLocation == -1 ||
@@ -513,15 +515,16 @@ namespace Two_and_a_Half_Dimensions
         EventArgs ev = new EventArgs();
         public override void Render()
         {
-            Matrix4 mat = GetMatrix();
+            ShadowInfo info = GetShadowInfo();
             if (this.Enabled)
             {
                 GL.UseProgram(this.Program);
-                GL.UniformMatrix4(lightWVPLocation, false, ref mat);
+                GL.UniformMatrix4(lightWVPLocation, false, ref info.matrix);
+                GL.Uniform1(shadowTextureLocation, info.texture);
             }
         }
 
-        public Matrix4 GetMatrix()
+        public ShadowInfo GetShadowInfo()
         {
             if (_lights.Count > 0)
             {
@@ -530,7 +533,7 @@ namespace Two_and_a_Half_Dimensions
             }
 
             this.Enabled = false;
-            return Matrix4.Identity;
+            return ShadowInfo.Default;
         }
 
         /// <summary>
@@ -544,9 +547,9 @@ namespace Two_and_a_Half_Dimensions
             SetLights(this, ev);
         }
 
-        public void AddLightMatrix(Matrix4 mvp)
+        public void AddLightsource(ShadowInfo info)
         {
-            _lights.Add(mvp);
+            _lights.Add(info);
         }
 
         public void AddLightPositionDirection(Vector3 Position, Vector3 Direction)
@@ -554,10 +557,13 @@ namespace Two_and_a_Half_Dimensions
 
         }
 
-        public void SetLightMatrix(Matrix4 mvp)
+        public void SetLightInfo( ShadowInfo info )
         {
             GL.UseProgram(this.Program);
-            GL.UniformMatrix4(lightWVPLocation, false, ref mvp);
+            GL.UniformMatrix4(lightWVPLocation, false, ref info.matrix);
+
+            GL.ActiveTexture(TextureUnit.Texture3);
+            GL.BindTexture(TextureTarget.Texture2D, info.texture);
         }
     }
 
@@ -599,6 +605,33 @@ namespace Two_and_a_Half_Dimensions
 
         public Vector3 Direction;
         public float Cutoff;
+    }
+
+    struct ShadowInfo
+    {
+        public Matrix4 matrix;
+        public int texture;
+        public float brightness;
+        public static ShadowInfo Default;
+
+        public ShadowInfo( Matrix4 mat )
+        {
+            matrix = mat;
+            texture = Resource.GetTexture("engine/white.png");
+            brightness = 1.0f;
+        }
+        public ShadowInfo(Matrix4 mat, int tex)
+        {
+            matrix = mat;
+            texture = tex;
+            brightness = 1.0f;
+        }
+        public ShadowInfo(Matrix4 mat, int tex, float bright)
+        {
+            matrix = Matrix4.Identity;
+            texture = tex;
+            brightness = bright;
+        }
     }
 
     struct LightLocations
