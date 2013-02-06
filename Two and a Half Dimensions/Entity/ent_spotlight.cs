@@ -24,12 +24,11 @@ namespace Two_and_a_Half_Dimensions.Entity
 
         public ShadowInfo shadowInfo;
 
-        private SpotLight light = new SpotLight();
         public override void Init()
         {
-            shadowInfo = new ShadowInfo();
-            //shadowInfo.texture = Resource.GetTexture("effects/flashlight.png");
-            shadowInfo.texture = Resource.GetTexture("effects/flashlight2.png");
+            shadowInfo = new ShadowInfo(Position, Angle, Resource.GetTexture("effects/flashlight2.png"), 1.0f );
+            shadowInfo.Linear = 0.01f;
+
             Utilities.window.shadows.SetLights += new ShadowTechnique.SetLightsHandler(shadows_SetLights);
             AmbientIntensity = 0.0f;
             DiffuseIntensity = 1.0f;
@@ -46,10 +45,11 @@ namespace Two_and_a_Half_Dimensions.Entity
 
         void shadows_SetLights(object sender, EventArgs e)
         {
+            this.Color = new Vector3((float)Math.Sin(Utilities.Time), 1.0f, (float)Math.Cos(Utilities.Time));
             if (this.Enabled && this.ExpensiveShadows)
             {
-                shadowInfo.AmbientIntensity = AmbientIntensity;
-                shadowInfo.DiffuseIntensity = DiffuseIntensity;
+                shadowInfo.AmbientIntensity = 0.0f;
+                shadowInfo.DiffuseIntensity = 1.0f;
                 shadowInfo.Color = Color;
                 shadowInfo.Constant = Constant;
                 shadowInfo.Cutoff = Cutoff;

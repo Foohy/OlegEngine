@@ -18,10 +18,6 @@ namespace Two_and_a_Half_Dimensions.Entity
         public float radius = 1.0f;
         public override void Init()
         {
-            //Create the model
-            Utilities.VertexP3N3T2[] verts = Utilities.CalculateVertices(radius, radius, 90, 90);
-            int[] elements = Utilities.CalculateElements(90, 90);;
-
             this.Model = Resource.GetMesh("monkey.obj");
 
             this.Mat = Resource.GetMaterial("error.png");

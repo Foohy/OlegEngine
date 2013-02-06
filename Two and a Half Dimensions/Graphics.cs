@@ -391,6 +391,9 @@ namespace Two_and_a_Half_Dimensions
             
             //GL.DrawElementsBaseVertex(BeginMode.Triangles, NumIndices, DrawElementsType.UnsignedInt, BaseIndex, 0);
             GL.DrawElements(BeginMode.Triangles, NumIndices, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            //Matrix4 newmatlmao = vmatrix * Matrix4.CreateTranslation(new Vector3(10.0f, 10.0f, 0));
+            //GL.UniformMatrix4(mat.locVMatrix, false, ref newmatlmao);
+            //GL.DrawElements(BeginMode.Triangles, NumIndices, DrawElementsType.UnsignedInt, IntPtr.Zero);
 
             GL.BindVertexArray(0);
         }
@@ -490,7 +493,6 @@ namespace Two_and_a_Half_Dimensions
                 GL.Uniform1(locShadowMapTexture, 3);
 
                 GL.ActiveTexture(TextureUnit.Texture0);
-
             }
         }
 
@@ -503,8 +505,6 @@ namespace Two_and_a_Half_Dimensions
 
             if (Properties.ShaderProgram != -1)
             {
-                //Check again
-                Console.WriteLine("Shader compile log: {0}", GL.GetProgramInfoLog(Properties.ShaderProgram));
                 //GL.LinkProgram(Program);
                 GL.UseProgram(Properties.ShaderProgram);
 

@@ -703,7 +703,7 @@ namespace Two_and_a_Half_Dimensions
             Direction = new Vector3(0, 0, 0);
 
             Constant = 0.0f;
-            Linear = 1.0f;
+            Linear = 0.0f;
             Exp = 0.0f;
             Cutoff = 30.0f;
         }
@@ -719,7 +719,7 @@ namespace Two_and_a_Half_Dimensions
             Direction = new Vector3(0, 0, 0);
 
             Constant = 0.0f;
-            Linear = 1.0f;
+            Linear = 0.0f;
             Exp = 0.0f;
             Cutoff = 30.0f;
         }
@@ -735,7 +735,7 @@ namespace Two_and_a_Half_Dimensions
             Direction = dir;
 
             Constant = 0.0f;
-            Linear = 1.0f;
+            Linear = 0.0f;
             Exp = 0.0f;
             Cutoff = 30.0f;
         }

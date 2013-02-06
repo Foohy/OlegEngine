@@ -271,8 +271,6 @@ void main()
 	{
 		TotalLight += CalcShadowSpotLight(gShadowCasters[i], Normal, ex_LightSpacePos );
 	}
-	//TotalLight = CalcShadowFactor( ex_LightSpacePos );
+
 	gl_FragColor = texture2D( sampler, ex_UV.st) * TotalLight;
-    //gl_FragColor = vec4( ex_Normal.x, ex_Normal.y, ex_Normal.z, 1.0 );
-	//gl_FragColor = vec4( sin(_time) / 2.0 + 0.5, sin(_time) / 2.0 + 0.5, sin(_time) / 2.0 + 0.5, 1.0 );
 }

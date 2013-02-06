@@ -112,14 +112,11 @@ namespace Two_and_a_Half_Dimensions
                     GL.CompileShader(VertexShader);
 
                     GL.GetShader(VertexShader, ShaderParameter.CompileStatus, out compileStatus);
-                    Console.WriteLine(compileStatus);
-                    Console.WriteLine(GL.GetShaderInfoLog(VertexShader));
 
                     //Create our fragment shader
                     int FragmentShader = GL.CreateShader(ShaderType.FragmentShader);
                     GL.ShaderSource(FragmentShader, frag);
                     GL.CompileShader(FragmentShader);
-                    Console.WriteLine(GL.GetShaderInfoLog(FragmentShader));
 
                     //Create our shader program and attach our fragment and vertex shaders
                     int program = GL.CreateProgram();
@@ -130,6 +127,29 @@ namespace Two_and_a_Half_Dimensions
                     GL.BindAttribLocation(program, 0, "_Position");
                     GL.BindAttribLocation(program, 1, "_UV");
                     GL.BindAttribLocation(program, 2, "_Normal");
+                    GL.BindAttribLocation(program, 3, "_Tangent");
+
+                    //Check for errors
+                    int statV = 0;
+                    int statF = 0;
+                    bool over = false;
+                    GL.GetShader( VertexShader, ShaderParameter.CompileStatus, out statV );
+                    GL.GetShader( FragmentShader, ShaderParameter.CompileStatus, out statF );
+
+                    #if DEBUG
+                    over = true;
+                    #endif
+
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    if (statV == 0 || over)
+                    {
+                        Console.WriteLine(GL.GetShaderInfoLog(VertexShader));
+                    }
+                    if (statF == 0 || over)
+                    {
+                        Console.WriteLine(GL.GetShaderInfoLog(FragmentShader));
+                    }
+                    Console.ResetColor();
 
                     //Link them up
                     GL.LinkProgram(program);

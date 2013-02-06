@@ -38,40 +38,6 @@ namespace Two_and_a_Half_Dimensions
             public Vector2 TexCoord;
         }
 
-        #region cube constants
-        private static Vector3[] vecCubeVerts = new Vector3[]
-        {
-            new Vector3( -1.0f, -1.0f, -1.0f), new Vector3(-1.0f,1.0f,-1.0f), new Vector3(1.0f,1.0f,-1.0f), new Vector3(1.0f,-1.0f,-1.0f), //Front face
-            new Vector3( -1.0f, -1.0f, 1.0f), new Vector3(-1.0f,1.0f,1.0f), new Vector3(1.0f,1.0f,1.0f), new Vector3(1.0f,-1.0f,1.0f), //back face
-            new Vector3(-1.0f,-1.0f,1.0f), new Vector3(-1.0f,-1.0f,-1.0f), new Vector3(-1.0f,1.0f,-1.0f), new Vector3(-1.0f,1.0f,1.0f), //Left face
-            new Vector3(1.0f,-1.0f,-1.0f), new Vector3(1.0f,1.0f,-1.0f), new Vector3(1.0f,1.0f,1.0f), new Vector3(1.0f,-1.0f,1.0f), //Right face
-            new Vector3(1.0f,1.0f,-1.0f), new Vector3(-1.0f,1.0f,-1.0f), new Vector3(-1.0f,1.0f,1.0f), new Vector3(1.0f,1.0f,1.0f), //Top face
-            new Vector3(1.0f,-1.0f,-1.0f), new Vector3(-1.0f,-1.0f,-1.0f), new Vector3(-1.0f,-1.0f,1.0f), new Vector3(1.0f,-1.0f,1.0f), //Bottom face
-        };
-        private static Vector3[] CubeNorms = new Vector3[]
-        {
-            new Vector3( 0, 0, -1.0f), new Vector3( 0, 0, -1.0f), new Vector3( 0, 0, -1.0f), new Vector3( 0, 0, -1.0f), //Front face
-            new Vector3( 0, 0, 1.0f), new Vector3( 0, 0, 1.0f), new Vector3( 0, 0, 1.0f), new Vector3( 0, 0, 1.0f), //back face
-            new Vector3(-1.0f,0,0), new Vector3(-1.0f,0,0), new Vector3(-1.0f,0,0), new Vector3(-1.0f,0,0), //Left face
-            new Vector3(1.0f,0,0), new Vector3(1.0f,0,0), new Vector3(1.0f,0,0), new Vector3(1.0f,0,0), //Right face
-            new Vector3(0,1.0f,0), new Vector3(0,1.0f,0), new Vector3(0,1.0f,0), new Vector3(0,1.0f,0), //Top face
-            new Vector3(0,-1.0f,0), new Vector3(0,-1.0f,0), new Vector3(0,-1.0f,0), new Vector3(0,-1.0f,0), //Bottom face
-        };
-        private static Vector2[] TexCoords = new Vector2[]
-        {
-            new Vector2( 0, 0 ),new Vector2( 0.0f,1.0f),new Vector2(1.0f, 1.0f),new Vector2( 1.0f, 0.0f ),
-        };
-        private static int[] CubeElements = new int[]
-        {
-            1,2,3,4,
-            5,6,7,8,
-            9,10,11,12,
-            13,14,15,16,
-            17,18,19,20,
-            21,22,23,24
-        };
-        #endregion
-
         public static void Init(Program win)
         {
             window = win;
@@ -79,104 +45,10 @@ namespace Two_and_a_Half_Dimensions
             //Make sure default error textures
             ErrorTex = LoadTexture("engine/error.png");
             ErrorMat = Resource.GetMaterial("engine/error.png", "default");
-            Console.WriteLine(GL.GetError());
             NormalUp = Resource.GetMaterial("engine/normal_up.jpg");
         }
 
-        #region Debug
-
-        public static void CheckShader( int shader )
-        {
-
-        }
-
-        #endregion
-
-        public static VertexP3N3T2[] CalculateVertices(float radius, float height, byte segments, byte rings)
-        {
-            var data = new VertexP3N3T2[segments * rings];
-
-            int i = 0;
-
-            for (double y = 0; y < rings; y++)
-            {
-                double phi = (y / (rings - 1)) * Math.PI / 2;
-                for (double x = 0; x < segments; x++)
-                {
-                    double theta = (x / (segments - 1)) * 2 * Math.PI;
-
-                    Vector3 v = new Vector3()
-                    {
-                        X = (float)(radius * Math.Sin(phi) * Math.Cos(theta)),
-                        Y = (float)(height * Math.Cos(phi)),
-                        Z = (float)(radius * Math.Sin(phi) * Math.Sin(theta)),
-                    };
-                    Vector3 n = Vector3.Normalize(v);
-                    Vector2 uv = new Vector2()
-                    {
-                        X = (float)(x / (segments - 1)),
-                        Y = (float)(y / (rings - 1))
-                    };
-                    // Using data[i++] causes i to be incremented multiple times in Mono 2.2 (bug #479506).
-                    data[i] = new VertexP3N3T2() { Position = v, Normal = n, TexCoord = uv };
-                    i++;
-                }
-
-            }
-
-            return data;
-        }
-
-        public static int[] CalculateElements( byte segments, byte rings)
-        {
-            var num_vertices = segments * rings;
-            var data = new int[num_vertices * 6];
-
-            ushort i = 0;
-
-            for (byte y = 0; y < rings - 1; y++)
-            {
-                for (byte x = 0; x < segments - 1; x++)
-                {
-                    data[i++] = (ushort)((y + 0) * segments + x);
-                    data[i++] = (ushort)((y + 1) * segments + x);
-                    data[i++] = (ushort)((y + 1) * segments + x + 1);
-
-                    data[i++] = (ushort)((y + 1) * segments + x + 1);
-                    data[i++] = (ushort)((y + 0) * segments + x + 1);
-                    data[i++] = (ushort)((y + 0) * segments + x);
-                }
-            }
-
-            // Verify that we don't access any vertices out of bounds:
-            foreach (int index in data)
-                if (index >= segments * rings)
-                    throw new IndexOutOfRangeException();
-
-            return data;
-        }
-
-        public static VertexP3N3T2[] GenerateCube(float width, float height, float depth, float texSize = 1)
-        {
-            VertexP3N3T2[] data = new VertexP3N3T2[24];
-
-            for (int i = 0; i < data.Length; i++)
-            {
-                Vector3 vert = new Vector3(vecCubeVerts[i].X * width, vecCubeVerts[i].Y * height, vecCubeVerts[i].Z * depth);
-                Vector3 norm = CubeNorms[i];
-                Vector2 uv = TexCoords[i % 4] * texSize;
-
-                data[i] = new VertexP3N3T2() { Normal = norm, Position = vert, TexCoord = uv };
-            }
-
-            return data;
-        }
-        public static int[] CalcCubeElements()
-        {
-            return CubeElements;
-        }
-
-        public static int LoadTexture(string filename )
+        public static int LoadTexture(string filename)
         {
             filename = Resource.TextureDir + filename;
             if (String.IsNullOrEmpty(filename))
@@ -190,7 +62,7 @@ namespace Two_and_a_Half_Dimensions
             if (!System.IO.File.Exists(filename))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Failed to load texture. Couldn't find: " + filename );
+                Console.WriteLine("Failed to load texture. Couldn't find: " + filename);
                 Console.ResetColor();
                 return ErrorTex;
             }
@@ -293,7 +165,7 @@ namespace Two_and_a_Half_Dimensions
                     case "f":
                         string[] element = curline.Split(' ');
 
-                        for (int n = 1; n < 4; n++ )
+                        for (int n = 1; n < 4; n++)
                         {
                             string[] group = element[n].Split('/');
                             //elements.Add(int.Parse(group[0]) - 1);
@@ -311,7 +183,7 @@ namespace Two_and_a_Half_Dimensions
                                 int uvNum = int.Parse(group[1]);
                                 if (uvNum < uv_UNSORTED.Count + 1)
                                 {
-                                    uv.Add(uv_UNSORTED[uvNum-1]);
+                                    uv.Add(uv_UNSORTED[uvNum - 1]);
                                 }
                             }
                             if (group.Length > 2 && group[2].Length > 0)
@@ -319,7 +191,7 @@ namespace Two_and_a_Half_Dimensions
                                 int normNum = int.Parse(group[2]);
                                 if (normNum < normals_UNSORTED.Count)
                                 {
-                                    normals.Add(normals_UNSORTED[normNum-1]);
+                                    normals.Add(normals_UNSORTED[normNum - 1]);
                                 }
                             }
                         }
@@ -331,7 +203,9 @@ namespace Two_and_a_Half_Dimensions
                     default:
                         if (!string.IsNullOrEmpty(curline))
                         {
+                            #if DEBUG
                             Console.WriteLine("Unknown line definition ({0}): {1}", i, curline);
+                            #endif
                         }
                         break;
                 }
@@ -410,8 +284,6 @@ namespace Two_and_a_Half_Dimensions
             }
 
             lsTangents = tangents.ToArray();
-
-            Console.WriteLine("Done loading model! " + lsVerts.Length );
         }
 
         public static Vector3[] CalculateTangents(Vector3[] vertices, Vector2[] UV)
@@ -478,10 +350,10 @@ namespace Two_and_a_Half_Dimensions
             {
                 src = System.IO.File.ReadAllText(shader);
             }
-            catch ( Exception e )
+            catch (Exception e)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Failed to load texture \"{0}\". {1}", shader, e.Message );
+                Console.WriteLine("Failed to load texture \"{0}\". {1}", shader, e.Message);
                 Console.ResetColor();
             }
 
@@ -500,184 +372,5 @@ namespace Two_and_a_Half_Dimensions
             if (num < low) return low;
             return num;
         }
-    }
-
-    class ObjLoader
-    {
-        private static string cfm(string str)
-        {
-            return str.Replace('.', ',');
-        }
-
-        public static VBO LoadStream(Stream stream)
-        {
-            StreamReader reader = new StreamReader(stream);
-            List<Vector3> points = new List<Vector3>();
-            List<Vector3> normals = new List<Vector3>();
-            List<Vector2> texCoords = new List<Vector2>();
-            List<Tri> tris = new List<Tri>();
-            string line;
-            char[] splitChars = { ' ' };
-            while ((line = reader.ReadLine()) != null)
-            {
-                line = line.Trim(splitChars);
-                line = line.Replace("  ", " ");
-
-                string[] parameters = line.Split(splitChars);
-
-                switch (parameters[0])
-                {
-                    case "p": // Point
-                        break;
-
-                    case "v": // Vertex
-                        float x = float.Parse(cfm(parameters[1]));
-                        float y = float.Parse(cfm(parameters[2]));
-                        float z = float.Parse(cfm(parameters[3]));
-                        points.Add(new Vector3(x, y, z));
-                        break;
-
-                    case "vt": // TexCoord
-                        float u = float.Parse(cfm(parameters[1]));
-                        float v = float.Parse(cfm(parameters[2]));
-                        texCoords.Add(new Vector2(u, v));
-                        break;
-
-                    case "vn": // Normal
-                        float nx = float.Parse(cfm(parameters[1]));
-                        float ny = float.Parse(cfm(parameters[2]));
-                        float nz = float.Parse(cfm(parameters[3]));
-                        normals.Add(new Vector3(nx, ny, nz));
-                        break;
-
-                    case "f": // Face
-                        tris.AddRange(parseFace(parameters));
-                        break;
-                }
-            }
-
-            Vector3[] p = points.ToArray();
-            Vector2[] tc = texCoords.ToArray();
-            Vector3[] n = normals.ToArray();
-            Tri[] f = tris.ToArray();
-
-            List<Vector3> verts = new List<Vector3>();
-            List<Vector3> norms = new List<Vector3>();
-            List<Vector3> uv = new List<Vector3>();
-            List<Utilities.VertexP3N3T2> compiledVerts = new List<Utilities.VertexP3N3T2>();
-
-            int[] elements = new int[ tris.Count * 3];
-            for (int i = 0; i < tris.Count; i++)
-            {
-                Tri tri = tris[i];
-                compiledVerts.AddRange(AddTriangle(tri, p, tc, n));
-
-                elements[i*3] = i*3;
-                elements[i*3+1] = i*3+1;
-                elements[i*3+2] = i*3+2;
-            }
-            Console.WriteLine("leedle");
-
-            return new VBO(compiledVerts.ToArray(), elements);
-
-            //return new MeshData(p, n, tc, f);
-        }
-
-        private static List<Utilities.VertexP3N3T2> AddTriangle(Tri tri, Vector3[] p, Vector2[] tc, Vector3[] n)
-        {
-            List<Utilities.VertexP3N3T2> compiledVerts = new List<Utilities.VertexP3N3T2>();
-            Utilities.VertexP3N3T2 vert = new Utilities.VertexP3N3T2();
-            vert.Normal = n[tri.First.norm];
-            vert.TexCoord = tc[tri.First.tex];
-            vert.Position = p[tri.First.vert];
-            compiledVerts.Add(vert);
-
-            vert.Normal = n[tri.Second.norm];
-            vert.TexCoord = tc[tri.Second.tex];
-            vert.Position = p[tri.Second.vert];
-            compiledVerts.Add(vert);
-
-            vert.Normal = n[tri.Third.norm];
-            vert.TexCoord = tc[tri.Third.tex];
-            vert.Position = p[tri.Third.vert];
-            compiledVerts.Add(vert);
-
-            return compiledVerts;
-        }
-
-        public static VBO LoadFile(string file)
-        {
-            // Silly me, using() closes the file automatically.
-            using (FileStream s = File.Open(file, FileMode.Open))
-            {
-                return LoadStream(s);
-            }
-        }
-
-        private static Tri[] parseFace(string[] indices)
-        {
-            GPoint[] p = new GPoint[indices.Length - 1];
-            for (int i = 0; i < p.Length; i++)
-            {
-                p[i] = parsePoint(indices[i + 1]);
-            }
-            return Triangulate(p);
-            //return new Face(p);
-        }
-
-        // Takes an array of points and returns an array of triangles.
-        // The points form an arbitrary polygon.
-        private static Tri[] Triangulate(GPoint[] ps)
-        {
-            List<Tri> ts = new List<Tri>();
-            if (ps.Length < 3)
-            {
-                throw new Exception("Invalid shape!  Must have >2 points");
-            }
-
-            GPoint lastButOne = ps[1];
-            GPoint lastButTwo = ps[0];
-            for (int i = 2; i < ps.Length; i++)
-            {
-                Tri t = new Tri();
-                t.First = lastButTwo;
-                t.Second = lastButOne;
-                t.Third = ps[i];
-
-                lastButOne = ps[i];
-                lastButTwo = ps[i - 1];
-                ts.Add(t);
-            }
-            return ts.ToArray();
-        }
-
-        private static GPoint parsePoint(string s)
-        {
-            char[] splitChars = { '/' };
-            string[] parameters = s.Split(splitChars);
-            int vert = int.Parse(parameters[0]) - 1;
-            int tex = int.Parse(parameters[1]) - 1;
-            int norm = int.Parse(parameters[2]) - 1;
-
-            GPoint p = new GPoint();
-            p.vert = vert;
-            p.norm = norm;
-            p.tex = tex;
-
-            return p;
-        }
-    }
-    struct GPoint
-    {
-        public int vert;
-        public int norm;
-        public int tex;
-    }
-
-    struct Tri
-    {
-        public GPoint First;
-        public GPoint Second;
-        public GPoint Third;
     }
 }
