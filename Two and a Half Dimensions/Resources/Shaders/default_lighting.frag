@@ -4,6 +4,7 @@
 precision highp float;
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
+const int MAX_SHADOW_CASTERS = 2;
 
 in vec4 ex_LightSpacePos;
 in vec2 ex_UV;
@@ -48,6 +49,14 @@ struct SpotLight
 	float Cutoff;
 };
 
+struct ShadowCaster
+{
+	PointLight Base;
+	vec3 Direction;
+	float Cutoff;
+	float Brightness;
+};
+
 vec2 poissonDisk[16] = vec2[]( 
    vec2( -0.94201624, -0.39906216 ), 
    vec2( 0.94558609, -0.76890725 ), 
@@ -69,6 +78,7 @@ vec2 poissonDisk[16] = vec2[](
 
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
+uniform ShadowCaster gShadowCasters[MAX_SHADOW_CASTERS];
 uniform DirectionalLight gDirectionalLight;
 
 uniform mat4 _pmatrix;
@@ -76,6 +86,7 @@ uniform mat4 _vmatrix;
 uniform float _time;
 uniform int gNumPointLights;
 uniform int gNumSpotLights;
+uniform int gNumShadowCasters;
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
 uniform vec3 gEyeWorldPos;
@@ -99,6 +110,7 @@ float CalcShadowFactor(vec4 LightSpacePos)
     UVCoords.x = 0.5 * ProjCoords.x + 0.5;
     UVCoords.y = 0.5 * ProjCoords.y + 0.5;
     float z = 0.5 * ProjCoords.z + 0.5;
+	/*
 	float visibility = 1.0;
 	for (int i=0;i<4;i++)
 	{
@@ -111,15 +123,15 @@ float CalcShadowFactor(vec4 LightSpacePos)
 			//visibility -= float(0.2*(1.0-texture( sampler_shadow, vec3(ex_LightSpacePos.xy + poissonDisk[index]/700.0,  (z-0.005)/ex_LightSpacePos.w) )));
 		}
 	}
-	UVCoords = clamp(UVCoords, 0, 1);
-	return visibility * texture2D(sampler_shadow_tex, UVCoords ).x;
-	/*
+	*/
+	//return visibility;
+
     float Depth = texture2D(sampler_shadow, UVCoords);
     if (Depth < (z + 0.00001)) //(Depth < (z + 0.00001))
-        return 0.5;
+        return 0.0;
     else
         return 1.0;
-		*/
+
 
 } 
 
@@ -157,9 +169,8 @@ vec4 CalcPointLight(PointLight l, vec3 Normal, vec4 LightSpacePos)
     vec3 LightDirection = WorldPos0 - l.Position;
     float Distance = length(LightDirection);
     LightDirection = normalize(LightDirection);
-	float ShadowFactor = CalcShadowFactor( LightSpacePos );
 
-    vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal, ShadowFactor);
+    vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal, 1.0);
 
     float Attenuation =  l.Atten.Constant +
                          l.Atten.Linear * Distance +
@@ -177,16 +188,48 @@ vec4 CalcSpotLight(SpotLight l, vec3 Normal, vec4 LightSpacePos)
 	{
         vec4 Color = CalcPointLight(l.Base, Normal, LightSpacePos);
 
-		
-		vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
-		vec2 UVCoords;
-		UVCoords.x = 0.5 * ProjCoords.x + 0.5;
-		UVCoords.y = 0.5 * ProjCoords.y + 0.5;
-		UVCoords = clamp(UVCoords, 0, 1);
-		Color *= texture2D(sampler_shadow_tex, UVCoords );
-
-
         return Color * (1.0 - (1.0 - SpotFactor) * 1.0/(1.0 - l.Cutoff));
+    }
+    else 
+	{
+        return vec4(0,0,0,0);
+    }
+}  
+
+vec4 CalcShadowPointLight(PointLight l, vec3 Normal, vec4 LightSpacePos)
+{
+    vec3 LightDirection = WorldPos0 - l.Position;
+    float Distance = length(LightDirection);
+    LightDirection = normalize(LightDirection);
+	float ShadowFactor = CalcShadowFactor( ex_LightSpacePos );
+
+    vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal, ShadowFactor);
+
+    float Attenuation =  l.Atten.Constant +
+                         l.Atten.Linear * Distance +
+                         l.Atten.Exp * Distance * Distance;
+
+    return Color / Attenuation;
+}
+
+vec4 CalcShadowSpotLight(ShadowCaster l, vec3 Normal, vec4 LightSpacePos)
+{
+    vec3 LightToPixel = normalize(WorldPos0 - l.Base.Position);
+    float SpotFactor = dot(LightToPixel, l.Direction);
+
+	vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+	vec2 UVCoords;
+	UVCoords.x = 0.5 * ProjCoords.x + 0.5;
+	UVCoords.y = 0.5 * ProjCoords.y + 0.5;
+
+    if (UVCoords.x < 1 && UVCoords.y < 1 && UVCoords.x > 0 && UVCoords.y > 0) 
+	{
+        vec4 Color = CalcShadowPointLight(l.Base, Normal, LightSpacePos);
+
+		Color *= texture2D(sampler_shadow_tex, -UVCoords );
+
+
+        return Color;
     }
     else 
 	{
@@ -222,7 +265,12 @@ void main()
 	for (int i = 0 ; i < gNumSpotLights ; i++) 
 	{
         TotalLight += CalcSpotLight(gSpotLights[i], Normal, ex_LightSpacePos);
-    }        
+    }
+
+	for (int i = 0; i < gNumShadowCasters; i++ )
+	{
+		TotalLight += CalcShadowSpotLight(gShadowCasters[i], Normal, ex_LightSpacePos );
+	}
 	//TotalLight = CalcShadowFactor( ex_LightSpacePos );
 	gl_FragColor = texture2D( sampler, ex_UV.st) * TotalLight;
     //gl_FragColor = vec4( ex_Normal.x, ex_Normal.y, ex_Normal.z, 1.0 );

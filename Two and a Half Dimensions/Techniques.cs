@@ -57,6 +57,7 @@ namespace Two_and_a_Half_Dimensions
         SpotLightLocations[] spotlightLocations = new SpotLightLocations[MAX_SPOTLIGHTS];
         PointLightLocations[] pointlightLocations = new PointLightLocations[MAX_POINTLIGHTS];
 
+
         DirectionalLight EnvironmentLight = new DirectionalLight();
         List<SpotLight> Spotlights = new List<SpotLight>();
         List<PointLight> Pointlights = new List<PointLight>();
@@ -338,7 +339,6 @@ namespace Two_and_a_Half_Dimensions
             GL.Uniform1(matSpecularPowerLocation, Power);
         }
 
-
         private double ToRadian(double deg)
         {
             return (Math.PI / 180) * deg;
@@ -480,6 +480,8 @@ namespace Two_and_a_Half_Dimensions
     }
     class ShadowTechnique : Technique
     {
+        const int MAX_SHADOWCASTERS = 2;
+
         public delegate void SetLightsHandler(object sender, EventArgs e);
         public event SetLightsHandler SetLights;
         public bool Enabled { get; private set; }
@@ -489,6 +491,9 @@ namespace Two_and_a_Half_Dimensions
         int shadowSamplerLocation;
         int shadowMapLocation;
         int shadowTextureLocation;
+        int numShadowCastersLocation;
+
+        ShadowCasterLocations[] shadowcasterLocations = new ShadowCasterLocations[MAX_SHADOWCASTERS];
 
         public int lightWVPLocation;
 
@@ -498,6 +503,26 @@ namespace Two_and_a_Half_Dimensions
             shadowSamplerLocation = GL.GetUniformLocation(prog, "sampler_shadow");
             lightWVPLocation = GL.GetUniformLocation(prog, "gLightWVP");
             shadowTextureLocation = GL.GetUniformLocation(prog, "sampler_shadow_tex");
+            numShadowCastersLocation = GL.GetUniformLocation(prog, "gNumShadowCasters");
+
+
+            for (int i = 0; i < shadowcasterLocations.Length; i++)
+            {
+                string beginning = string.Format("gShadowCasters[{0}]", i);
+
+                shadowcasterLocations[i].Color = GL.GetUniformLocation(prog, beginning + ".Base.Base.Color");
+                shadowcasterLocations[i].AmbientIntensity = GL.GetUniformLocation(prog, beginning + ".Base.Base.AmbientIntensity");
+                shadowcasterLocations[i].Position = GL.GetUniformLocation(prog, beginning + ".Base.Position");
+                shadowcasterLocations[i].Direction = GL.GetUniformLocation(prog, beginning + ".Direction");
+                shadowcasterLocations[i].Cutoff = GL.GetUniformLocation(prog, beginning + ".Cutoff");
+                shadowcasterLocations[i].DiffuseIntensity = GL.GetUniformLocation(prog, beginning + ".Base.Base.DiffuseIntensity");
+
+                shadowcasterLocations[i].Constant = GL.GetUniformLocation(prog, beginning + ".Base.Atten.Constant");
+                shadowcasterLocations[i].Linear = GL.GetUniformLocation(prog, beginning + ".Base.Atten.Linear");
+                shadowcasterLocations[i].Exp = GL.GetUniformLocation(prog, beginning + ".Base.Atten.Exp");
+
+                shadowcasterLocations[i].Brightness = GL.GetUniformLocation(prog, beginning + ".Brightness");
+            }
 
             if (!GL.IsProgram(prog) ||
                 shadowMapLocation == -1 ||
@@ -519,7 +544,8 @@ namespace Two_and_a_Half_Dimensions
             if (this.Enabled)
             {
                 GL.UseProgram(this.Program);
-                GL.UniformMatrix4(lightWVPLocation, false, ref info.matrix);
+                Matrix4 mat = info.matrix;
+                GL.UniformMatrix4(lightWVPLocation, false, ref mat);
                 GL.Uniform1(shadowTextureLocation, info.texture);
             }
         }
@@ -545,6 +571,9 @@ namespace Two_and_a_Half_Dimensions
 
             if (SetLights == null) return; //don't bother setting the lights if no one is out there
             SetLights(this, ev);
+
+            //set the information to the shader
+            SetShadowedSpotlights(_lights.ToArray());
         }
 
         public void AddLightsource(ShadowInfo info)
@@ -560,10 +589,38 @@ namespace Two_and_a_Half_Dimensions
         public void SetLightInfo( ShadowInfo info )
         {
             GL.UseProgram(this.Program);
-            GL.UniformMatrix4(lightWVPLocation, false, ref info.matrix);
+            Matrix4 mat = info.matrix;
+            GL.UniformMatrix4(lightWVPLocation, false, ref mat);
 
             GL.ActiveTexture(TextureUnit.Texture3);
             GL.BindTexture(TextureTarget.Texture2D, info.texture);
+        }
+
+        private void SetShadowedSpotlights(ShadowInfo[] pLights)
+        {
+            GL.UseProgram(this.Program);
+            GL.Uniform1(numShadowCastersLocation, pLights.Length);
+
+            for (int i = 0; i < pLights.Length; i++)
+            {
+                GL.Uniform3(shadowcasterLocations[i].Color, pLights[i].Color.X, pLights[i].Color.Y, pLights[i].Color.Z);
+                GL.Uniform1(shadowcasterLocations[i].AmbientIntensity, pLights[i].AmbientIntensity);
+                GL.Uniform1(shadowcasterLocations[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
+                GL.Uniform3(shadowcasterLocations[i].Position, pLights[i].Position.X, pLights[i].Position.Y, pLights[i].Position.Z);
+                Vector3 Direction = pLights[i].Direction;
+                Direction.Normalize();
+                GL.Uniform3(shadowcasterLocations[i].Direction, Direction.X, Direction.Y, Direction.Z);
+                GL.Uniform1(shadowcasterLocations[i].Cutoff, Math.Cos(ToRadian(pLights[i].Cutoff)));
+                GL.Uniform1(shadowcasterLocations[i].Constant, pLights[i].Constant);
+                GL.Uniform1(shadowcasterLocations[i].Linear, pLights[i].Linear);
+                GL.Uniform1(shadowcasterLocations[i].Exp, pLights[i].Exp);
+                GL.Uniform1(shadowcasterLocations[i].Brightness, pLights[i].brightness);
+            }
+        }
+
+        private double ToRadian(double deg)
+        {
+            return (Math.PI / 180) * deg;
         }
     }
 
@@ -609,28 +666,78 @@ namespace Two_and_a_Half_Dimensions
 
     struct ShadowInfo
     {
-        public Matrix4 matrix;
+        public Vector3 Color;
+        public float AmbientIntensity;
+        public float DiffuseIntensity;
+
+        public Vector3 Position;
+
+        public float Constant;
+        public float Linear;
+        public float Exp;
+
+        public Vector3 Direction;
+        public float Cutoff;
+
+
+        public Matrix4 matrix
+        {
+            get
+            {
+                return Matrix4.LookAt(Position, Position + Direction, Vector3.UnitY);
+            }
+        }
         public int texture;
         public float brightness;
         public static ShadowInfo Default;
 
-        public ShadowInfo( Matrix4 mat )
+        public ShadowInfo(Vector3 pos, Vector3 dir )
         {
-            matrix = mat;
             texture = Resource.GetTexture("engine/white.png");
             brightness = 1.0f;
+
+            Color = new Vector3(1.0f, 1.0f, 1.0f);
+            AmbientIntensity = 0.0f;
+            DiffuseIntensity = 1.0f;
+            Position = new Vector3(0, 0, 0);
+            Direction = new Vector3(0, 0, 0);
+
+            Constant = 0.0f;
+            Linear = 1.0f;
+            Exp = 0.0f;
+            Cutoff = 30.0f;
         }
-        public ShadowInfo(Matrix4 mat, int tex)
+        public ShadowInfo(Vector3 pos, Vector3 dir, int tex)
         {
-            matrix = mat;
             texture = tex;
             brightness = 1.0f;
+
+            Color = new Vector3(1.0f, 1.0f, 1.0f);
+            AmbientIntensity = 0.0f;
+            DiffuseIntensity = 1.0f;
+            Position = new Vector3(0, 0, 0);
+            Direction = new Vector3(0, 0, 0);
+
+            Constant = 0.0f;
+            Linear = 1.0f;
+            Exp = 0.0f;
+            Cutoff = 30.0f;
         }
-        public ShadowInfo(Matrix4 mat, int tex, float bright)
+        public ShadowInfo(Vector3 pos, Vector3 dir, int tex, float bright)
         {
-            matrix = Matrix4.Identity;
             texture = tex;
             brightness = bright;
+
+            Color = new Vector3(1.0f, 1.0f, 1.0f);
+            AmbientIntensity = 0.0f;
+            DiffuseIntensity = 1.0f;
+            Position = pos;
+            Direction = dir;
+
+            Constant = 0.0f;
+            Linear = 1.0f;
+            Exp = 0.0f;
+            Cutoff = 30.0f;
         }
     }
 
@@ -665,6 +772,24 @@ namespace Two_and_a_Half_Dimensions
         public int Constant;
         public int Linear;
         public int Exp;
+    }
+
+    struct ShadowCasterLocations
+    {
+        public int Color;
+        public int AmbientIntensity;
+        public int DiffuseIntensity;
+        public int Position;
+
+        public int Direction;
+        public int Cutoff;
+
+        public int Constant;
+        public int Linear;
+        public int Exp;
+
+        public int Brightness;
+        public int DepthTexture;
     }
 
     #endregion
