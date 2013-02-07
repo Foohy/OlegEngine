@@ -13,7 +13,7 @@ namespace Two_and_a_Half_Dimensions.Entity
         private bool shouldDraw = true;
         public override void Init()
         {
-            this.Mat = Resource.GetMaterial(Utilities.window.shadowFBO.shadowMap, "depthtest");
+            this.Mat = Resource.GetMaterial("engine/depth");
             this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
             this.Model = Resource.GetMesh("debug/quad.obj");
 

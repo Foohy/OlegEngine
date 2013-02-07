@@ -136,14 +136,14 @@ namespace Two_and_a_Half_Dimensions.Levels
             //Create the mesh
             Vector3[] tangents = Utilities.CalculateTangents(verts.ToArray(), uv.ToArray());
             geometry = new Mesh(verts.ToArray(), Indices.ToArray(), tangents, normals.ToArray(), uv.ToArray());
-            geometry.mat = Resource.GetMaterial("grass.png", "default_lighting");
-            geometry.mat.Properties.NormalMapTexture = Resource.GetTexture("normalmap.png");
+            geometry.mat = Resource.GetMaterial("levels/grass");
+            //geometry.mat.Properties.NormalMapTexture = Resource.GetTexture("normalmap.png");
             //geometry.mat.SetShader(Utilities.window.effect.Program);
 
             tangents = Utilities.CalculateTangents(front_verts.ToArray(), front_UV.ToArray());
             geometry_front = new Mesh(front_verts.ToArray(), front_indices.ToArray(), tangents, front_normals.ToArray(), front_UV.ToArray());
-            geometry_front.mat = Resource.GetMaterial("dirt.png", "default_lighting");
-            geometry_front.mat.Properties.NormalMapTexture = Resource.GetTexture("normalmap2.png");
+            geometry_front.mat = Resource.GetMaterial("levels/dirt");
+            //geometry_front.mat.Properties.NormalMapTexture = Resource.GetTexture("normalmap2.png");
             //geometry_front.mat.SetShader(Utilities.window.effect.Program);
 
             CreateBackgroundCubes(3000);
@@ -319,7 +319,7 @@ namespace Two_and_a_Half_Dimensions.Levels
             background = new VBO(verts.ToArray(), indices.ToArray(), null, null, uv.ToArray());
 
             //Load up a texture
-            bg_texture = Resource.GetMaterial("building.png", "default_lighting");
+            bg_texture = Resource.GetMaterial("levels/building");
         }
 
         public override void Draw(FrameEventArgs e)

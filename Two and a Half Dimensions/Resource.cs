@@ -13,6 +13,7 @@ namespace Two_and_a_Half_Dimensions
         public const string ModelDir = "Resources/Models/";
         public const string TextureDir = "Resources/Materials/";
         public const string ShaderDir = "Resources/Shaders/";
+        public const string MaterialExtension = ".fmf";
 
         static Dictionary<string, int> Textures = new Dictionary<string, int>();
         static Dictionary<string, Material> Materials = new Dictionary<string, Material>();
@@ -24,11 +25,12 @@ namespace Two_and_a_Half_Dimensions
         {
             if (!Materials.ContainsKey(filename))
             {
-                Materials[filename] = new Material(filename);
+                Materials[filename] = Utilities.LoadMaterial(filename);
             }
 
             return Materials[filename];
         }
+        /*
         public static Material GetMaterial(string filename, string shader)
         {
             if (!Materials.ContainsKey(filename))
@@ -47,6 +49,7 @@ namespace Two_and_a_Half_Dimensions
 
             return Materials[textureid.ToString()];
         }
+         * */
         public static int GetTexture(string filename)
         {
             if (!Textures.ContainsKey(filename))

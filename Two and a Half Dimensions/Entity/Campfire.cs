@@ -19,7 +19,7 @@ namespace Two_and_a_Half_Dimensions.Entity
         {
             //Create the model
             this.Model = Resource.GetMesh("props/oleg.obj");
-            this.Mat = Resource.GetMaterial("models/props/oleg.png", "default_lighting");
+            this.Mat = Resource.GetMaterial("models/props/oleg");
             this.Name = "Fire";
 
             light = (ent_pointlight)EntManager.Create<ent_pointlight>();

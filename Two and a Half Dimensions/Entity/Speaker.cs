@@ -16,7 +16,7 @@ namespace Two_and_a_Half_Dimensions.Entity
   
         public override void Init()
         {
-            this.Mat = Resource.GetMaterial("speaker.png", "default_lighting");
+            this.Mat = Resource.GetMaterial("models/props/speaker");
             this.Mat.Properties.SpecularPower = 32.0f;
             this.Mat.Properties.SpecularIntensity = 1.0f;
             this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;

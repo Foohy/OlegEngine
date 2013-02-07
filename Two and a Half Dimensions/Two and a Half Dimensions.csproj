@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bass.Net, Version=2.4.9.0, Culture=neutral, PublicKeyToken=b7566c273e6ef480, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -41,6 +44,9 @@
     </Reference>
     <Reference Include="FarseerPhysics">
       <HintPath>.\FarseerPhysics.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>.\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -108,65 +114,37 @@
     <Content Include="Resources\Audio\Physics\rock_hit_hard.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Materials\ball.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\boobs.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\building.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\depth.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\cow.jpg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\dirt.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\effects\flashlight.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\effects\flashlight2.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\engine\normal_up.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\engine\error.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\grass.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\models\props\oleg.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\models\props\popcorn_machine.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\normalmap.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\normalmap2.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\speaker.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\models\vehicles\van.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\starm.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\engine\white.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Resources\Materials\ball.png" />
+    <Content Include="Resources\Materials\boobs.jpg" />
+    <Content Include="Resources\Materials\cow.jpg" />
+    <Content Include="Resources\Materials\depth.png" />
+    <Content Include="Resources\Materials\engine\error.png" />
+    <Content Include="Resources\Materials\engine\normal_up.jpg" />
+    <Content Include="Resources\Materials\engine\white.png" />
+    <Content Include="Resources\Materials\levels\building.png" />
+    <Content Include="Resources\Materials\levels\dirt.png" />
+    <Content Include="Resources\Materials\levels\grass.png" />
+    <Content Include="Resources\Materials\models\props\oleg.png" />
+    <Content Include="Resources\Materials\models\props\popcorn_machine.png" />
+    <Content Include="Resources\Materials\models\props\speaker.png" />
+    <Content Include="Resources\Materials\models\vehicles\van.png" />
+    <Content Include="Resources\Materials\normalmap.png" />
+    <Content Include="Resources\Materials\normalmap2.png" />
+    <Content Include="Resources\Materials\speaker.png" />
+    <Content Include="Resources\Materials\starm.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Materials\engine\depth.fmf" />
+    <None Include="Resources\Materials\engine\error.fmf" />
+    <None Include="Resources\Materials\engine\normal_up.fmf" />
+    <None Include="Resources\Materials\engine\white.fmf" />
+    <None Include="Resources\Materials\engine\white_shiny.fmf" />
+    <None Include="Resources\Materials\levels\building.fmf" />
+    <None Include="Resources\Materials\levels\dirt.fmf" />
+    <None Include="Resources\Materials\levels\grass.fmf" />
+    <None Include="Resources\Materials\levels\level1.fmf" />
+    <None Include="Resources\Materials\models\props\oleg.fmf" />
+    <None Include="Resources\Materials\models\props\speaker.fmf" />
     <None Include="Resources\Models\ball.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -258,8 +236,17 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Resources\Materials\effects\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /E /Y</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

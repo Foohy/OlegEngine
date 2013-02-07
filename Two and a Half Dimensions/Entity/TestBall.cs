@@ -20,7 +20,7 @@ namespace Two_and_a_Half_Dimensions.Entity
         {
             this.Model = Resource.GetMesh("ball.obj");
 
-            this.Mat = Resource.GetMaterial("dirt.png", "default_lighting");
+            this.Mat = Resource.GetMaterial("levels/dirt");
             this.Mat.Properties.SpecularPower = 32.0f;
             this.Mat.Properties.SpecularIntensity = 5.0f;
             //this.Mat.SetShader("default");

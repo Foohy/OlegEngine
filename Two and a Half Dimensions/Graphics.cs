@@ -418,6 +418,16 @@ namespace Two_and_a_Half_Dimensions
         public int locShadowMap = -1;
         public int locShadowMapTexture = -1;
 
+        /// <summary>
+        /// Initialize a new material object - all by yourself!
+        /// </summary>
+        public Material( MaterialProperties properties, string name = "DYNAMIC" )
+        {
+            Properties = properties;
+            setShader(Properties.ShaderProgram);
+            Name = name;
+        }
+
         public Material(string filename)
         {
             Properties.BaseTexture = Resource.GetTexture(filename);
@@ -450,6 +460,12 @@ namespace Two_and_a_Half_Dimensions
             Properties.BaseTexture = Resource.GetTexture(filename);
             Name = filename;
             setShader(Program);
+        }
+
+        public void SetProperties(MaterialProperties properties)
+        {
+            Properties = properties;
+            setShader(Properties.ShaderProgram);
         }
 
         public void SetShader(string shaderfile)
@@ -558,7 +574,7 @@ namespace Two_and_a_Half_Dimensions
             }
             else
             {
-                GL.BindTexture(TextureTarget.Texture2D, Utilities.NormalUp.Properties.BaseTexture);
+                 GL.BindTexture(TextureTarget.Texture2D, Utilities.NormalUp.Properties.BaseTexture);
             }
 
             //The shadow map is bound to texture unit three in Techniques.cs. It only needs to be bound once.

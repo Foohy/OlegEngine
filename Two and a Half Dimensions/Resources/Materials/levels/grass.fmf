@@ -1,0 +1,4 @@
+{
+	"Shader" 		: "default_lighting",
+	"Basetexture" 	: "levels/grass.png",
+}

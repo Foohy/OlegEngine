@@ -21,7 +21,7 @@ namespace Two_and_a_Half_Dimensions.Levels
         public override void Preload()
         {
             levelmodel = Resource.GetMesh("Levels/level1.obj");
-            levelmodel.mat = Resource.GetMaterial("engine/white.png", "default_lighting");
+            levelmodel.mat = Resource.GetMaterial("levels/level1");
 
             //Create the physics mesh on the ground
             //TODO: create a level format or something

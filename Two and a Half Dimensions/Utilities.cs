@@ -9,6 +9,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
+using Newtonsoft.Json;
+
 namespace Two_and_a_Half_Dimensions
 {
     class Utilities
@@ -44,8 +46,80 @@ namespace Two_and_a_Half_Dimensions
 
             //Make sure default error textures
             ErrorTex = LoadTexture("engine/error.png");
-            ErrorMat = Resource.GetMaterial("engine/error.png", "default");
-            NormalUp = Resource.GetMaterial("engine/normal_up.jpg");
+            ErrorMat = LoadMaterial("engine/error");
+            NormalUp = LoadMaterial("engine/normal_up");
+        }
+
+        public static Material LoadMaterial(string filename)
+        {
+            filename = Resource.TextureDir + filename + Resource.MaterialExtension;
+            if (String.IsNullOrEmpty(filename))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Failed to load material. Filename is empty!");
+                Console.ResetColor();
+
+                return null;
+            }
+
+            if (!System.IO.File.Exists(filename))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Failed to load material. Couldn't find: " + filename);
+                Console.ResetColor();
+
+                return null;
+            }
+            string jsonString = File.ReadAllText(filename);
+            JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
+            MaterialProperties properties = new MaterialProperties();
+            string Name = "DYNAMIC";
+            string lastVal = "";
+            while (reader.Read())
+            {
+                if (reader.Value != null)
+                {
+                    switch (lastVal)
+                    {
+                        case "Shader":
+                            properties.ShaderProgram = Resource.GetProgram( reader.Value.ToString() );
+                            break;
+
+                        case "Basetexture":
+                            properties.BaseTexture = Resource.GetTexture(reader.Value.ToString());
+                            Name = reader.Value.ToString();
+                            break;
+
+                        case "Normalmap":
+                            properties.NormalMapTexture = Resource.GetTexture(reader.Value.ToString());
+                            break;
+
+                        case "SpecPower":
+                            float pwr = 0.0f;
+                            float.TryParse(reader.Value.ToString(), out pwr );
+                            properties.SpecularPower = pwr;
+                            break;
+
+                        case "SpecIntensity":
+                            float intensity = 0.0f;
+                            float.TryParse(reader.Value.ToString(), out intensity);
+                            properties.SpecularIntensity = intensity;
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    lastVal = reader.Value.ToString();
+                }
+                else
+                {
+                    //Console.WriteLine(reader.TokenType);
+                }
+
+            }
+
+            return new Material(properties, Name);
         }
 
         public static int LoadTexture(string filename)
@@ -204,7 +278,7 @@ namespace Two_and_a_Half_Dimensions
                         if (!string.IsNullOrEmpty(curline))
                         {
                             #if DEBUG
-                            Console.WriteLine("Unknown line definition ({0}): {1}", i, curline);
+                            //Console.WriteLine("Unknown line definition ({0}): {1}", i, curline);
                             #endif
                         }
                         break;

@@ -1,0 +1,6 @@
+{
+	"Shader" 		: "default_lighting",
+	"Basetexture" 	: "levels/dirt.png",
+	"SpecPower"		: "16.0",
+	"SpecIntensity" : "5.0",
+}
