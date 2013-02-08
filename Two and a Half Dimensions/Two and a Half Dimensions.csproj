@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio.cs" />
+    <Compile Include="Editor.cs" />
     <Compile Include="Entity\BaseEntity.cs" />
     <Compile Include="Entity\Car.cs" />
     <Compile Include="Entity\ent_pointlight.cs" />

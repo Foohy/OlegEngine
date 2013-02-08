@@ -96,9 +96,9 @@ namespace Two_and_a_Half_Dimensions
             GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, Width / (float)Height, 1.0f, 256.0f);
             Utilities.ViewMatrix = projection;
-            Console.WriteLine(projection);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref projection);
+            //Console.WriteLine(projection);
+            //GL.MatrixMode(MatrixMode.Projection);
+            //GL.LoadMatrix(ref projection);
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace Two_and_a_Half_Dimensions
             //Set them accordingly
             //TODO: make it support multiple points (and optimize the hell out of it)
             ShadowInfo info = shadows.GetShadowInfo();
-            
+
             if (shadows.Enabled)
             {
                 shadows.SetLightInfo(info);
@@ -164,6 +164,7 @@ namespace Two_and_a_Half_Dimensions
             
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             shadowFBO.BindForReading();
+            Player.ply.Draw(e);
             effect.Render();
             RenderScene(e);
             //Draw the skybox

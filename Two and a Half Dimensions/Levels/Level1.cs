@@ -16,7 +16,6 @@ namespace Two_and_a_Half_Dimensions.Levels
         Mesh levelmodel;
         bool SetShadow = true;
         Vector3 Angle = new Vector3();
-        Vector3 Pos = new Vector3();
         ent_spotlight spotlight;
         public override void Preload()
         {

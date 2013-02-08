@@ -12,6 +12,13 @@ using OpenTK.Input;
 
 namespace Two_and_a_Half_Dimensions
 {
+    enum PlayerMode
+    {
+        NOCLIP,
+        EDIT,
+        CUSTOM
+    }
+
     class Player
     {
         public static Player ply { get; private set; }
@@ -24,9 +31,8 @@ namespace Two_and_a_Half_Dimensions
         public float Zoom { get; set; }
         public bool OverrideCamMatrix { get; set; }
         private Program window = null;
-        private bool OnGround = true;
-        private float upVelocity = 0.0f;
-        private float scrollCurrent = 0f;
+
+        public PlayerMode Mode { get; private set; }
 
         public Player(Program Win, Vector3 pos, float height = 4.0f)
         {
@@ -41,11 +47,36 @@ namespace Two_and_a_Half_Dimensions
             window = Win;
 
             Zoom = 5.0f;
+            this.Mode = PlayerMode.NOCLIP;
+
+            this.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+        }
+
+        void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
+        {
+            if (e.Key == Key.F11)
+            {
+                if (this.Mode == PlayerMode.NOCLIP)
+                {
+                    this.SetMode(PlayerMode.EDIT);
+                }
+                else if (this.Mode == PlayerMode.EDIT)
+                {
+                    this.SetMode(PlayerMode.NOCLIP);
+                }
+            }
         }
 
         public void SetPos(Vector3 vec)
         {
             this.Pos = vec;
+        }
+        public void SetMode( PlayerMode mode )
+        {
+            if (Mode == PlayerMode.EDIT) Editor.Stop();
+            if (mode == PlayerMode.EDIT) Editor.Init();
+
+            this.Mode = mode;
         }
 
         public void Think(FrameEventArgs e)
@@ -53,34 +84,22 @@ namespace Two_and_a_Half_Dimensions
             if (window == null) return;
             //Update position
 
-
-            NoClipThink(e);
-
-            if (!OverrideCamMatrix)
+            switch (this.Mode)
             {
-                CamAngle = new Vector2d((float)CamAngle.X, Utilities.Clamp((float)CamAngle.Y, 1.0f, -1.0f) );
-                Vector3 point = new Vector3((float)Math.Cos(CamAngle.X), (float)Math.Sin(Utilities.Clamp((float)CamAngle.Y, 1.0f, -1.0f)), (float)Math.Sin(CamAngle.X));
-                Vector3 Eye = Pos;// +new Vector3(0, scrollCurrent / 7, 0);
-                Vector3 Target = Pos + point;// ; +new Vector3(0, scrollCurrent / 7, 0);
+                case PlayerMode.NOCLIP:
+                    NoClipThink(e);
+                    break;
 
-                //Matrix4 cam = Matrix4.CreateTranslation(Vector3.Zero);
-                //cam *= Matrix4.CreateRotationX((float)CamAngle.X);
-                //cam *= Matrix4.CreateRotationX((float)CamAngle.X);
-                //cam *= Matrix4.CreateTranslation(-Eye);
-
-                this.ViewNormal = Target - Eye;
-                this.ViewNormal.Normalize();
-
-                //this.ViewNormal = point;
-                //this.ViewNormal.Normalize();
-                //this.camMatrix = cam;
-                this.camMatrix = Matrix4.LookAt(Eye, Target, Vector3.UnitY);
+                case PlayerMode.EDIT:
+                    EditorThink(e);
+                    break;
             }
 
         }
 
         private void NoClipThink(FrameEventArgs e)
         {
+            //Update the internal variables for the camera location
             Input.LockMouse = true;
             float multiplier = 8;
             if (window.Keyboard[Key.LShift])
@@ -106,13 +125,31 @@ namespace Two_and_a_Half_Dimensions
                     SetPos(new Vector3(Pos.X, Pos.Y + (float)e.Time * multiplier, Pos.Z));
                 }
             }
+
             CamAngle += new Vector2d(Input.deltaX / 350f, Input.deltaY / -350f);
+
+
+
+            //Set the camera matrix itself
+            CamAngle = new Vector2d((float)CamAngle.X, Utilities.Clamp((float)CamAngle.Y, 1.0f, -1.0f)); //Clamp it because I can't math correctly
+
+            //find the point where we'll be facing
+            Vector3 point = new Vector3((float)Math.Cos(CamAngle.X), (float)Math.Sin(Utilities.Clamp((float)CamAngle.Y, 1.0f, -1.0f)), (float)Math.Sin(CamAngle.X));
+
+            this.ViewNormal = point;
+            this.ViewNormal.Normalize();
+            this.camMatrix = Matrix4.LookAt(Pos, (Pos + point), Vector3.UnitY);
         }
-        
+
+        private void EditorThink(FrameEventArgs e)
+        {
+            Editor.Think(e);
+        }
 
 
         public void Draw(FrameEventArgs e)
         {
+            if (this.Mode == PlayerMode.EDIT) { Editor.Draw(e); }
         }
     }
 }

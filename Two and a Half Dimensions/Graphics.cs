@@ -21,22 +21,6 @@ namespace Two_and_a_Half_Dimensions
         public int ElementBufferID;
         public int NumElements;
 
-        public VBO(Utilities.VertexP3N3T2[] vertinfo, int[] indices)
-        {
-            Vector3[] verts = new Vector3[vertinfo.Length];
-            Vector3[] normals = new Vector3[vertinfo.Length];
-            Vector2[] coords = new Vector2[vertinfo.Length];
-
-            for (int i = 0; i < vertinfo.Length; i++)
-            {
-                verts[i] = vertinfo[i].Position;
-                normals[i] = vertinfo[i].Normal;
-                coords[i] = vertinfo[i].TexCoord;
-            }
-
-            InitializeVBO(verts, indices, null, normals, coords);
-
-        }
         /// <summary>
         /// Generate a VertexBuffer for each of Color, Normal, TextureCoordinate, Vertex, and Indices
         /// </summary>
@@ -284,24 +268,6 @@ namespace Two_and_a_Half_Dimensions
         public Mesh(Vector3[] verts, int[] elements, Vector3[] tangents)
         {
             loadMesh(verts, elements, tangents);
-        }
-        
-        public Mesh(Utilities.VertexP3N3T2[] vertinfo, int[] indices)
-        {
-            Vector3[] verts = new Vector3[vertinfo.Length];
-            Vector3[] normals = new Vector3[vertinfo.Length];
-            Vector2[] coords = new Vector2[vertinfo.Length];
-            Vector3[] tangents = new Vector3[0];
-
-            for (int i = 0; i < vertinfo.Length; i++)
-            {
-                verts[i] = vertinfo[i].Position;
-                normals[i] = vertinfo[i].Normal;
-                coords[i] = vertinfo[i].TexCoord;
-            }
-
-            loadMesh(verts, indices, tangents, normals, coords);
-
         }
 
         public void LoadMesh(string filename)

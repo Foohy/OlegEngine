@@ -33,13 +33,6 @@ namespace Two_and_a_Half_Dimensions
         }
         #endregion
 
-        public struct VertexP3N3T2
-        {
-            public Vector3 Position;
-            public Vector3 Normal;
-            public Vector2 TexCoord;
-        }
-
         public static void Init(Program win)
         {
             window = win;
