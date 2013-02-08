@@ -2,6 +2,6 @@
 	"Shader" 		: "default_lighting",
 	"Basetexture" 	: "engine/normal_up.png",
 	"Normalmap"     : "normalmap.png",
-	"SpecPower"		: "16.0",
-	"SpecIntensity" : "4.0",
+	"SpecPower"		: "2.0",
+	"SpecIntensity" : "1.0",
 }

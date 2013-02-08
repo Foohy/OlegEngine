@@ -33,13 +33,24 @@ namespace Two_and_a_Half_Dimensions.Levels
             BaseEntity ent = EntManager.Create<DepthScreen>();
             ent.Spawn();
 
+            Vector3 OlegPos = new Vector3(-2.00f, 2.421f, 14.90f);
             //some fires too
-            Entity.BaseEntity fire = Entity.EntManager.Create<Entity.Campfire>();
-            fire.Spawn();
-            fire.SetPos(new Vector3(-2.00f, 2.421f, 15.90f));
-            fire.Scale = new Vector3(0.75f);
-            fire.SetAngle(new Vector3(0, (float)Math.PI, 0.25f));
-            //fire.SetAngle((float)(Math.PI / 16));
+            ent_static oleg = (ent_static)Entity.EntManager.Create<ent_static>();
+            oleg.Spawn();
+            oleg.Model = Resource.GetMesh("props/oleg.obj");
+            oleg.Mat = Resource.GetMaterial("models/props/oleg");
+            oleg.Name = "Oleg";
+            oleg.SetPos(OlegPos);
+            oleg.Scale = new Vector3(0.75f);
+            oleg.SetAngle(new Vector3(0, (float)Math.PI, 0.25f));
+
+            ent_pointlight pointlight = (ent_pointlight)EntManager.Create<ent_pointlight>();
+            pointlight.Spawn();
+            pointlight.AmbientIntensity = 0.4f;
+            pointlight.DiffuseIntensity = 0.85f;
+            pointlight.Color = new Vector3(1.0f, 0.5f, 0.0f);
+            pointlight.SetPos(OlegPos);
+            pointlight.Linear = 0.1f;
 
             spotlight = (ent_spotlight)EntManager.Create<ent_spotlight>();
             spotlight.Spawn();

@@ -26,7 +26,7 @@ namespace Two_and_a_Half_Dimensions.Entity
 
         public override void Init()
         {
-            shadowInfo = new ShadowInfo(Position, Angle, Resource.GetTexture("effects/flashlight2.png"), 1.0f );
+            shadowInfo = new ShadowInfo(Position, Angle, Resource.GetTexture("effects/flashlight.png"), 1.0f );
             shadowInfo.Linear = 0.01f;
 
             Utilities.window.shadows.SetLights += new ShadowTechnique.SetLightsHandler(shadows_SetLights);
@@ -45,7 +45,6 @@ namespace Two_and_a_Half_Dimensions.Entity
 
         void shadows_SetLights(object sender, EventArgs e)
         {
-            this.Color = new Vector3((float)Math.Sin(Utilities.Time), 1.0f, (float)Math.Cos(Utilities.Time));
             if (this.Enabled && this.ExpensiveShadows)
             {
                 shadowInfo.AmbientIntensity = 0.0f;

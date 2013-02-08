@@ -12,6 +12,8 @@ using FarseerPhysics.Collision;
 using FarseerPhysics.Controllers;
 using FarseerPhysics.Dynamics;
 
+using Two_and_a_Half_Dimensions.Entity;
+
 namespace Two_and_a_Half_Dimensions.Levels
 {
     class TestLevel : LevelBase
@@ -190,14 +192,6 @@ namespace Two_and_a_Half_Dimensions.Levels
             //gimme some depths
             Entity.BaseEntity ent = Entity.EntManager.Create<Entity.DepthScreen>();
             ent.Spawn();
-
-            //some fires too
-            Entity.BaseEntity fire = Entity.EntManager.Create<Entity.Campfire>();
-            fire.Spawn();
-            fire.SetPos(new Vector3(327.007f, -6.916133f, 1.0f));
-            fire.Scale = new Vector3( 0.75f );
-            fire.SetAngle((float)(Math.PI / 16));
-            fire.Name = "Fire";
 
         }
 
