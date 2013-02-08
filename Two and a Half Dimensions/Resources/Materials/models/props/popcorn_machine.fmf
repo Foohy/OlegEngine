@@ -1,0 +1,6 @@
+{
+	"Shader" 		: "default_lighting",
+	"Basetexture" 	: "models/props/popcorn_machine.png",
+	"SpecPower"		: "1.0",
+	"SpecIntensity" : "3.0"
+}

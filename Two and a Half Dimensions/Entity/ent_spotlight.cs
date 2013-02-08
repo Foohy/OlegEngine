@@ -23,18 +23,38 @@ namespace Two_and_a_Half_Dimensions.Entity
         public float DiffuseIntensity { get; set; }
 
         public ShadowInfo shadowInfo;
+        private SpotLight cheapLight;
 
         public override void Init()
         {
             shadowInfo = new ShadowInfo(Position, Angle, Resource.GetTexture("effects/flashlight.png"), 1.0f );
             shadowInfo.Linear = 0.01f;
+            cheapLight = new SpotLight();
+            cheapLight.Linear = 0.01f;
 
             Utilities.window.shadows.SetLights += new ShadowTechnique.SetLightsHandler(shadows_SetLights);
+            Utilities.window.effect.SetLights += new LightingTechnique.SetLightsHandler(effect_SetLights);
             AmbientIntensity = 0.0f;
             DiffuseIntensity = 1.0f;
 
             this.Enabled = true;
             this.ExpensiveShadows = true;
+        }
+
+        void effect_SetLights(object sender, EventArgs e)
+        {
+            if (this.Enabled && !this.ExpensiveShadows)
+            {
+                cheapLight.AmbientIntensity = 0.0f;
+                cheapLight.DiffuseIntensity = 1.0f;
+                cheapLight.Color = Color;
+                cheapLight.Constant = Constant;
+                cheapLight.Cutoff = Cutoff;
+                cheapLight.Direction = this.Angle;
+                cheapLight.Position = Position;
+
+                Utilities.window.effect.AddSpotLight(cheapLight);
+            }
         }
 
         public override void Remove()
@@ -54,9 +74,6 @@ namespace Two_and_a_Half_Dimensions.Entity
                 shadowInfo.Cutoff = Cutoff;
                 shadowInfo.Direction = this.Angle;
                 shadowInfo.Position = Position;
-
-                shadowInfo.Position = Position;
-                shadowInfo.Direction = this.Angle;
 
                 Utilities.window.shadows.AddLightsource(shadowInfo);
             }
