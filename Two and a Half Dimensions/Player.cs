@@ -87,9 +87,9 @@ namespace Two_and_a_Half_Dimensions
                 multiplier = 20;
 
             if (window.Keyboard[Key.W])
-                SetPos(new Vector3(Pos.X + (float)Math.Cos(CamAngle.X) * (float)e.Time * multiplier, Pos.Y, Pos.Z + (float)Math.Sin(CamAngle.X) * (float)e.Time * multiplier));
+                SetPos(new Vector3(Pos.X + (float)Math.Cos(CamAngle.X) * (float)e.Time * multiplier, Pos.Y + (float)Math.Sin(CamAngle.Y) * (float)e.Time * multiplier, Pos.Z + (float)Math.Sin(CamAngle.X) * (float)e.Time * multiplier));
             if (window.Keyboard[Key.S])
-                SetPos(new Vector3(Pos.X - (float)Math.Cos(CamAngle.X) * (float)e.Time * multiplier, Pos.Y, Pos.Z - (float)Math.Sin(CamAngle.X) * (float)e.Time * multiplier));
+                SetPos(new Vector3(Pos.X - (float)Math.Cos(CamAngle.X) * (float)e.Time * multiplier, Pos.Y + (float)Math.Sin(CamAngle.Y) * (float)e.Time * multiplier, Pos.Z - (float)Math.Sin(CamAngle.X) * (float)e.Time * multiplier));
             if (window.Keyboard[Key.D])
                 SetPos(new Vector3(Pos.X + (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)e.Time * multiplier, Pos.Y, Pos.Z + (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)e.Time * multiplier));
             if (window.Keyboard[Key.A])
