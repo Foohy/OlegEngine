@@ -32,6 +32,7 @@ namespace Two_and_a_Half_Dimensions
             base.OnLoad(e);
 
             //Print useful information about the card
+            Console.WriteLine("==================================");
             Console.Write("Vendor: {0}", GL.GetString(StringName.Vendor));
             Console.WriteLine(", Renderer: {0}", GL.GetString(StringName.Renderer));
             Console.WriteLine(GL.GetString(StringName.ShadingLanguageVersion));
@@ -39,6 +40,7 @@ namespace Two_and_a_Half_Dimensions
             int major = int.Parse(versionOpenGL[0].ToString());
             int minor = int.Parse(versionOpenGL[2].ToString());
             Console.WriteLine("OpenGL version: {0}.{1}", major, minor);
+            Console.WriteLine("==================================");
 
             Utilities.Init(this);
             Audio.Init();

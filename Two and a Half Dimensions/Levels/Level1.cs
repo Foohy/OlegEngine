@@ -32,7 +32,7 @@ namespace Two_and_a_Half_Dimensions.Levels
             BaseEntity ent = EntManager.Create<DepthScreen>();
             ent.Spawn();
 
-            Vector3 OlegPos = new Vector3(-2.00f, 2.421f, 14.90f);
+            Vector3 OlegPos = new Vector3(-2.00f, 2.421f, -14.90f);
             //some fires too
             ent_static oleg = (ent_static)Entity.EntManager.Create<ent_static>();
             oleg.Spawn();
@@ -41,14 +41,14 @@ namespace Two_and_a_Half_Dimensions.Levels
             oleg.Name = "Oleg";
             oleg.SetPos(OlegPos);
             oleg.Scale = new Vector3(0.75f);
-            oleg.SetAngle(new Vector3(0, (float)Math.PI, 0.25f));
+            oleg.SetAngle(new Vector3(0, 0, 0.25f));
 
             oleg = (ent_static)Entity.EntManager.Create<ent_static>();
             oleg.Spawn();
             oleg.Model = Resource.GetMesh("props/popcorn_machine.obj");
             oleg.Mat = Resource.GetMaterial("models/props/popcorn_machine");
             oleg.Name = "Popcorn Machine";
-            oleg.SetPos(new Vector3( -60.814f, 0.0f, 2.1119f ));
+            oleg.SetPos(new Vector3( 60.614f, 0.0f, -2.1119f ));
             oleg.Scale = new Vector3(0.45f);
 
             ent_pointlight pointlight = (ent_pointlight)EntManager.Create<ent_pointlight>();

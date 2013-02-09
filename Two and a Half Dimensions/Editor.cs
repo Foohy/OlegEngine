@@ -15,22 +15,37 @@ namespace Two_and_a_Half_Dimensions
         public static bool Active = false;
 
         public static float Zoom = 1.0f;
-        private static float goalZoom = -20f;
+        private static float goalZoom = 20f;
 
         private static Vector3 Pos = new Vector3();
         private static float multiplier = 8;
 
-        private static float halfPI = 1.570796326794896f;
+        private static float halfPI = -1.570796326794896f;
         private static ent_static Cursor;
+        private static float Multiplier = 0.000924f;
         public static void Init()
         {
-            Pos = new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, -20.0f);
+            Pos = new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, Player.ply.Pos.Z);
 
             Cursor = (ent_static)EntManager.Create<ent_static>();
             Cursor.Spawn();
-            Cursor.SetPos(new Vector3(0, 0, -4.0f));
+            Cursor.SetPos(new Vector3(0, 0, 0));
             Cursor.Model = Resource.GetMesh("cursor.obj");
             Cursor.Mat = Resource.GetMaterial("models/cursor");
+
+            Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.window.Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
+        }
+
+        static void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            MouseState state = Mouse.GetState();
+            
+        }
+
+        static void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         public static void Think(FrameEventArgs e)
@@ -64,7 +79,7 @@ namespace Two_and_a_Half_Dimensions
             }
             if (Utilities.window.Keyboard[Key.A])
             {
-                Pos += new Vector3((float)e.Time, 0.0f, 0.0f) * multiplier;
+                Pos += new Vector3(-(float)e.Time, 0.0f, 0.0f) * multiplier;
             }
             if (Utilities.window.Keyboard[Key.S])
             {
@@ -72,22 +87,24 @@ namespace Two_and_a_Half_Dimensions
             }
             if (Utilities.window.Keyboard[Key.D])
             {
-                Pos += new Vector3(-(float)e.Time, 0.0f, 0.0f) * multiplier;
+                Pos += new Vector3((float)e.Time, 0.0f, 0.0f) * multiplier;
             }
 
             if (Cursor != null)
             {
-                Vector2 mousePos = new Vector2(Utilities.window.Mouse.X - (Utilities.window.Width / 2), Utilities.window.Mouse.Y - (Utilities.window.Height / 2));
+                MouseState state = Mouse.GetState();
+                if (state.IsButtonDown(MouseButton.Right ) )
+                {
+                    //Multiplier += (float)Input.deltaY / 100000.0f;
+                    //Console.WriteLine(Multiplier);
+                }
+
+                Vector2 mousePos = new Vector2((Utilities.window.Mouse.X - (Utilities.window.Width / 2)), -(Utilities.window.Mouse.Y - (Utilities.window.Height / 2)));
 
                 Vector2 Position = new Vector2(Pos.X, Pos.Y);
-                Position += mousePos * Zoom * 0.000864f; //lmao fuck
+                Position += mousePos * Zoom * Multiplier; //lmao fuck
                 Cursor.SetPos(Position);
             }
-        }
-
-        private void GetFixedMouseCoords()
-        {
-
         }
 
         public static void Draw(FrameEventArgs e)
@@ -118,6 +135,9 @@ namespace Two_and_a_Half_Dimensions
             {
                 Cursor.Remove();
             }
+
+            Utilities.window.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.window.Mouse.ButtonUp -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
         }
     }
 }
