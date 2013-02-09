@@ -33,28 +33,11 @@ namespace Two_and_a_Half_Dimensions.Entity
             cheapLight.Linear = 0.01f;
 
             Utilities.window.shadows.SetLights += new ShadowTechnique.SetLightsHandler(shadows_SetLights);
-            Utilities.window.effect.SetLights += new LightingTechnique.SetLightsHandler(effect_SetLights);
             AmbientIntensity = 0.0f;
             DiffuseIntensity = 1.0f;
 
             this.Enabled = true;
             this.ExpensiveShadows = true;
-        }
-
-        void effect_SetLights(object sender, EventArgs e)
-        {
-            if (this.Enabled && !this.ExpensiveShadows)
-            {
-                cheapLight.AmbientIntensity = 0.0f;
-                cheapLight.DiffuseIntensity = 1.0f;
-                cheapLight.Color = Color;
-                cheapLight.Constant = Constant;
-                cheapLight.Cutoff = Cutoff;
-                cheapLight.Direction = this.Angle;
-                cheapLight.Position = Position;
-
-                Utilities.window.effect.AddSpotLight(cheapLight);
-            }
         }
 
         public override void Remove()
@@ -65,7 +48,7 @@ namespace Two_and_a_Half_Dimensions.Entity
 
         void shadows_SetLights(object sender, EventArgs e)
         {
-            if (this.Enabled && this.ExpensiveShadows)
+            if (this.Enabled )
             {
                 shadowInfo.AmbientIntensity = 0.0f;
                 shadowInfo.DiffuseIntensity = 1.0f;
@@ -74,6 +57,7 @@ namespace Two_and_a_Half_Dimensions.Entity
                 shadowInfo.Cutoff = Cutoff;
                 shadowInfo.Direction = this.Angle;
                 shadowInfo.Position = Position;
+                shadowInfo.Cheap = !this.ExpensiveShadows;
 
                 Utilities.window.shadows.AddLightsource(shadowInfo);
             }

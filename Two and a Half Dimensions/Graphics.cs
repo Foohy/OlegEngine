@@ -249,10 +249,8 @@ namespace Two_and_a_Half_Dimensions
         int[] buffers = new int[5];
         public Material mat;
 
-        int BaseVertex;
         int[] BaseIndex;
         int NumIndices;
-        int MaterialIndex;
 
         public Mesh()
         {

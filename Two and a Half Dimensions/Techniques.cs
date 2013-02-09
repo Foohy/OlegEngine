@@ -115,6 +115,8 @@ namespace Two_and_a_Half_Dimensions
                 spotlightLocations[i].Constant = GL.GetUniformLocation(prog, beginning + ".Base.Atten.Constant");
                 spotlightLocations[i].Linear = GL.GetUniformLocation(prog, beginning + ".Base.Atten.Linear");
                 spotlightLocations[i].Exp = GL.GetUniformLocation(prog, beginning + ".Base.Atten.Exp");
+                spotlightLocations[i].UseTexture = GL.GetUniformLocation(prog, beginning + ".UseTexture");
+                spotlightLocations[i].Texture = GL.GetUniformLocation(prog, beginning + ".SpotlightTexture");
             }
 
             this.Program = prog;
@@ -128,6 +130,7 @@ namespace Two_and_a_Half_Dimensions
         private EventArgs ev =  new EventArgs();
         public override void Render()
         {
+            GL.UseProgram(this.Program);
             this.SetEyeWorldPos(Player.ply.Pos);
 
             //Clear the lights for this frame
@@ -282,7 +285,7 @@ namespace Two_and_a_Half_Dimensions
         {
         }
 
-        public void SetDirectionalLight(DirectionalLight Light)
+        private void SetDirectionalLight(DirectionalLight Light)
         {
             GL.Uniform3(lightLocations.Color, Light.Color.X, Light.Color.Y, Light.Color.Z);
             GL.Uniform1(lightLocations.AmbientIntensity, Light.AmbientIntensity);
@@ -326,6 +329,9 @@ namespace Two_and_a_Half_Dimensions
                 GL.Uniform1(spotlightLocations[i].Constant, pLights[i].Constant);
                 GL.Uniform1(spotlightLocations[i].Linear, pLights[i].Linear);
                 GL.Uniform1(spotlightLocations[i].Exp, pLights[i].Exp);
+
+                GL.Uniform1(spotlightLocations[i].UseTexture, pLights[i].UseTexture);
+                //GL.Uniform1(spotlightLocations[i].Texture
             }
         }
 
@@ -522,6 +528,7 @@ namespace Two_and_a_Half_Dimensions
                 shadowcasterLocations[i].Exp = GL.GetUniformLocation(prog, beginning + ".Base.Atten.Exp");
 
                 shadowcasterLocations[i].Brightness = GL.GetUniformLocation(prog, beginning + ".Brightness");
+                shadowcasterLocations[i].Cheap = GL.GetUniformLocation(prog, beginning + ".Cheap");
             }
 
             if (!GL.IsProgram(prog) ||
@@ -615,6 +622,7 @@ namespace Two_and_a_Half_Dimensions
                 GL.Uniform1(shadowcasterLocations[i].Linear, pLights[i].Linear);
                 GL.Uniform1(shadowcasterLocations[i].Exp, pLights[i].Exp);
                 GL.Uniform1(shadowcasterLocations[i].Brightness, pLights[i].brightness);
+                GL.Uniform1(shadowcasterLocations[i].Cheap, pLights[i].Cheap ? 1 : 0 );
             }
         }
 
@@ -662,6 +670,8 @@ namespace Two_and_a_Half_Dimensions
 
         public Vector3 Direction;
         public float Cutoff;
+        public int UseTexture;
+        public int Texture;
     }
 
     struct ShadowInfo
@@ -678,6 +688,7 @@ namespace Two_and_a_Half_Dimensions
 
         public Vector3 Direction;
         public float Cutoff;
+        public bool Cheap;
 
 
         public Matrix4 matrix
@@ -706,6 +717,9 @@ namespace Two_and_a_Half_Dimensions
             Linear = 0.0f;
             Exp = 0.0f;
             Cutoff = 30.0f;
+
+            Cheap = false;
+            
         }
         public ShadowInfo(Vector3 pos, Vector3 dir, int tex)
         {
@@ -722,6 +736,8 @@ namespace Two_and_a_Half_Dimensions
             Linear = 0.0f;
             Exp = 0.0f;
             Cutoff = 30.0f;
+
+            Cheap = false;
         }
         public ShadowInfo(Vector3 pos, Vector3 dir, int tex, float bright)
         {
@@ -738,6 +754,8 @@ namespace Two_and_a_Half_Dimensions
             Linear = 0.0f;
             Exp = 0.0f;
             Cutoff = 30.0f;
+
+            Cheap = false;
         }
     }
 
@@ -772,6 +790,9 @@ namespace Two_and_a_Half_Dimensions
         public int Constant;
         public int Linear;
         public int Exp;
+
+        public int UseTexture;
+        public int Texture;
     }
 
     struct ShadowCasterLocations
@@ -790,6 +811,9 @@ namespace Two_and_a_Half_Dimensions
 
         public int Brightness;
         public int DepthTexture;
+
+        public int Cheap;
+        public int Texture;
     }
 
     #endregion

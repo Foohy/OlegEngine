@@ -55,6 +55,7 @@ struct ShadowCaster
 	vec3 Direction;
 	float Cutoff;
 	float Brightness;
+	int Cheap;
 };
 
 vec2 poissonDisk[16] = vec2[]( 
@@ -224,7 +225,15 @@ vec4 CalcShadowSpotLight(ShadowCaster l, vec3 Normal, vec4 LightSpacePos)
 
     if (UVCoords.x < 1 && UVCoords.y < 1 && UVCoords.x > 0 && UVCoords.y > 0) 
 	{
-        vec4 Color = CalcShadowPointLight(l.Base, Normal, LightSpacePos);
+		vec4 Color = vec4( 1, 0, 0, 0 );
+		if (l.Cheap > 0)
+		{
+			Color = CalcPointLight(l.Base, Normal, LightSpacePos);
+		}
+		else
+		{
+			Color = CalcShadowPointLight(l.Base, Normal, LightSpacePos);
+		}
 
 		Color *= texture2D(sampler_shadow_tex, -UVCoords );
 

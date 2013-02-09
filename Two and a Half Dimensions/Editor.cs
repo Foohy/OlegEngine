@@ -21,7 +21,7 @@ namespace Two_and_a_Half_Dimensions
         private static float halfPI = 1.570796326794896f;
         public static void Init()
         {
-            Pos = new Vector3(0.0f, 0.0f, -20.0f);
+            Pos = new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, -20.0f);
         }
 
         public static void Think(FrameEventArgs e)
