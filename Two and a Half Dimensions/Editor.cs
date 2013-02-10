@@ -18,16 +18,20 @@ namespace Two_and_a_Half_Dimensions
         private static float goalZoom = 20f;
 
         private static Vector3 Pos = new Vector3();
+        private static Vector2 MousePos = new Vector2();
         private static float multiplier = 8;
 
         private static float halfPI = -1.570796326794896f;
         private static ent_static Cursor;
         private static float Multiplier = 0.000924f;
+
+        private static List<Vector2> Points = new List<Vector2>();
+        private static ent_editor_build TempEnt;
         public static void Init()
         {
             Pos = new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, Player.ply.Pos.Z);
 
-            Cursor = (ent_static)EntManager.Create<ent_static>();
+            Cursor = EntManager.Create<ent_static>();
             Cursor.Spawn();
             Cursor.SetPos(new Vector3(0, 0, 0));
             Cursor.Model = Resource.GetMesh("cursor.obj");
@@ -45,7 +49,14 @@ namespace Two_and_a_Half_Dimensions
 
         static void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //throw new NotImplementedException();
+            if (TempEnt == null)
+            {
+                TempEnt = EntManager.Create<ent_editor_build>();
+                TempEnt.Spawn();
+            }
+            TempEnt.AddPoint(MousePos);
+            //TempEnt.Points.Add(MousePos);
+            Points.Add(MousePos);
         }
 
         public static void Think(FrameEventArgs e)
@@ -101,9 +112,9 @@ namespace Two_and_a_Half_Dimensions
 
                 Vector2 mousePos = new Vector2((Utilities.window.Mouse.X - (Utilities.window.Width / 2)), -(Utilities.window.Mouse.Y - (Utilities.window.Height / 2)));
 
-                Vector2 Position = new Vector2(Pos.X, Pos.Y);
-                Position += mousePos * Zoom * Multiplier; //lmao fuck
-                Cursor.SetPos(Position);
+                MousePos = new Vector2(Pos.X, Pos.Y);
+                MousePos += mousePos * Zoom * Multiplier; //lmao fuck
+                Cursor.SetPos(MousePos);
             }
         }
 

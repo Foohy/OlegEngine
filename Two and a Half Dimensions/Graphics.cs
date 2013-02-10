@@ -10,6 +10,26 @@ namespace Two_and_a_Half_Dimensions
 {
     class Graphics
     {
+        public static void DrawLine(Vector3 Modelview, Vector3 Point1, Vector3 Point2)
+        {
+            GL.UseProgram(0);
+            Matrix4 modelview = Utilities.ViewMatrix;
+            Matrix4 curpos = Matrix4.Identity;
+            //Teehee deprecated functions
+            GL.LineWidth(1.0f);
+            GL.Color3(0.0f, 0.0f, 1.0f);
+            GL.PushMatrix();
+                GL.MultMatrix(ref modelview);
+                GL.MultMatrix(ref curpos);
+                GL.Color3(0.0f, 1.0f, 1.0f);
+                GL.Begin(BeginMode.Lines);
+                GL.LineWidth(9.0f);
+                
+                GL.Vertex3(Point1);
+                GL.Vertex3(Point2);
+                GL.End();
+            GL.PopMatrix();
+        }
     }
 
     class VBO
@@ -239,14 +259,17 @@ namespace Two_and_a_Half_Dimensions
 
     class Mesh
     {
-        const int INDEX_BUFFER  = 0;
-        const int POS_VB        = 1;
-        const int NORMAL_VB     = 2;
-        const int TEXCOORD_VB   = 3;
-        const int TANGENT_VB    = 4;
+        public BeginMode DrawMode = BeginMode.Triangles;
+        public BufferUsageHint UsageHint = BufferUsageHint.StaticDraw;
+
+        public const int INDEX_BUFFER  = 0;
+        public const int POS_VB        = 1;
+        public const int NORMAL_VB     = 2;
+        public const int TEXCOORD_VB   = 3;
+        public const int TANGENT_VB    = 4;
 
         int VAO = 0;
-        int[] buffers = new int[5];
+        public int[] buffers = new int[5];
         public Material mat;
 
         int[] BaseIndex;
@@ -281,9 +304,60 @@ namespace Two_and_a_Half_Dimensions
             loadMesh(verts, elements, tangents, normals, lsUV);
         }
 
+        public void UpdateMesh(string filename)
+        {
+            Vector3[] verts;
+            Vector3[] tangents;
+            Vector3[] normals;
+            Vector2[] lsUV;
+            int[] elements;
+
+            Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV);
+
+            UpdateMesh(verts, elements, tangents, normals, lsUV);
+        }
+
+        public void UpdateMesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] lsUV = null)
+        {
+            NumIndices = elements.Length;
+            BaseIndex = elements;
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[POS_VB]);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * Vector3.SizeInBytes), verts, this.UsageHint);
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+            if (lsUV != null)
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[TEXCOORD_VB]);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(lsUV.Length * Vector2.SizeInBytes), lsUV, this.UsageHint);
+                GL.EnableVertexAttribArray(1);
+                GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
+            }
+
+            if (normals != null)
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[NORMAL_VB]);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(normals.Length * Vector3.SizeInBytes), normals, this.UsageHint);
+                GL.EnableVertexAttribArray(2);
+                GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+            }
+
+            //tangent buffer
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[TANGENT_VB]);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tangents.Length * Vector3.SizeInBytes), tangents, this.UsageHint);
+            GL.EnableVertexAttribArray(3);
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffers[INDEX_BUFFER]);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(elements.Length * sizeof(int)), elements, this.UsageHint);
+
+
+            GL.BindVertexArray(0);
+        }
+
         private void loadMesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] lsUV = null )
         {
-
             GL.GenVertexArrays(1, out VAO);
             GL.BindVertexArray(VAO);
 
@@ -295,14 +369,14 @@ namespace Two_and_a_Half_Dimensions
 
             //Create their buffers
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[POS_VB]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * Vector3.SizeInBytes), verts, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * Vector3.SizeInBytes), verts, this.UsageHint);
             GL.EnableVertexAttribArray(0);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
 
             if (lsUV != null)
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[TEXCOORD_VB]);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(lsUV.Length * Vector2.SizeInBytes), lsUV, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(lsUV.Length * Vector2.SizeInBytes), lsUV, this.UsageHint);
                 GL.EnableVertexAttribArray(1);
                 GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
             }
@@ -310,19 +384,19 @@ namespace Two_and_a_Half_Dimensions
             if (normals != null)
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[NORMAL_VB]);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(normals.Length * Vector3.SizeInBytes), normals, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(normals.Length * Vector3.SizeInBytes), normals, this.UsageHint);
                 GL.EnableVertexAttribArray(2);
                 GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
             }
 
             //tangent buffer
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[TANGENT_VB]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tangents.Length * Vector3.SizeInBytes), tangents, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tangents.Length * Vector3.SizeInBytes), tangents, this.UsageHint);
             GL.EnableVertexAttribArray(3);
             GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, 0, 0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffers[INDEX_BUFFER]);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(elements.Length * sizeof(int)), elements, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(elements.Length * sizeof(int)), elements, this.UsageHint);
 
 
             GL.BindVertexArray(0);
@@ -354,7 +428,7 @@ namespace Two_and_a_Half_Dimensions
             }
             
             //GL.DrawElementsBaseVertex(BeginMode.Triangles, NumIndices, DrawElementsType.UnsignedInt, BaseIndex, 0);
-            GL.DrawElements(BeginMode.Triangles, NumIndices, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            GL.DrawElements(DrawMode, NumIndices, DrawElementsType.UnsignedInt, IntPtr.Zero);
             //Matrix4 newmatlmao = vmatrix * Matrix4.CreateTranslation(new Vector3(10.0f, 10.0f, 0));
             //GL.UniformMatrix4(mat.locVMatrix, false, ref newmatlmao);
             //GL.DrawElements(BeginMode.Triangles, NumIndices, DrawElementsType.UnsignedInt, IntPtr.Zero);

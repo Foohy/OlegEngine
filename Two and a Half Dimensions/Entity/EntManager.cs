@@ -20,12 +20,12 @@ namespace Two_and_a_Half_Dimensions.Entity
         static List<BaseEntity> Ents = new List<BaseEntity>();
         static int _nmEnts = 0;
 
-        public static BaseEntity Create<T>() where T : BaseEntity, new()
+        public static T Create<T>() where T : BaseEntity, new()
         {
             _nmEnts++;
 
             //Create a new instance
-            BaseEntity ent = new T();
+            T ent = new T();
             
             //If it was spawned during level loading, set it as world spawn
             if (Levels.LevelManager.IsLoading)

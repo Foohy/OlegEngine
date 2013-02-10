@@ -22,7 +22,7 @@ namespace Two_and_a_Half_Dimensions
         public Program()
             : base(1900, 900, new GraphicsMode(32, 24, 0, 4), "BY NO MEANS.", GameWindowFlags.Default) //GraphicsMode(32, 24, 0, 4)
         {
-            VSync = VSyncMode.On;
+            VSync = VSyncMode.Off;
         }
 
         /// <summary>Load resources here.</summary>
@@ -33,7 +33,7 @@ namespace Two_and_a_Half_Dimensions
 
             //Print useful information about the card
             Console.WriteLine("==================================");
-            Console.Write("Vendor: {0}", GL.GetString(StringName.Vendor));
+            Console.WriteLine("Vendor: {0}", GL.GetString(StringName.Vendor));
             Console.WriteLine(", Renderer: {0}", GL.GetString(StringName.Renderer));
             Console.WriteLine(GL.GetString(StringName.ShadingLanguageVersion));
             string versionOpenGL = GL.GetString(StringName.Version);
@@ -99,8 +99,8 @@ namespace Two_and_a_Half_Dimensions
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, Width / (float)Height, 1.0f, 256.0f);
             Utilities.ViewMatrix = projection;
             //Console.WriteLine(projection);
-            //GL.MatrixMode(MatrixMode.Projection);
-            //GL.LoadMatrix(ref projection);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadMatrix(ref projection);
         }
 
         /// <summary>
