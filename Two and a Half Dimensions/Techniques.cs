@@ -300,7 +300,7 @@ namespace Two_and_a_Half_Dimensions
         {
             GL.Uniform1(numPointLightsLocation, pLights.Length);
 
-            for (int i = 0; i < pLights.Length; i++)
+            for (int i = 0; i < pLights.Length && i < MAX_POINTLIGHTS; i++)
             {
                 GL.Uniform3(pointlightLocations[i].Color, pLights[i].Color.X, pLights[i].Color.Y, pLights[i].Color.Z);
                 GL.Uniform1(pointlightLocations[i].AmbientIntensity, pLights[i].AmbientIntensity);
@@ -316,7 +316,7 @@ namespace Two_and_a_Half_Dimensions
         {
             GL.Uniform1(numSpotLightsLocation, pLights.Length);
 
-            for (int i = 0; i < pLights.Length; i++) 
+            for (int i = 0; i < pLights.Length && i < MAX_POINTLIGHTS; i++) 
             {
                 GL.Uniform3(spotlightLocations[i].Color, pLights[i].Color.X, pLights[i].Color.Y, pLights[i].Color.Z);
                 GL.Uniform1(spotlightLocations[i].AmbientIntensity, pLights[i].AmbientIntensity);
@@ -608,7 +608,7 @@ namespace Two_and_a_Half_Dimensions
             GL.UseProgram(this.Program);
             GL.Uniform1(numShadowCastersLocation, pLights.Length);
 
-            for (int i = 0; i < pLights.Length; i++)
+            for (int i = 0; i < pLights.Length && i < MAX_SHADOWCASTERS; i++)
             {
                 GL.Uniform3(shadowcasterLocations[i].Color, pLights[i].Color.X, pLights[i].Color.Y, pLights[i].Color.Z);
                 GL.Uniform1(shadowcasterLocations[i].AmbientIntensity, pLights[i].AmbientIntensity);

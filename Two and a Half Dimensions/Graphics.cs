@@ -273,7 +273,7 @@ namespace Two_and_a_Half_Dimensions
         public Material mat;
 
         int[] BaseIndex;
-        int NumIndices;
+        int NumIndices = -1;
 
         public Mesh()
         {
@@ -319,6 +319,15 @@ namespace Two_and_a_Half_Dimensions
 
         public void UpdateMesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] lsUV = null)
         {
+            if (NumIndices < 0) //If we've never set this, we need to create our array buffer
+            {
+                GL.GenVertexArrays(1, out VAO);
+                GL.BindVertexArray(VAO);
+
+                //Create the buffers for the vertices attributes
+                GL.GenBuffers(5, buffers);
+            }
+
             NumIndices = elements.Length;
             BaseIndex = elements;
 

@@ -15,14 +15,14 @@ namespace Two_and_a_Half_Dimensions
         public static bool Active = false;
 
         public static float Zoom = 1.0f;
-        private static float goalZoom = 20f;
+        private static float goalZoom = 5.0f;
 
         private static Vector3 Pos = new Vector3();
-        private static Vector2 MousePos = new Vector2();
+        private static Vector3 MousePos = new Vector3();
         private static float multiplier = 8;
 
         private static float halfPI = -1.570796326794896f;
-        private static ent_static Cursor;
+        private static ent_cursor Cursor;
         private static float Multiplier = 0.000924f;
 
         private static List<Vector2> Points = new List<Vector2>();
@@ -31,20 +31,29 @@ namespace Two_and_a_Half_Dimensions
         {
             Pos = new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, Player.ply.Pos.Z);
 
-            Cursor = EntManager.Create<ent_static>();
+            Cursor = EntManager.Create<ent_cursor>();
             Cursor.Spawn();
             Cursor.SetPos(new Vector3(0, 0, 0));
-            Cursor.Model = Resource.GetMesh("cursor.obj");
-            Cursor.Mat = Resource.GetMaterial("models/cursor");
+            //Cursor.Scale = Vector3.One * 0.25f;
 
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
+            Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+        }
+
+        static void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && TempEnt != null && TempEnt.Points.Count > 1)
+            {
+                TempEnt.Build();
+
+                TempEnt = null;
+            }
         }
 
         static void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
         {
             MouseState state = Mouse.GetState();
-            
         }
 
         static void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
@@ -56,7 +65,7 @@ namespace Two_and_a_Half_Dimensions
             }
             TempEnt.AddPoint(MousePos);
             //TempEnt.Points.Add(MousePos);
-            Points.Add(MousePos);
+            //Points.Add(MousePos);
         }
 
         public static void Think(FrameEventArgs e)
@@ -72,14 +81,14 @@ namespace Two_and_a_Half_Dimensions
             Pos = new Vector3(Pos.X, Pos.Y, Zoom);
 
             //How fast should we move
-            multiplier = 8;
+            multiplier = 7;
             if (Utilities.window.Keyboard[Key.LShift])
             {
-                multiplier = 15;
+                multiplier = 25;
             }
             else if (Utilities.window.Keyboard[Key.LControl])
             {
-                multiplier = 3;
+                multiplier = 1.0f;
             }
             
 
@@ -109,13 +118,88 @@ namespace Two_and_a_Half_Dimensions
                     //Multiplier += (float)Input.deltaY / 100000.0f;
                     //Console.WriteLine(Multiplier);
                 }
-
-                Vector2 mousePos = new Vector2((Utilities.window.Mouse.X - (Utilities.window.Width / 2)), -(Utilities.window.Mouse.Y - (Utilities.window.Height / 2)));
-
-                MousePos = new Vector2(Pos.X, Pos.Y);
+                //Console.WriteLine(LPCameraScreenToVector(0, 0, Utilities.window.Mouse.X, Utilities.window.Mouse.Y, (float)Math.PI / 4.0f ));
+                Vector3 mousePos = new Vector3((Utilities.window.Mouse.X - (Utilities.window.Width / 2)), -(Utilities.window.Mouse.Y - (Utilities.window.Height / 2)), 0);
+                //MousePos = Get2Dto3D(Utilities.window.Mouse.X, Utilities.window.Mouse.Y, -5.0f );
+                //MousePos += new Vector3(MousePos.X, MousePos.Y, 0);
+                MousePos = new Vector3(Pos.X, Pos.Y, 0);
+                //MousePos += LPCameraScreenToVector(0, 0, Utilities.window.Mouse.X, Utilities.window.Mouse.Y, (float)Math.PI / 4.0f);
                 MousePos += mousePos * Zoom * Multiplier; //lmao fuck
                 Cursor.SetPos(MousePos);
             }
+        }
+        private static Vector3 Get2Dto3D(int x, int y, float z)
+        {
+            return UnProject(new Vector3(x, y, z), Utilities.ViewMatrix, Utilities.ProjectionMatrix);
+        }
+        /*
+        private static Vector2 NormalizeMouse(float x, float y)
+        {
+            return new Vector2(((float)x - (Utilities.window.Width / 2)) / Utilities.window.Width, -((float)y - (Utilities.window.Height / 2)) / Utilities.window.Height);
+        }
+        */
+        private static Vector2 NormalizeMouse(float x, float y)
+        {
+            return new Vector2(((float)x * 2.0f - Utilities.window.Width) / Utilities.window.Width, -((float)y * 2.0f - Utilities.window.Height) / Utilities.window.Height);
+        }
+
+        private static Vector3 LPCameraScreenToVector( float iScreenX, float iScreenY, float iScreenW, float iScreenH, float fFoV )
+        {
+            //This code works by basically treating the camera like a frustrum of a pyramid.
+            //We slice this frustrum at a distance "d" from the camera, where the slice will be a rectangle whose width equals the "4:3" width corresponding to the given screen height.
+            float d = (float)(4 * iScreenH / ( 6 * Math.Tan( 0.5 * fFoV ) ));
+  
+            //Forward, right, and up vectors (need these to convert from local to world coordinates
+            Vector3 _lookAt = new Vector3(0, 0, 1.0f);
+            Vector3 _right = new Vector3(0.0f, 1.0f, 0);
+            Vector3 _up = Vector3.UnitY;
+  
+            //Then convert vec to proper world coordinates and return it
+            Vector3 norm = (d * _lookAt + (iScreenX - 0.5f * iScreenW) * _right + (0.5f * iScreenH - iScreenY) * _up);
+            norm.Normalize();
+            return norm;
+        }
+
+        private static Vector3 GetDirection(float xclip, float yclip)
+        {
+            Vector3 _right = new Vector3(1.0f, 0, 0);
+            Vector3 _lookAt = new Vector3(0, 0, -1.0f);
+
+
+            float fov = (float)Math.PI / 4.0f;
+
+            float ytotal = 1.0f * (float)Math.Tan(fov / 2.0f);
+            float xtotal = ytotal * (Utilities.window.Width / Utilities.window.Height );
+
+            //get positions relative to cam's forward vector
+            float x = xclip * xtotal;
+            float y = yclip * ytotal;
+
+            Vector3 xoff = _right * x;
+            Vector3 yoff = Vector3.UnitY * y;
+            Vector3 zoff = _lookAt * 1.0f;
+
+            Vector3 worldpos = Pos + xoff + yoff + zoff;
+            Vector3 norm = (Pos - worldpos);
+            norm.Normalize();
+            return norm;
+        }
+
+
+        private static Vector3 UnProject(Vector3 screen, Matrix4 view, Matrix4 projection)
+        {
+            Vector4 pos = new Vector4();
+            Vector2 Mousepos = NormalizeMouse(screen.X, screen.Y);
+            // Map x and y from window coordinates, map to range -1 to 1 
+            pos.X = Mousepos.X;
+            pos.Y = Mousepos.Y;
+            pos.Z = screen.Z * 2.0f - 1.0f;
+            pos.W = 1.0f;
+
+            Vector4 pos2 = Vector4.Transform(pos, Matrix4.Invert(Matrix4.Mult(view, projection)));
+            Vector3 pos_out = new Vector3(pos2.X, pos2.Y, pos2.Z);
+
+            return pos_out / pos2.W;
         }
 
         public static void Draw(FrameEventArgs e)
@@ -124,7 +208,7 @@ namespace Two_and_a_Half_Dimensions
             Player.ply.CamAngle = new Vector2d(halfPI, 0.0f); //Clamp it because I can't math correctly
 
             //find the point where we'll be facing
-            Vector3 point = new Vector3((float)Math.Cos(halfPI), (float)Math.Sin(0), (float)Math.Sin(halfPI));
+            Vector3 point = new Vector3(0.0f, 0.0f, -1.0f);
 
             Player.ply.ViewNormal = point;
             Player.ply.ViewNormal.Normalize();

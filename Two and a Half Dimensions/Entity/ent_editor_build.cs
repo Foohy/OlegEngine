@@ -14,7 +14,8 @@ namespace Two_and_a_Half_Dimensions.Entity
 {
     class ent_editor_build : BaseEntity 
     {
-        public List<Vector2> Points = new List<Vector2>();
+        public List<Vector3> Points = new List<Vector3>();
+        public bool Built = false;
         private List<Vector3> _meshPoints = new List<Vector3>();
         private Mesh previewMesh = new Mesh();
         public override void Init()
@@ -22,51 +23,58 @@ namespace Two_and_a_Half_Dimensions.Entity
             this.Model = Resource.GetMesh("ball.obj");
             this.Mat = Resource.GetMaterial("engine/white");
             this.Mat.Properties.ShaderProgram = Resource.GetProgram("default");
-            this.Scale = Vector3.One * 0.25f;
+            this.Scale = Vector3.One * 0.05f;
 
             previewMesh.DrawMode = BeginMode.Lines;
             previewMesh.mat = Resource.GetMaterial("engine/white");
             previewMesh.mat.SetShader("default");
             previewMesh.UsageHint = BufferUsageHint.StreamDraw;
-            previewMesh.LoadMesh("cow.obj");
+            //previewMesh.LoadMesh("debug/quad.obj");
         }
 
-        public void AddPoint(Vector2 point)
+        public void AddPoint(Vector3 point)
         {
             Points.Add(point);
-            _meshPoints.Add(new Vector3(point.X, point.Y, this.Position.Z));
+            //_meshPoints.Add(new Vector3(point.X, point.Y, this.Position.Z));
             Vector3[] verts = GenerateVerts();
             int[] elements = GenerateElements(verts);
             Vector3[] tangents = new Vector3[verts.Length];
 
             if (elements.Length > 1)
             {
-                /*
-                //Update the mesh
-                GL.BindBuffer(BufferTarget.ArrayBuffer, previewMesh.buffers[Mesh.POS_VB]);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * Vector3.SizeInBytes), verts, previewMesh.UsageHint);
-                GL.EnableVertexAttribArray(0);
-                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, previewMesh.buffers[Mesh.INDEX_BUFFER]);
-                GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(elements.Length * sizeof(int)), elements, previewMesh.UsageHint);
-                 * */
                 previewMesh.UpdateMesh(verts, elements, tangents);
-                //previewMesh.UpdateMesh("vehicles/van.obj");
             }
-            if (elements.Length > 3)
+        }
+
+        public void Build()
+        {
+            //previewMesh.DrawMode = BeginMode.Polygon;
+            //this.SetModel(previewMesh);
+            //Create a list of verts for the physics
+            Vertices physverts = new Vertices();
+            for (int i = 0; i < Points.Count; i++)
             {
-                //previewMesh.UpdateMesh("monkey.obj");
+                physverts.Add(new Microsoft.Xna.Framework.Vector2(Points[i].X, Points[i].Y));
             }
+            //Create something that could be construed as physics
+            Body bod = new Body(Levels.LevelManager.physWorld);
+            bod.BodyType = BodyType.Static;
+            List<Vertices> moreverts = FarseerPhysics.Common.Decomposition.EarclipDecomposer.ConvexPartition(physverts);
+            List<Fixture> fixt = FarseerPhysics.Factories.FixtureFactory.AttachCompoundPolygon(moreverts, 0.5f, bod);
+
+            this.Built = true;
         }
         private Vector3[] GenerateVerts()
         {
             List<Vector3> verts = new List<Vector3>();
             for (int i = 0; i + 1 < Points.Count; i++)
             {
-                verts.Add(new Vector3(Points[i].X, Points[i].Y, this.Position.Z));
-                verts.Add(new Vector3(Points[i+1].X, Points[i+1].Y, this.Position.Z));
+                verts.Add(new Vector3(Points[i].X, Points[i].Y, Points[i].Z));
+                verts.Add(new Vector3(Points[i + 1].X, Points[i + 1].Y, Points[i+1].Z));
             }
+
+            verts.Add(Points[Points.Count-1]);
+            verts.Add(Points[0]);
 
             return verts.ToArray();
         }
@@ -83,18 +91,23 @@ namespace Two_and_a_Half_Dimensions.Entity
         }
         public override void Draw()
         {
-            Vector3 oldPos = this.Position;
-            this.previewMesh.Render(Matrix4.Identity);
-            for (int i = 0; i < Points.Count; i++)
+            if (Built)
             {
-                //if (i + 1 < Points.Count)
-                //{
-                //    Graphics.DrawLine(oldPos, new Vector3(Points[i].X, Points[i].Y, this.Position.Z), new Vector3(Points[i + 1].X, Points[i + 1].Y, this.Position.Z));
-                //}
-                this.SetPos(Points[i]);
-                base.Draw();
+                //base.Draw();
+                previewMesh.Render(Matrix4.Identity);
             }
-            this.SetPos(oldPos);       
+            else
+            {
+                Vector3 oldPos = this.Position;
+                GL.LineWidth(3.0f);
+                this.previewMesh.Render(Matrix4.Identity);
+                for (int i = 0; i < Points.Count; i++)
+                {
+                    this.SetPos(Points[i]);
+                    base.Draw();
+                }
+                this.SetPos(oldPos);
+            }
         }
     }
 }

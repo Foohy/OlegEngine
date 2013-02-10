@@ -308,47 +308,61 @@ namespace Two_and_a_Half_Dimensions
             //lsUV = Tuv;
             */
             //Go through all the vertices and calculate their tangents/bitangents
-            for (int i = 0; i < verts.Count; i += 3)
+            if (uv.Count >= verts.Count)
             {
-                Vector3 v0 = verts[i];
-                Vector3 v1 = verts[i + 1];
-                Vector3 v2 = verts[i + 2];
+                for (int i = 0; i < verts.Count; i += 3)
+                {
+                    Vector3 v0 = verts[i];
+                    Vector3 v1 = verts[i + 1];
+                    Vector3 v2 = verts[i + 2];
 
-                Vector3 edge1 = v1 - v0;
-                Vector3 edge2 = v2 - v0;
+                    Vector3 edge1 = v1 - v0;
+                    Vector3 edge2 = v2 - v0;
 
-                Vector2 uv0 = uv[i];
-                Vector2 uv1 = uv[i + 1];
-                Vector2 uv2 = uv[i + 2];
+                    Vector2 uv0 = uv[i];
+                    Vector2 uv1 = uv[i + 1];
+                    Vector2 uv2 = uv[i + 2];
 
-                float DeltaU1 = uv1.X - uv0.X;
-                float DeltaV1 = uv1.Y - uv0.Y;
-                float DeltaU2 = uv2.X - uv0.X;
-                float DeltaV2 = uv2.Y - uv0.Y;
+                    float DeltaU1 = uv1.X - uv0.X;
+                    float DeltaV1 = uv1.Y - uv0.Y;
+                    float DeltaU2 = uv2.X - uv0.X;
+                    float DeltaV2 = uv2.Y - uv0.Y;
 
-                float f = 1.0f / (DeltaU1 * DeltaV2 - DeltaU2 * DeltaV1);
-                Vector3 Tangent, Bitangent;
-                Tangent = new Vector3();
-                Bitangent = new Vector3();
+                    float f = 1.0f / (DeltaU1 * DeltaV2 - DeltaU2 * DeltaV1);
+                    Vector3 Tangent, Bitangent;
+                    Tangent = new Vector3();
+                    Bitangent = new Vector3();
 
-                Tangent.X = f * (DeltaV2 * edge1.X - DeltaV1 * edge2.X);
-                Tangent.Y = f * (DeltaV2 * edge1.Y - DeltaV1 * edge2.Y);
-                Tangent.Z = f * (DeltaV2 * edge1.Z - DeltaV1 * edge2.Z);
+                    Tangent.X = f * (DeltaV2 * edge1.X - DeltaV1 * edge2.X);
+                    Tangent.Y = f * (DeltaV2 * edge1.Y - DeltaV1 * edge2.Y);
+                    Tangent.Z = f * (DeltaV2 * edge1.Z - DeltaV1 * edge2.Z);
 
-                Bitangent.X = f * (-DeltaU2 * edge1.X - DeltaU1 * edge2.X);
-                Bitangent.X = f * (-DeltaU2 * edge1.Y - DeltaU1 * edge2.Y);
-                Bitangent.X = f * (-DeltaU2 * edge1.X - DeltaU1 * edge2.Z);
+                    Bitangent.X = f * (-DeltaU2 * edge1.X - DeltaU1 * edge2.X);
+                    Bitangent.X = f * (-DeltaU2 * edge1.Y - DeltaU1 * edge2.Y);
+                    Bitangent.X = f * (-DeltaU2 * edge1.X - DeltaU1 * edge2.Z);
 
-                tangents.Add(Tangent);
-                tangents.Add(Tangent);
-                tangents.Add(Tangent);
+                    tangents.Add(Tangent);
+                    tangents.Add(Tangent);
+                    tangents.Add(Tangent);
 
+                }
             }
 
-            for (int i = 0; i < tangents.Count; i++)
+            if (tangents.Count == 0)
             {
-                tangents[i].Normalize();
+                for (int i = 0; i < verts.Count; i++)
+                {
+                    tangents.Add(new Vector3(0, 0, 0));
+                }
             }
+            else
+            {
+                for (int i = 0; i < tangents.Count; i++)
+                {
+                    tangents[i].Normalize();
+                }
+            }
+
 
             lsTangents = tangents.ToArray();
         }
