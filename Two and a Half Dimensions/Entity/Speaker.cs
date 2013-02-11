@@ -21,10 +21,8 @@ namespace Two_and_a_Half_Dimensions.Entity
             this.Mat.Properties.SpecularIntensity = 1.0f;
             this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
             this.Model = Resource.GetMesh("speaker.obj");
-            //this.Model = ObjLoader.LoadFile("Resources/Models/cow.obj");
-            Audio.PrecacheSong("Resources/Audio/Physics/rock_hit_hard.wav", "Music");
-            
-            song = Audio.LoadSong("Resources/Audio/Brodyquest.mp3", "Music", true, true, this );
+            //this.Model = ObjLoader.LoadFile("Resources/Models/cow.obj");            
+            song = Audio.LoadSong("Resources/Audio/Brodyquest.mp3", true, true, this );
 
             startTime = (float)Utilities.Time + 1.0f;
             //this.DisableLighting = true;

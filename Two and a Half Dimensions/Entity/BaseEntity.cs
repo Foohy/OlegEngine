@@ -109,6 +109,14 @@ namespace Two_and_a_Half_Dimensions.Entity
             if (Model != null) { Model.Remove(); }
             Model = model;
         }
+
+        public void EmitSound(string soundpath, bool loop = false, float volume = 1.0f, int frequency = 44100)
+        {
+            Audio song = Audio.LoadSong(soundpath, loop, true, this);
+            song.Play(true);
+            song.SetVolume(volume);
+            song.SetFrequency(frequency);
+        }
         #endregion
 
     }

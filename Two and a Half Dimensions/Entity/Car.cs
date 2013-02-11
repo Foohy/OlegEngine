@@ -14,7 +14,6 @@ namespace Two_and_a_Half_Dimensions.Entity
 {
     class Car : BaseEntity
     {
-
         public Matrix4 camMatrix;
         public Vector2d CamAngle = new Vector2d(-1.5f, 0.0f);
         public float Zoom { get; set; }
@@ -103,7 +102,7 @@ namespace Two_and_a_Half_Dimensions.Entity
             Zoom = 15.0f;
 
             Utilities.window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            horn = Audio.LoadSong("Resources/Audio/horn.mp3", "horn", false, true, this);
+            horn = Audio.LoadSong("Resources/Audio/horn.mp3", false, true, this);
         }
 
         void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)

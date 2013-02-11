@@ -67,7 +67,7 @@ namespace Two_and_a_Half_Dimensions.Entity
             Levels.LevelManager.physWorld.ContactManager.PostSolve += CollideSounds;
             
             //Create the sound effect for the physics of our ball
-            phys_hit = Audio.LoadSong("Resources/Audio/Physics/rock_hit_hard.wav", "phys_rock", false);
+            phys_hit = Audio.LoadSong("Resources/Audio/Physics/rock_hit_hard.wav", false);
             GL.PointSize(5.0f);
         }
 
@@ -161,7 +161,7 @@ namespace Two_and_a_Half_Dimensions.Entity
                 //phys_hit.SetFrequency((100 - (float)force) * 1000); // (100 - (float)force) / 100
                 int freq = 60000 - (int)force * 100;
                 Console.WriteLine(freq);
-                Audio.PlaySingleSound("rock_hit", 1.0f, freq);
+                Audio.PlaySound("rock_hit", 1.0f, freq);
             }
 
         }

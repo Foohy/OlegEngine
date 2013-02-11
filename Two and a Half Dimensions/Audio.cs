@@ -12,21 +12,20 @@ namespace Two_and_a_Half_Dimensions
     class Audio
     {
         public int Handle { get; private set; }
-        public string Name { get; private set; }
         public string Filename { get; private set; }
         public Entity.BaseEntity attachedEnt = null;
         public bool Positional = false;
         public Vector3 Position { get; private set; }
         public float Volume { get; private set; }
+        public bool Looped { get; private set; }
 
         private static List<Audio> _lsAudio = new List<Audio>();
         private static Dictionary<string, CachedAudio> _lsPrecached = new Dictionary<string, CachedAudio>();
         //private static Dictionary<Audio, int> musics = new Dictionary<Audio, int>();
         public static bool init = false;
-        public Audio( int handle, string name, string filename )
+        public Audio( int handle, string filename )
         {
             Handle = handle;
-            Name = name;
             Filename = filename;
         }
 
@@ -51,12 +50,9 @@ namespace Two_and_a_Half_Dimensions
                 Console.WriteLine("COULD NOT INITIALIZE AUDIO CONTEXT: " + ex.Message);
                 Console.ResetColor();
             }
-
-            PrecacheSong("Resources/Audio/Physics/rock_hit_hard.wav", "rock_hit");
-            //PlaySingleSound("rock_hit");
         }
 
-        public static Audio LoadSong(string filename, string shortname, bool Loop = false, bool Positional = false, Entity.BaseEntity ent = null)
+        public static Audio LoadSong(string filename, bool Loop = false, bool Positional = false, Entity.BaseEntity ent = null)
         {
             int handle = 0;
             BASSFlag flags = BASSFlag.BASS_MUSIC_PRESCAN;
@@ -67,9 +63,10 @@ namespace Two_and_a_Half_Dimensions
 
             if (handle != 0)
             {
-                Audio audio = new Audio(handle, shortname, filename);
+                Audio audio = new Audio(handle, filename);
                 audio.Positional = (Positional || ent != null);
                 audio.attachedEnt = ent;
+                audio.Looped = Loop;
 
                 _lsAudio.Add(audio);
 
@@ -84,10 +81,10 @@ namespace Two_and_a_Half_Dimensions
                 if (Bass.BASS_ErrorGetCode() == BASSError.BASS_ERROR_NO3D) Console.WriteLine("Are you sure the audio file is mono?");
             }
 
-            return null;
+            return new Audio(-1, "rude");
         }
 
-        public static unsafe void PrecacheSong(string filename, string name)
+        public static unsafe void Precache(string filename )
         {
             byte[] bytes = null;
             try
@@ -102,31 +99,29 @@ namespace Two_and_a_Half_Dimensions
             int length = bytes.Length;
             fixed (byte* p = &bytes[0])
             {
-                CachedAudio memAudio = new CachedAudio(name, new IntPtr(p), length);
+                CachedAudio memAudio = new CachedAudio(filename, new IntPtr(p), length);
                 memAudio.Filename = filename; //may as well store this
 
-                if (!_lsPrecached.ContainsKey(name))
+                if (!_lsPrecached.ContainsKey(filename))
                 {
-                    _lsPrecached.Add(name, memAudio);
+                    _lsPrecached.Add(filename, memAudio);
                 }
             }
         }
 
-        public static void PlaySingleSound( string name, float volume = 1.0f, int frequency = 44100 )
+        public static void PlaySound( string name, float volume = 1.0f, int frequency = 44100 )
         {
-            if (_lsPrecached.ContainsKey(name))
+            if (!_lsPrecached.ContainsKey(name))
             {
-                int handle = Bass.BASS_StreamCreateFile(_lsPrecached[name].bufferPointer, 0, _lsPrecached[name].bufferLength, BASSFlag.BASS_DEFAULT); //Bass.BASS_StreamCreatePush( 44100, 1, BASSFlag.BASS_DEFAULT, IntPtr.Zero );
-                if (handle == 0) Console.WriteLine("Failed to play precached sound! " + Bass.BASS_ErrorGetCode()); 
-                Bass.BASS_ChannelSetAttribute(handle, BASSAttribute.BASS_ATTRIB_VOL, volume);
-                Bass.BASS_ChannelSetAttribute(handle, BASSAttribute.BASS_ATTRIB_FREQ, frequency);
-                Bass.BASS_ChannelPlay(handle, true);
+                Precache(name);
+                Console.WriteLine("Sound not precached: {0}", name);
+            }
 
-            }
-            else
-            {
-                Console.WriteLine("Key does not exist");
-            }
+            int handle = Bass.BASS_StreamCreateFile(_lsPrecached[name].bufferPointer, 0, _lsPrecached[name].bufferLength, BASSFlag.BASS_DEFAULT); //Bass.BASS_StreamCreatePush( 44100, 1, BASSFlag.BASS_DEFAULT, IntPtr.Zero );
+            if (handle == 0) Console.WriteLine("Failed to play precached sound! " + Bass.BASS_ErrorGetCode());
+            Bass.BASS_ChannelSetAttribute(handle, BASSAttribute.BASS_ATTRIB_VOL, volume);
+            Bass.BASS_ChannelSetAttribute(handle, BASSAttribute.BASS_ATTRIB_FREQ, frequency);
+            Bass.BASS_ChannelPlay(handle, true);
         }
 
         public static void Think( FrameEventArgs e )
@@ -143,6 +138,19 @@ namespace Two_and_a_Half_Dimensions
                 if (_lsAudio[i].attachedEnt != null)
                 {
                     _lsAudio[i].Set3DPosition(_lsAudio[i].attachedEnt.Position);
+                }
+
+                if (_lsAudio[i].Handle != 0 && !_lsAudio[i].Looped)
+                {
+                    long seconds = Bass.BASS_ChannelGetPosition(_lsAudio[i].Handle);
+                    long length = Bass.BASS_ChannelGetLength(_lsAudio[i].Handle);
+
+                    if (seconds >= length)
+                    {
+                        Bass.BASS_ChannelStop( _lsAudio[i].Handle );
+                        _lsAudio.RemoveAt(i);
+                    }
+                    
                 }
             }
         }
@@ -191,7 +199,8 @@ namespace Two_and_a_Half_Dimensions
                 Un4seen.Bass.BASSActive active = Bass.BASS_ChannelIsActive(this.Handle);
                 return active == BASSActive.BASS_ACTIVE_STOPPED || active == BASSActive.BASS_ACTIVE_PAUSED;
             }
-            else return false;
+            
+            return false;
         }
         public BASSActive GetStreamState()
         {
