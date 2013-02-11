@@ -21,6 +21,9 @@ namespace Two_and_a_Half_Dimensions
 
     class Player
     {
+        public delegate void CalcViewHandler(object sender, EventArgs e);
+        public event CalcViewHandler CalcView;
+
         public static Player ply { get; private set; }
         public Vector3 Pos { get; private set; }
         public float Height { get; set; }
@@ -31,6 +34,7 @@ namespace Two_and_a_Half_Dimensions
         public float Zoom { get; set; }
         public bool OverrideCamMatrix { get; set; }
         private Program window = null;
+        private EventArgs ev = new EventArgs();
 
         public PlayerMode Mode { get; private set; }
 
@@ -92,6 +96,10 @@ namespace Two_and_a_Half_Dimensions
 
                 case PlayerMode.EDIT:
                     EditorThink(e);
+                    break;
+                case PlayerMode.CUSTOM:
+                    if (CalcView == null) { NoClipThink(e); return; }
+                    CalcView(this, ev);
                     break;
             }
 

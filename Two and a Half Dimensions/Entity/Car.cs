@@ -19,7 +19,7 @@ namespace Two_and_a_Half_Dimensions.Entity
         public float Zoom { get; set; }
         private float crZoom = 0;
 
-        public bool NoClip = true;
+        public bool NoClip = false;
 
         private float physScale = 0.44f;
         //physics for wheels and stuff
@@ -53,10 +53,7 @@ namespace Two_and_a_Half_Dimensions.Entity
 
             //Load models
             this.Model = Resource.GetMesh("vehicles/van.obj");
-            //this.Mat = Resource.GetMaterial("Resources/Materials/van.png", "Resources/Shaders/default.vert", "Resources/Shaders/default.frag");
-            this.Mat = Resource.GetMaterial("models/vehicles/van.png");
-            //this.Mat.SetShader( "default.vert", "default.frag" );
-            this.Mat.SetShader(Utilities.window.effect.Program);
+            this.Mat = Resource.GetMaterial("models/vehicles/van");
             wheel = Resource.GetMesh("wheel.obj");
             wheel.mat = this.Mat;
 
@@ -65,7 +62,6 @@ namespace Two_and_a_Half_Dimensions.Entity
             bod.BodyType = BodyType.Dynamic;
 
             this.Physics = bod.FixtureList[0];
-            //this.Physics.Body.Position = new Microsoft.Xna.Framework.Vector2( this.Position.X, this.Position.Y );
             this.Physics.Body.Restitution = 0.2f;
             this.Physics.Body.Friction = 2.0f;
             this.Physics.UserData = (object)this.GetType().Name;
@@ -102,7 +98,19 @@ namespace Two_and_a_Half_Dimensions.Entity
             Zoom = 15.0f;
 
             Utilities.window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            Two_and_a_Half_Dimensions.Player.ply.CalcView += new Two_and_a_Half_Dimensions.Player.CalcViewHandler(ply_CalcView);
+            Two_and_a_Half_Dimensions.Player.ply.SetMode(PlayerMode.CUSTOM);
             horn = Audio.LoadSong("Resources/Audio/horn.mp3", false, true, this);
+        }
+
+        void ply_CalcView(object sender, EventArgs e)
+        {
+            //Camera
+            Vector3 point = new Vector3((float)Math.Cos(CamAngle.X), (float)Math.Sin(CamAngle.Y) - 0.21f, (float)Math.Sin(CamAngle.X));
+            camMatrix = Matrix4.LookAt(Position + new Vector3(0, crZoom / 90, crZoom), Position + point + new Vector3(0, crZoom / 90, 0), Vector3.UnitY);
+            Two_and_a_Half_Dimensions.Player.ply.camMatrix = camMatrix;
+
+            Two_and_a_Half_Dimensions.Player.ply.SetPos(Position + new Vector3(0, crZoom / 90, crZoom));
         }
 
         void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -110,6 +118,10 @@ namespace Two_and_a_Half_Dimensions.Entity
             if (e.Key == OpenTK.Input.Key.Space)
             {
                 horn.Play(true);
+            }
+            if (e.Key == OpenTK.Input.Key.Enter)
+            {
+                this.SetPos(new Vector2(0, 0));
             }
         }
 
@@ -154,13 +166,6 @@ namespace Two_and_a_Half_Dimensions.Entity
             if (Utilities.window.Keyboard[OpenTK.Input.Key.PageUp]) Zoom += (float)Utilities.Frametime * 100;
             Zoom += Input.deltaZ * 0.7f;
             crZoom += (Zoom - crZoom) / 4;
-
-            //Camera
-            Vector3 point = new Vector3((float)Math.Cos(CamAngle.X), (float)Math.Sin(CamAngle.Y) - 0.21f, (float)Math.Sin(CamAngle.X));
-            camMatrix = Matrix4.LookAt(Position + new Vector3(0, crZoom / 90, crZoom), Position + point + new Vector3(0, crZoom / 90, 0), Vector3.UnitY);
-            Two_and_a_Half_Dimensions.Player.ply.camMatrix = camMatrix;
-
-            Two_and_a_Half_Dimensions.Player.ply.SetPos(Position + new Vector3(0, crZoom / 90, crZoom));
         }
 
 
@@ -193,6 +198,11 @@ namespace Two_and_a_Half_Dimensions.Entity
 
             Levels.LevelManager.physWorld.RemoveBody(wheels[0].Body);
             Levels.LevelManager.physWorld.RemoveBody(wheels[1].Body);
+
+            Two_and_a_Half_Dimensions.Player.ply.SetMode(PlayerMode.NOCLIP);
+
+            Utilities.window.Keyboard.KeyDown -= Keyboard_KeyDown;
+            Two_and_a_Half_Dimensions.Player.ply.CalcView -= ply_CalcView;
         }
     }
 }

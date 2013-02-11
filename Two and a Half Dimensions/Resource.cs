@@ -28,7 +28,9 @@ namespace Two_and_a_Half_Dimensions
                 Materials[filename] = Utilities.LoadMaterial(filename);
             }
 
-            return Materials[filename];
+            if (Materials[filename] != null) return Materials[filename];
+
+            return Utilities.ErrorMat;
         }
         /*
         public static Material GetMaterial(string filename, string shader)

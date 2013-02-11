@@ -17,6 +17,7 @@ namespace Two_and_a_Half_Dimensions.Levels
         bool SetShadow = true;
         Vector3 Angle = new Vector3();
         ent_spotlight spotlight;
+        Car playerCar;
         public override void Preload()
         {
             levelmodel = Resource.GetMesh("Levels/level1.obj");
@@ -108,6 +109,20 @@ namespace Two_and_a_Half_Dimensions.Levels
                     Console.WriteLine("VIEW IS BEING OVERWRITTEN!");
                 }
                 Console.WriteLine("==========================");
+            }
+            if (e.Key == OpenTK.Input.Key.F10)
+            {
+                if (playerCar == null)
+                {
+                    playerCar = EntManager.Create<Car>();
+                    playerCar.SetPos(new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, 3.0f));
+                    playerCar.Spawn();
+                }
+                else
+                {
+                    playerCar.Remove();
+                    playerCar = null;
+                }
             }
         }
 
