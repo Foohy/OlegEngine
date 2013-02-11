@@ -82,14 +82,14 @@ namespace Two_and_a_Half_Dimensions.Entity
             return Ents.ToArray();
         }
 
-        public static BaseEntity[] GetByType<T>() where T : BaseEntity
+        public static T[] GetByType<T>() where T : BaseEntity
         {
-            List<BaseEntity> ents = new List<BaseEntity>();
+            List<T> ents = new List<T>();
             for (int i = 0; i < Ents.Count; i++)
             {
                 if (Ents[i] is T)
                 {
-                    ents.Add(Ents[i]);
+                    ents.Add((T)Ents[i]);
                 }
             }
 

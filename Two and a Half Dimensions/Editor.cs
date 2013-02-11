@@ -10,23 +10,35 @@ using Two_and_a_Half_Dimensions.Entity;
 
 namespace Two_and_a_Half_Dimensions
 {
+    enum EditMode
+    {
+        CreatePhys,
+        CreateEnt,
+        Transform
+    }
+
     class Editor
     {
         public static bool Active = false;
-
         public static float Zoom = 1.0f;
+        public static EditMode CurrentMode = EditMode.CreatePhys;
+        public static Vector3 MousePos = new Vector3();
+        public static BaseEntity SelectedEnt;
+        public static ent_cursor Cursor;
+
         private static float goalZoom = 5.0f;
 
         private static Vector3 Pos = new Vector3();
-        private static Vector3 MousePos = new Vector3();
+
         private static float multiplier = 8;
 
         private static float halfPI = -1.570796326794896f;
-        private static ent_cursor Cursor;
+
         private static float Multiplier = 0.000924f;
 
         private static List<Vector2> Points = new List<Vector2>();
-        private static ent_editor_build TempEnt;
+        
+        
         public static void Init()
         {
             Pos = new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, Player.ply.Pos.Z);
@@ -43,29 +55,77 @@ namespace Two_and_a_Half_Dimensions
 
         static void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
         {
-            if (e.Key == Key.Enter && TempEnt != null && TempEnt.Points.Count > 1)
+            switch (CurrentMode)
             {
-                TempEnt.Build();
+                case EditMode.CreateEnt:
+                    break;
 
-                TempEnt = null;
+                case EditMode.CreatePhys:
+                    CreatePhys.KeyDown(e);
+                    break;
+
+                case EditMode.Transform:
+                    Transform.KeyDown(e);
+                    break;
+            }
+
+            if (e.Key == Key.Left)
+            {
+                CurrentMode--;
+                if (CurrentMode < 0) CurrentMode = EditMode.Transform;
+
+                Console.WriteLine("EDIT MODE: {0}", CurrentMode.ToString());
             }
         }
 
         static void Mouse_ButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MouseState state = Mouse.GetState();
+            switch (CurrentMode)
+            {
+                case EditMode.CreateEnt:
+                    break;
+
+                case EditMode.CreatePhys:
+                    CreatePhys.MouseUp(e);
+                    break;
+
+                case EditMode.Transform:
+                    Transform.MouseUp(e);
+                    break;
+            }
         }
 
         static void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (TempEnt == null)
+            switch (CurrentMode)
             {
-                TempEnt = EntManager.Create<ent_editor_build>();
-                TempEnt.Spawn();
+                case EditMode.CreateEnt:
+                    break;
+
+                case EditMode.CreatePhys:
+                    CreatePhys.MouseDown(e);
+                    break;
+
+                case EditMode.Transform:
+                    Transform.MouseDown(e);
+                    break;
             }
-            TempEnt.AddPoint(MousePos);
-            //TempEnt.Points.Add(MousePos);
-            //Points.Add(MousePos);
+        }
+
+        public static void SetSelected(BaseEntity e)
+        {
+            //Reset the previous selected ents color
+            if (SelectedEnt != null)
+            {
+                SelectedEnt.Color = Vector3.One;
+            }
+            SelectedEnt = e;
+
+            //Set the new entity's color
+            if (SelectedEnt != null)
+            {
+                SelectedEnt.Color = new Vector3(0, 1.0f, 0);
+            }
         }
 
         public static void Think(FrameEventArgs e)
@@ -126,6 +186,21 @@ namespace Two_and_a_Half_Dimensions
                 //MousePos += LPCameraScreenToVector(0, 0, Utilities.window.Mouse.X, Utilities.window.Mouse.Y, (float)Math.PI / 4.0f);
                 MousePos += mousePos * Zoom * Multiplier; //lmao fuck
                 Cursor.SetPos(MousePos);
+            }
+
+            //Tell the current mode to think
+            switch (CurrentMode)
+            {
+                case EditMode.CreateEnt:
+                    break;
+
+                case EditMode.CreatePhys:
+                    CreatePhys.Think(e);
+                    break;
+
+                case EditMode.Transform:
+                    Transform.Think(e);
+                    break;
             }
         }
         private static Vector3 Get2Dto3D(int x, int y, float z)
@@ -234,5 +309,115 @@ namespace Two_and_a_Half_Dimensions
             Utilities.window.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Mouse.ButtonUp -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
         }
+
+
+
+        #region SPECIFIC MODE FUNCTIONALITY
+
+        private class CreatePhys
+        {
+            private static ent_editor_build TempEnt;
+
+            public static void MouseDown(MouseButtonEventArgs e)
+            {
+                if (TempEnt == null)
+                {
+                    TempEnt = EntManager.Create<ent_editor_build>();
+                    TempEnt.Spawn();
+                }
+                TempEnt.AddPoint(Editor.MousePos);
+                //TempEnt.Points.Add(MousePos);
+                //Points.Add(MousePos);
+            }
+
+            public static void MouseUp(MouseButtonEventArgs e)
+            {
+
+            }
+
+            public static void KeyDown(KeyboardKeyEventArgs e)
+            {
+                if (e.Key == Key.Enter && TempEnt != null && TempEnt.Points.Count > 1)
+                {
+                    TempEnt.Build();
+
+                    TempEnt = null;
+                }
+            }
+
+            public static void KeyUp(KeyboardKeyEventArgs e)
+            {
+            }
+
+            public static void Think(FrameEventArgs e)
+            {
+
+            }
+        }
+        private class Transform
+        {
+            static float dist = (float)Math.Pow(5, 2); //use the distance squared to save on sqrt calls
+            static bool dragging = false;
+            public static void MouseDown(MouseButtonEventArgs e)
+            {
+                float curDist = dist;
+                BaseEntity closest = null;
+                //Try to find an entity
+                BaseEntity[] ents = EntManager.GetAll();
+                for (int i = 0; i < ents.Length; i++)
+                {
+                    Vector3 dif = ents[i].Position - Editor.MousePos;
+                    if (dif.LengthSquared < curDist && !(ents[i] is ent_cursor))
+                    {
+                        curDist = dif.LengthSquared;
+                        closest = ents[i];
+                    }
+                }
+                Editor.SetSelected(closest);
+
+                if (closest != null)
+                {
+                    dragging = true;
+                }
+                else
+                {
+
+                }
+            }
+
+            public static void MouseUp(MouseButtonEventArgs e)
+            {
+                if (dragging && Editor.SelectedEnt != null)
+                {
+                    Editor.SelectedEnt.SetPos(new Vector2(Editor.MousePos.X, Editor.MousePos.Y));
+                    dragging = false;
+                }
+            }
+
+            public static void KeyDown(KeyboardKeyEventArgs e)
+            {
+
+            }
+
+            public static void KeyUp(KeyboardKeyEventArgs e)
+            {
+            }
+
+            public static void Think(FrameEventArgs e)
+            {
+                if (dragging && Editor.SelectedEnt != null)
+                {
+                    Editor.SelectedEnt.SetPos(new Vector2(Editor.MousePos.X, Editor.MousePos.Y));
+
+                    if (Editor.SelectedEnt.Physics != null)
+                    {
+                        Editor.SelectedEnt.Physics.Body.LinearVelocity = new Microsoft.Xna.Framework.Vector2(Input.deltaX, -Input.deltaY) / 4.0f;
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
+
 }
