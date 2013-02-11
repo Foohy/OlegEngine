@@ -17,19 +17,20 @@ namespace Two_and_a_Half_Dimensions.Entity
         public List<Vector3> Points = new List<Vector3>();
         public bool Built = false;
         private List<Vector3> _meshPoints = new List<Vector3>();
-        private Mesh previewMesh = new Mesh();
+        private Mesh previewMesh;
         public override void Init()
         {
+            previewMesh = new Mesh();
             this.Model = Resource.GetMesh("ball.obj");
             this.Mat = Resource.GetMaterial("engine/white");
-            this.Mat.Properties.ShaderProgram = Resource.GetProgram("default");
+            //this.Mat.SetShader(Resource.GetProgram("default"));
             this.Scale = Vector3.One * 0.05f;
+            this.Color = new Vector3(0, 1.0f, 0);
 
             previewMesh.DrawMode = BeginMode.Lines;
-            previewMesh.mat = Resource.GetMaterial("engine/white");
-            previewMesh.mat.SetShader("default");
+            previewMesh.mat = Resource.GetMaterial("engine/white_simple");
             previewMesh.UsageHint = BufferUsageHint.StreamDraw;
-            //previewMesh.LoadMesh("debug/quad.obj");
+            previewMesh.Color = new Vector3(1.0f,0, 0);
         }
 
         public void AddPoint(Vector3 point)
@@ -63,6 +64,8 @@ namespace Two_and_a_Half_Dimensions.Entity
             List<Fixture> fixt = FarseerPhysics.Factories.FixtureFactory.AttachCompoundPolygon(moreverts, 0.5f, bod);
 
             this.Built = true;
+            previewMesh.Color = new Vector3(1.0f, 1.0f, 1.0f);
+            previewMesh.mat.SetShader(Resource.GetProgram("default_lighting"));
         }
         private Vector3[] GenerateVerts()
         {

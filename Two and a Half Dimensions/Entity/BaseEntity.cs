@@ -21,6 +21,7 @@ namespace Two_and_a_Half_Dimensions.Entity
         public bool DisableLighting { get; set; }
         public OpenTK.Graphics.OpenGL.BeginMode drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
         public bool WorldSpawn = false;
+        public Vector3 Color { get; set; }
 
         public Vector3 Position { get; private set; }
         public Vector3 Angle { get; private set; }
@@ -33,7 +34,8 @@ namespace Two_and_a_Half_Dimensions.Entity
 
         public void Spawn()
         {
-            this.Scale = new Vector3(1, 1, 1);
+            this.Color = Vector3.One;
+            this.Scale = Vector3.One;
             this.DisableLighting = false;
             this.Init();
 
@@ -61,6 +63,7 @@ namespace Two_and_a_Half_Dimensions.Entity
                 if (this.DisableLighting) GL.Disable(EnableCap.Lighting);
 
                 Model.mat = this.Mat;
+                Model.Color = this.Color;
 
                 modelview = Matrix4.CreateTranslation(Vector3.Zero);
                 modelview *= Matrix4.Scale(Scale);

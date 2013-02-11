@@ -261,6 +261,7 @@ namespace Two_and_a_Half_Dimensions
     {
         public BeginMode DrawMode = BeginMode.Triangles;
         public BufferUsageHint UsageHint = BufferUsageHint.StaticDraw;
+        public Vector3 Color = Vector3.One;
 
         public const int INDEX_BUFFER  = 0;
         public const int POS_VB        = 1;
@@ -425,7 +426,9 @@ namespace Two_and_a_Half_Dimensions
             GL.BindVertexArray(this.VAO);
             if (mat != null)
             {
+                mat.Properties.Color = this.Color;
                 mat.BindMaterial();
+                
 
                 //Set the matrix to the shader
                 GL.UniformMatrix4(mat.locMMatrix, false, ref mmatrix);
@@ -464,6 +467,7 @@ namespace Two_and_a_Half_Dimensions
         public int locNormalMap = -1;
         public int locShadowMap = -1;
         public int locShadowMapTexture = -1;
+        public int locColor = -1;
 
         /// <summary>
         /// Initialize a new material object - all by yourself!
@@ -541,6 +545,7 @@ namespace Two_and_a_Half_Dimensions
                 locNormalMap = GL.GetUniformLocation(Program, "sampler_normal");
                 locShadowMap = GL.GetUniformLocation(Program, "sampler_shadow");
                 locShadowMapTexture = GL.GetUniformLocation(Program, "sampler_shadow_tex");
+                locColor = GL.GetUniformLocation(Program, "_color");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -580,6 +585,7 @@ namespace Two_and_a_Half_Dimensions
                 locNormalMap = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_normal");
                 locShadowMap = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_shadow");
                 locShadowMapTexture = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_shadow_tex");
+                locColor = GL.GetUniformLocation(Properties.ShaderProgram, "_color");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -616,8 +622,7 @@ namespace Two_and_a_Half_Dimensions
             GL.ActiveTexture(TextureUnit.Texture1);
             if (Properties.NormalMapTexture > 0)
             {
-                GL.BindTexture(TextureTarget.Texture2D, Properties.NormalMapTexture );
-                
+                GL.BindTexture(TextureTarget.Texture2D, Properties.NormalMapTexture );             
             }
             else
             {
@@ -631,16 +636,24 @@ namespace Two_and_a_Half_Dimensions
 
             Utilities.window.effect.SetMatSpecularIntensity(Properties.SpecularIntensity);
             Utilities.window.effect.SetMatSpecularPower(Properties.SpecularPower);
+
+            GL.Uniform3(this.locColor, this.Properties.Color);
         }
     }
 
-    struct MaterialProperties
+    class MaterialProperties
     {
         public int ShaderProgram;
         public int BaseTexture;
         public int NormalMapTexture;
         public float SpecularPower;
         public float SpecularIntensity;
+        public Vector3 Color;
+
+        public MaterialProperties()
+        {
+            Color = Vector3.One;
+        }
     }
 
     class FBO

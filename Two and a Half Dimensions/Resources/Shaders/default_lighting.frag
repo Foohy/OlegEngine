@@ -91,6 +91,7 @@ uniform int gNumShadowCasters;
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
 uniform vec3 gEyeWorldPos;
+uniform vec3 _color = vec3( 1.0, 1.0, 1.0);
 
 uniform sampler2D sampler;
 uniform sampler2D sampler_normal;
@@ -281,5 +282,5 @@ void main()
 		TotalLight += CalcShadowSpotLight(gShadowCasters[i], Normal, ex_LightSpacePos );
 	}
 
-	gl_FragColor = texture2D( sampler, ex_UV.st) * TotalLight;
+	gl_FragColor = texture2D( sampler, ex_UV.st) * TotalLight * vec4(_color, 1.0);
 }
