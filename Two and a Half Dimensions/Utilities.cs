@@ -99,6 +99,20 @@ namespace Two_and_a_Half_Dimensions
                             properties.SpecularIntensity = intensity;
                             break;
 
+                        case "Color":
+                            string curline = reader.Value.ToString();
+                            string[] components = curline.Split(' ');
+                            if (components.Length > 2)
+                            {
+                                float r= 1.0f, g = 1.0f, b = 1.0f;
+                                float.TryParse(components[0], out r);
+                                float.TryParse(components[1], out g);
+                                float.TryParse(components[2], out b);
+
+                                properties.Color = new Vector3(r, g, b);
+                            }
+                            break;
+
                         default:
                             break;
                     }
