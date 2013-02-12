@@ -58,6 +58,7 @@ namespace Two_and_a_Half_Dimensions
             switch (CurrentMode)
             {
                 case EditMode.CreateEnt:
+                    CreateEnt.KeyDown(e);
                     break;
 
                 case EditMode.CreatePhys:
@@ -83,6 +84,7 @@ namespace Two_and_a_Half_Dimensions
             switch (CurrentMode)
             {
                 case EditMode.CreateEnt:
+                    CreateEnt.MouseUp(e);
                     break;
 
                 case EditMode.CreatePhys:
@@ -100,6 +102,7 @@ namespace Two_and_a_Half_Dimensions
             switch (CurrentMode)
             {
                 case EditMode.CreateEnt:
+                    CreateEnt.MouseDown(e);
                     break;
 
                 case EditMode.CreatePhys:
@@ -192,6 +195,7 @@ namespace Two_and_a_Half_Dimensions
             switch (CurrentMode)
             {
                 case EditMode.CreateEnt:
+                    CreateEnt.Think(e);
                     break;
 
                 case EditMode.CreatePhys:
@@ -358,6 +362,7 @@ namespace Two_and_a_Half_Dimensions
         {
             static float dist = (float)Math.Pow(5, 2); //use the distance squared to save on sqrt calls
             static bool dragging = false;
+            static Vector3 offset = Vector3.Zero;
             public static void MouseDown(MouseButtonEventArgs e)
             {
                 float curDist = dist;
@@ -378,6 +383,7 @@ namespace Two_and_a_Half_Dimensions
                 if (closest != null)
                 {
                     dragging = true;
+                    offset = MousePos - closest.Position;
                 }
                 else
                 {
@@ -389,7 +395,7 @@ namespace Two_and_a_Half_Dimensions
             {
                 if (dragging && Editor.SelectedEnt != null)
                 {
-                    Editor.SelectedEnt.SetPos(new Vector2(Editor.MousePos.X, Editor.MousePos.Y));
+                    Editor.SelectedEnt.SetPos(MousePos - offset);
                     dragging = false;
                 }
             }
@@ -407,13 +413,38 @@ namespace Two_and_a_Half_Dimensions
             {
                 if (dragging && Editor.SelectedEnt != null)
                 {
-                    Editor.SelectedEnt.SetPos(new Vector2(Editor.MousePos.X, Editor.MousePos.Y));
+                    Editor.SelectedEnt.SetPos(MousePos - offset);
 
                     if (Editor.SelectedEnt.Physics != null)
                     {
                         Editor.SelectedEnt.Physics.Body.LinearVelocity = new Microsoft.Xna.Framework.Vector2(Input.deltaX, -Input.deltaY) / 4.0f;
                     }
                 }
+            }
+        }
+        private class CreateEnt
+        {
+            public static void MouseDown(MouseButtonEventArgs e)
+            {
+
+            }
+
+            public static void MouseUp(MouseButtonEventArgs e)
+            {
+
+            }
+
+            public static void KeyDown(KeyboardKeyEventArgs e)
+            {
+
+            }
+
+            public static void KeyUp(KeyboardKeyEventArgs e)
+            {
+            }
+
+            public static void Think(FrameEventArgs e)
+            {
             }
         }
 

@@ -16,7 +16,6 @@ namespace Two_and_a_Half_Dimensions.Entity
     {
         public bool Enabled { get; set; }
         public bool ExpensiveShadows { get; set; }
-        public Vector3 Color { get; set; }
         public float Cutoff { get; set; }
         public float Constant { get; set; }
         public float AmbientIntensity { get; set; }

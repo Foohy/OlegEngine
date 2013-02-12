@@ -15,7 +15,6 @@ namespace Two_and_a_Half_Dimensions.Entity
     class ent_pointlight : BaseEntity 
     {
         public bool Enabled { get; set; }
-        public Vector3 Color { get; set; }
         public float Cutoff { get; set; }
         public float Constant { get; set; }
         public float AmbientIntensity { get; set; }
