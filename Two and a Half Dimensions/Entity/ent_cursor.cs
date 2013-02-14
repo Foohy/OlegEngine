@@ -25,7 +25,7 @@ namespace Two_and_a_Half_Dimensions.Entity
             pl.DiffuseIntensity = 0.6f;
             pl.Linear = 2.0f;
             pl.Position = this.Position;
-            pl.Color = new Vector3(1.0f, 1.0f, 1.0f);
+            //pl.Color = new Vector3(1.0f, 1.0f, 1.0f);
             this.EmitSound("Resources/Audio/horn.mp3");
         }
 

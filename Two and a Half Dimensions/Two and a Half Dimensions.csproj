@@ -120,8 +120,6 @@
     <Content Include="Resources\Materials\boobs.jpg" />
     <Content Include="Resources\Materials\cow.jpg" />
     <Content Include="Resources\Materials\depth.png" />
-    <Content Include="Resources\Materials\engine\error.png" />
-    <Content Include="Resources\Materials\engine\normal_up.jpg" />
     <Content Include="Resources\Materials\engine\white.png" />
     <Content Include="Resources\Materials\levels\building.png" />
     <Content Include="Resources\Materials\levels\dirt.png" />
@@ -137,8 +135,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Materials\engine\depth.fmf" />
-    <None Include="Resources\Materials\engine\error.fmf" />
-    <None Include="Resources\Materials\engine\normal_up.fmf" />
     <None Include="Resources\Materials\engine\white.fmf" />
     <None Include="Resources\Materials\engine\white_shiny.fmf" />
     <None Include="Resources\Materials\levels\building.fmf" />

@@ -38,9 +38,9 @@ namespace Two_and_a_Half_Dimensions
             window = win;
 
             //Make sure default error textures
-            ErrorTex = LoadTexture("engine/error.png");
-            ErrorMat = LoadMaterial("engine/error");
-            NormalUp = LoadMaterial("engine/normal_up");
+            ErrorTex = GenerateErrorTex();
+            ErrorMat = new Material(ErrorTex, "default");
+            NormalUp = new Material(GenerateNormalTex(), "default");
         }
 
         public static Material LoadMaterial(string filename)
@@ -164,7 +164,7 @@ namespace Two_and_a_Half_Dimensions
             // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.ActiveTexture(TextureUnit.Texture0);//Something farish away
+            GL.ActiveTexture(TextureUnit.Texture0);
             return id;
         }
 
@@ -466,6 +466,72 @@ namespace Two_and_a_Half_Dimensions
             if (num > high) return high;
             if (num < low) return low;
             return num;
+        }
+
+        private static int GenerateErrorTex()
+        {
+            Bitmap tex = new Bitmap(32, 32);
+            for (int x = 0; x < tex.Height; x++)
+            {
+                for (int y = 0; y < tex.Width; y++)
+                {
+                    if ((x + (y%2)) % 2 == 0)
+                    {
+                        tex.SetPixel(x, y, Color.White);
+                    }
+                    else
+                    {
+                        tex.SetPixel(x, y, Color.Red);
+                    }
+                }
+            }
+
+            //Create the opengl texture
+            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, id);
+
+            System.Drawing.Imaging.BitmapData bmp_data = tex.LockBits(new Rectangle(0, 0, tex.Width, tex.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            tex.UnlockBits(bmp_data);
+
+            // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
+            // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
+            // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest );
+            GL.ActiveTexture(TextureUnit.Texture0);
+            return id;
+        }
+
+        private static int GenerateNormalTex()
+        {
+            Bitmap tex = new Bitmap(1, 1);
+            
+            tex.SetPixel(0, 0, Color.FromArgb( 133, 119, 253 ));
+
+            //Create the opengl texture
+            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, id);
+
+            System.Drawing.Imaging.BitmapData bmp_data = tex.LockBits(new Rectangle(0, 0, tex.Width, tex.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            tex.UnlockBits(bmp_data);
+
+            // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
+            // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
+            // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            return id;
         }
     }
 }
