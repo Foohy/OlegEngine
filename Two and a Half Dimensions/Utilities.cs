@@ -159,11 +159,21 @@ namespace Two_and_a_Half_Dimensions
 
             bmp.UnlockBits(bmp_data);
 
-            // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
-            // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
-            // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+            if (GLVersion.Major <= 2)
+            {
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, 1); 
+            }
+            else
+            {
+                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);  
+            }
+
+            //TODO: Settings system that'll only set supported modes
+            float maxAniso;
+            GL.GetFloat((GetPName)ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out maxAniso);
+            GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, maxAniso);
+
             GL.ActiveTexture(TextureUnit.Texture0);
             return id;
         }

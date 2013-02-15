@@ -10,6 +10,14 @@ using OpenTK.Input;
 
 namespace Two_and_a_Half_Dimensions
 {
+
+    struct GLVersion
+    {
+        static public int Major;
+        static public int Minor;
+    }
+
+
     class Program : GameWindow 
     {
         public Player ply;
@@ -18,6 +26,7 @@ namespace Two_and_a_Half_Dimensions
         public LightingTechnique effect = new LightingTechnique();
         public SkyboxTechnique skybox = new SkyboxTechnique();
         public ShadowTechnique shadows = new ShadowTechnique();
+
 
         public Program()
             : base(1900, 900, new GraphicsMode(32, 24, 0, 4), "BY NO MEANS.", GameWindowFlags.Default) //GraphicsMode(32, 24, 0, 4)
@@ -37,9 +46,9 @@ namespace Two_and_a_Half_Dimensions
             Console.WriteLine(", Renderer: {0}", GL.GetString(StringName.Renderer));
             Console.WriteLine(GL.GetString(StringName.ShadingLanguageVersion));
             string versionOpenGL = GL.GetString(StringName.Version);
-            int major = int.Parse(versionOpenGL[0].ToString());
-            int minor = int.Parse(versionOpenGL[2].ToString());
-            Console.WriteLine("OpenGL version: {0}.{1}", major, minor);
+            GLVersion.Major = versionOpenGL[0];
+            GLVersion.Minor = versionOpenGL[2];
+            Console.WriteLine("OpenGL version: {0}.{1}", GLVersion.Major, GLVersion.Minor);
             Console.WriteLine("==================================");
 
             Utilities.Init(this);
