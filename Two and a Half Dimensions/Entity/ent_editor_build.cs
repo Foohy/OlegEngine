@@ -65,7 +65,6 @@ namespace Two_and_a_Half_Dimensions.Entity
 
             this.Built = true;
             previewMesh.Color = new Vector3(1.0f, 1.0f, 1.0f);
-            previewMesh.mat.SetShader(Resource.GetProgram("default_lighting"));
         }
         private Vector3[] GenerateVerts()
         {

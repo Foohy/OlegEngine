@@ -178,7 +178,7 @@ namespace Two_and_a_Half_Dimensions
             return id;
         }
 
-        public static void LoadOBJ(string filename, out Vector3[] lsVerts, out int[] lsElements, out Vector3[] lsTangents, out Vector3[] lsNormals, out Vector2[] lsUV)
+        public static void LoadOBJ(string filename, out Vector3[] lsVerts, out int[] lsElements, out Vector3[] lsTangents, out Vector3[] lsNormals, out Vector2[] lsUV, out Mesh.BoundingBox boundingBox)
         {
             filename = Resource.ModelDir + filename;
 
@@ -188,6 +188,8 @@ namespace Two_and_a_Half_Dimensions
             lsTangents = null;
             lsNormals = null;
             lsUV = null;
+            boundingBox = new Mesh.BoundingBox();
+
             try
             {
                 file = System.IO.File.ReadAllLines(filename);
@@ -267,6 +269,10 @@ namespace Two_and_a_Half_Dimensions
                                 {
                                     verts.Add(verts_UNSORTED[vertNum - 1]);
                                     elements.Add(elements.Count);
+
+                                    //Update the size of the bounding box
+                                    boundingBox.BottomLeft = SmallestVec(boundingBox.BottomLeft, verts[verts.Count-1]);
+                                    boundingBox.TopRight = BiggestVec(boundingBox.TopRight, verts[verts.Count-1]);
                                 }
                             }
                             if (group.Length > 1 && group[1].Length > 0)
@@ -389,6 +395,41 @@ namespace Two_and_a_Half_Dimensions
 
 
             lsTangents = tangents.ToArray();
+        }
+
+        private static Vector3 SmallestVec(Vector3 currentSmallest, Vector3 contender)
+        {
+            if (contender.X < currentSmallest.X)
+            {
+                currentSmallest.X = contender.X;
+            }
+            if (contender.Y < currentSmallest.Y)
+            {
+                currentSmallest.Y = contender.Y;
+            }
+            if (contender.Z < currentSmallest.Z)
+            {
+                currentSmallest.Z = contender.Z;
+            }
+
+            return currentSmallest;
+        }
+        private static Vector3 BiggestVec(Vector3 currentBiggest, Vector3 contender)
+        {
+            if (contender.X > currentBiggest.X)
+            {
+                currentBiggest.X = contender.X;
+            }
+            if (contender.Y > currentBiggest.Y)
+            {
+                currentBiggest.Y = contender.Y;
+            }
+            if (contender.Z > currentBiggest.Z)
+            {
+                currentBiggest.Z = contender.Z;
+            }
+
+            return currentBiggest;
         }
 
         public static Vector3[] CalculateTangents(Vector3[] vertices, Vector2[] UV)

@@ -70,8 +70,9 @@ namespace Two_and_a_Half_Dimensions
                 Vector3[] normals;
                 Vector2[] lsUV;
                 int[] elements;
+                Mesh.BoundingBox boundingbox;
 
-                Utilities.LoadOBJ(filename, out verts, out elements, out tangents,out normals, out lsUV );
+                Utilities.LoadOBJ(filename, out verts, out elements, out tangents,out normals, out lsUV, out boundingbox );
                 Models[filename] = new VBO(verts, elements, null, normals, lsUV);
             }
 
@@ -86,8 +87,9 @@ namespace Two_and_a_Half_Dimensions
                 Vector3[] normals;
                 Vector2[] lsUV;
                 int[] elements;
+                Mesh.BoundingBox boundingbox;
 
-                Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV);
+                Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
                 Meshes[filename] = new Mesh(verts, elements,tangents, normals, lsUV);
             }
 

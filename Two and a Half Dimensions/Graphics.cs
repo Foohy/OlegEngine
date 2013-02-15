@@ -276,6 +276,12 @@ namespace Two_and_a_Half_Dimensions
         int[] BaseIndex;
         int NumIndices = -1;
 
+        public class BoundingBox
+        {
+            public Vector3 BottomLeft = -Vector3.One;
+            public Vector3 TopRight = Vector3.One;
+        }
+
         public Mesh()
         {
         }
@@ -299,8 +305,9 @@ namespace Two_and_a_Half_Dimensions
             Vector3[] normals;
             Vector2[] lsUV;
             int[] elements;
+            Mesh.BoundingBox boundingbox;
 
-            Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV);
+            Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox );
 
             loadMesh(verts, elements, tangents, normals, lsUV);
         }
@@ -312,8 +319,9 @@ namespace Two_and_a_Half_Dimensions
             Vector3[] normals;
             Vector2[] lsUV;
             int[] elements;
+            Mesh.BoundingBox boundingbox;
 
-            Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV);
+            Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
 
             UpdateMesh(verts, elements, tangents, normals, lsUV);
         }
