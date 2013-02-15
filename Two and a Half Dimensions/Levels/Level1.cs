@@ -17,7 +17,7 @@ namespace Two_and_a_Half_Dimensions.Levels
         bool SetShadow = true;
         Vector3 Angle = new Vector3();
         ent_spotlight spotlight;
-        Car playerCar;
+        ent_car playerCar;
         public override void Preload()
         {
             levelmodel = Resource.GetMesh("Levels/level1.obj");
@@ -30,7 +30,7 @@ namespace Two_and_a_Half_Dimensions.Levels
             level.BodyType = BodyType.Static;
 
 
-            BaseEntity ent = EntManager.Create<DepthScreen>();
+            BaseEntity ent = EntManager.Create<ent_depthscreen>();
             ent.Spawn();
 
             Vector3 OlegPos = new Vector3(-2.00f, 2.421f, -14.90f);
@@ -92,7 +92,7 @@ namespace Two_and_a_Half_Dimensions.Levels
             }
             if (e.Key == OpenTK.Input.Key.Q)
             {
-                Entity.TestBall ball = (Entity.TestBall)Entity.EntManager.Create<Entity.TestBall>();
+                Entity.ent_testball ball = (Entity.ent_testball)Entity.EntManager.Create<Entity.ent_testball>();
                 //ball.radius = rand.Next(0, 3000) / (float)1000;
                 ball.Spawn();
                 ball.SetPos(new Vector2(Player.ply.Pos.X, Player.ply.Pos.Y + 3.0f));
@@ -114,7 +114,7 @@ namespace Two_and_a_Half_Dimensions.Levels
             {
                 if (playerCar == null)
                 {
-                    playerCar = EntManager.Create<Car>();
+                    playerCar = EntManager.Create<ent_car>();
                     playerCar.SetPos(new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, 3.0f));
                     playerCar.Spawn();
                 }

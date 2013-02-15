@@ -7,7 +7,7 @@ using OpenTK;
 
 namespace Two_and_a_Half_Dimensions.Entity
 {
-    class Speaker : BaseEntity 
+    class ent_speaker : BaseEntity 
     {
         float startTime = 0;
         float syncedTime = 0;

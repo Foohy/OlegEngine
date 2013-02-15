@@ -12,7 +12,7 @@ using FarseerPhysics.Dynamics;
 
 namespace Two_and_a_Half_Dimensions.Entity
 {
-    class TestBall : BaseEntity 
+    class ent_testball : BaseEntity 
     {
         public float Rotation = 0;
         public float radius = 1.0f;

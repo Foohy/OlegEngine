@@ -12,7 +12,7 @@ using FarseerPhysics.Dynamics;
 
 namespace Two_and_a_Half_Dimensions.Entity
 {
-    class Car : BaseEntity
+    class ent_car : BaseEntity
     {
         public Matrix4 camMatrix;
         public Vector2d CamAngle = new Vector2d(-1.5f, 0.0f);

@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Two_and_a_Half_Dimensions.Entity
 {
-    class DepthScreen : BaseEntity 
+    class ent_depthscreen : BaseEntity 
     {
         private bool shouldDraw = true;
         public override void Init()

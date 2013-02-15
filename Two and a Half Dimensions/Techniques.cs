@@ -125,7 +125,7 @@ namespace Two_and_a_Half_Dimensions
         }
 
         //lmao
-        Entity.Car car;
+        Entity.ent_car car;
         Entity.BaseEntity fire;
         private EventArgs ev =  new EventArgs();
         public override void Render()

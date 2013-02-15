@@ -172,7 +172,7 @@ namespace Two_and_a_Half_Dimensions.Levels
             //Fixture fix = bod.CreateFixture(edgeShape);
 
             //Create a player
-            ply = Entity.EntManager.Create<Entity.Car>();
+            ply = Entity.EntManager.Create<Entity.ent_car>();
             ply.SetPos(new Vector3(190, 100, -2.0f));
             ply.Spawn();
 
@@ -190,7 +190,7 @@ namespace Two_and_a_Half_Dimensions.Levels
             //Vertices physverts = PolygonTools.CreatePolygon(bmp., bmp.Width);
 
             //gimme some depths
-            Entity.BaseEntity ent = Entity.EntManager.Create<Entity.DepthScreen>();
+            Entity.BaseEntity ent = Entity.EntManager.Create<ent_depthscreen>();
             ent.Spawn();
 
         }
@@ -233,7 +233,7 @@ namespace Two_and_a_Half_Dimensions.Levels
             if (e.KeyChar == 'q')
             {
 
-                Entity.TestBall ball = (Entity.TestBall)Entity.EntManager.Create<Entity.TestBall>();
+                Entity.ent_testball ball = (Entity.ent_testball)Entity.EntManager.Create<Entity.ent_testball>();
                 //ball.radius = rand.Next(0, 3000) / (float)1000;
                 ball.Spawn();
                 ball.SetPos(new Vector2(Player.ply.Pos.X, Player.ply.Pos.Y + 3.0f));
@@ -241,7 +241,7 @@ namespace Two_and_a_Half_Dimensions.Levels
 
             if (e.KeyChar == 'e')
             {
-                Entity.TestNerd nerd = (Entity.TestNerd)Entity.EntManager.Create<Entity.TestNerd>();
+                Entity.ent_testnerd nerd = (Entity.ent_testnerd)Entity.EntManager.Create<Entity.ent_testnerd>();
                 //ball.radius = rand.Next(0, 3000) / (float)1000;
                 nerd.Spawn();
                 nerd.SetPos(new Vector2(Player.ply.Pos.X, Player.ply.Pos.Y + 3.0f));
@@ -265,7 +265,7 @@ namespace Two_and_a_Half_Dimensions.Levels
 
             for (int i = 0; i < amt; i+=20)
             {
-                Entity.BaseEntity speaker = Entity.EntManager.Create<Entity.Speaker>();
+                Entity.BaseEntity speaker = Entity.EntManager.Create<Entity.ent_speaker>();
                 speaker.SetPos(new Vector3(Points[i].X - 1.0f, Points[i].Y, 1.0f) );
                 speaker.Spawn();
             }

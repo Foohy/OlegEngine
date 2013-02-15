@@ -12,7 +12,7 @@ using FarseerPhysics.Dynamics;
 
 namespace Two_and_a_Half_Dimensions.Entity
 {
-    class Player : BaseEntity
+    class ent_player : BaseEntity
     {
         public float radius = 2.0f;
 
