@@ -46,8 +46,8 @@ namespace Two_and_a_Half_Dimensions.Levels
 
             oleg = (ent_static)Entity.EntManager.Create<ent_static>();
             oleg.Spawn();
-            oleg.Model = Resource.GetMesh("props/popcorn_machine.obj");
-            oleg.Mat = Resource.GetMaterial("models/props/popcorn_machine");
+            oleg.Model = Resource.GetMesh("props/radio.obj");
+            oleg.Mat = Resource.GetMaterial("engine/white");
             oleg.Name = "Popcorn Machine";
             oleg.SetPos(new Vector3( 60.614f, 0.0f, -2.1119f ));
             oleg.Scale = new Vector3(0.45f);
@@ -66,6 +66,10 @@ namespace Two_and_a_Half_Dimensions.Levels
             spotlight.Color = new Vector3(1.0f, 1.0f, 1.0f);
             spotlight.Constant = 1.0f;
             spotlight.Cutoff = 20.0f;
+
+            //HUD?!?!?!?!?!?
+            //GUI.GUIManager.Create<GUI.Panel>();
+            GUI.GUIManager.Create<GUI.Window>();
 
             //Make us some nice environmental lighting
             DirectionalLight light = new DirectionalLight();

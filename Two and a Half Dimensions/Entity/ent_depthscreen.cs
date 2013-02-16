@@ -11,11 +11,19 @@ namespace Two_and_a_Half_Dimensions.Entity
     class ent_depthscreen : BaseEntity 
     {
         private bool shouldDraw = true;
+        GUI.Panel DepthScreen;
+        float Size = 8;
         public override void Init()
         {
             this.Mat = Resource.GetMaterial("engine/depth");
             this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
             this.Model = Resource.GetMesh("debug/quad.obj");
+
+            DepthScreen = GUI.GUIManager.Create<GUI.Panel>();
+            DepthScreen.SetMaterial(Resource.GetMaterial("engine/depth"));
+            DepthScreen.Width = Utilities.window.Width / Size;
+            DepthScreen.Height = Utilities.window.Height / Size;
+            DepthScreen.Position = new Vector2(0, Utilities.window.Height - DepthScreen.Height);
 
             Utilities.window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
@@ -25,26 +33,18 @@ namespace Two_and_a_Half_Dimensions.Entity
             if (e.Key == OpenTK.Input.Key.F1)
             {
                 shouldDraw = !shouldDraw;
+                DepthScreen.ShouldDraw = shouldDraw;
             }
         }
 
         public override void Think()
         {
-            //this.SetPos(Utilities.window.ply.Pos);
-            //this.SetAngle(new Vector3((float)Utilities.Time, (float)Utilities.Time, (float)Utilities.Time ));
+
         }
 
         public override void Draw()
         {
-            if (!shouldDraw) { return; }
-            if (Utilities.CurrentPass == 2)
-            {
-                GL.Disable(EnableCap.CullFace);
-                GL.DepthFunc(DepthFunction.Always);
-                base.Draw();
-                GL.Enable(EnableCap.CullFace);
-                GL.DepthFunc(DepthFunction.Less);
-            }
+
         }
     }
 }

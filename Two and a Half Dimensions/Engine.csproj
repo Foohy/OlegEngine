@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Two_and_a_Half_Dimensions</RootNamespace>
-    <AssemblyName>Two and a Half Dimensions</AssemblyName>
+    <AssemblyName>Engine</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -77,7 +77,9 @@
     <Compile Include="Entity\ent_speaker.cs" />
     <Compile Include="Entity\ent_testball.cs" />
     <Compile Include="Graphics.cs" />
+    <Compile Include="GUI\Elements\Window.cs" />
     <Compile Include="GUI\Elements\Panel.cs" />
+    <Compile Include="GUI\gui.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="Levels\Level1.cs" />
     <Compile Include="Levels\LevelBase.cs" />
@@ -199,6 +201,12 @@
     </None>
     <None Include="Resources\Models\wheel.obj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Shaders\hud.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Shaders\hud.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Resources\Shaders\skybox2.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

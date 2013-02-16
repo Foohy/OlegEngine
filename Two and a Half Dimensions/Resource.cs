@@ -150,10 +150,15 @@ namespace Two_and_a_Half_Dimensions
                     Console.ForegroundColor = ConsoleColor.Red;
                     if (statV == 0 || over)
                     {
+                        if (statV != 0) Console.ForegroundColor = ConsoleColor.Yellow;
+
                         Console.WriteLine(GL.GetShaderInfoLog(VertexShader));
+                        Console.ForegroundColor = ConsoleColor.Red;
                     }
                     if (statF == 0 || over)
                     {
+                        if (statF != 0) Console.ForegroundColor = ConsoleColor.Yellow;
+
                         Console.WriteLine(GL.GetShaderInfoLog(FragmentShader));
                     }
                     Console.ResetColor();

@@ -27,11 +27,12 @@ namespace Two_and_a_Half_Dimensions
         public SkyboxTechnique skybox = new SkyboxTechnique();
         public ShadowTechnique shadows = new ShadowTechnique();
 
-
+        private Matrix4 defaultViewMatrix = Matrix4.Identity;
+        private Matrix4 defaultOrthoMatrix = Matrix4.Identity;
         public Program()
             : base(1900, 900, new GraphicsMode(32, 24, 0, 4), "BY NO MEANS.", GameWindowFlags.Default) //GraphicsMode(32, 24, 0, 4)
         {
-            VSync = VSyncMode.Off;
+            VSync = VSyncMode.Adaptive;
         }
 
         /// <summary>Load resources here.</summary>
@@ -105,11 +106,12 @@ namespace Two_and_a_Half_Dimensions
             base.OnResize(e);
 
             GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, Width / (float)Height, 1.0f, 256.0f);
-            Utilities.ViewMatrix = projection;
-            //Console.WriteLine(projection);
+            defaultViewMatrix = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, Width / (float)Height, 1.0f, 256.0f);
+            //defaultOrthoMatrix = Matrix4.CreateOrthographic(Width, Height, 1.0f, 256.0f);
+            defaultOrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, 1.0f, 256f);
+            Utilities.ViewMatrix = defaultViewMatrix;
             GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref projection);
+            GL.LoadMatrix(ref defaultViewMatrix);
         }
 
         /// <summary>
@@ -141,6 +143,9 @@ namespace Two_and_a_Half_Dimensions
         {
             base.OnRenderFrame(e);
             updateTitle();
+
+            //Reset the view matrix, just in case it's been altered
+            Utilities.ViewMatrix = defaultViewMatrix;
 
             //Get the positions for all the light positions that'll cast fancyshadows
             shadows.UpdateLightPositions();
@@ -178,8 +183,14 @@ namespace Two_and_a_Half_Dimensions
             Player.ply.Draw(e);
             effect.Render();
             RenderScene(e);
+
             //Draw the skybox
             skybox.Render();
+
+            //Draw surface stuff
+            Utilities.ViewMatrix = defaultOrthoMatrix;
+            Utilities.ProjectionMatrix = Matrix4.Identity;
+            GUI.GUIManager.Draw();
             SwapBuffers();
         }
 
