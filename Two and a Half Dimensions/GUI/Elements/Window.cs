@@ -79,7 +79,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             if (this.resizing)
             {
                 Vector2 Screenpos = this.GetScreenPos();
-                this.Width = Utilities.Clamp(Utilities.window.Mouse.X - Screenpos.X, 10000, this.TitleText.GetTextLength(WindowTitle));
+                this.Width = Utilities.Clamp(Utilities.window.Mouse.X - Screenpos.X, 10000, this.TitleText.GetTextLength(WindowTitle) + 10);
                 this.Height = Utilities.Clamp( Utilities.window.Mouse.Y - Screenpos.Y, 10000, 30 );
             }
         }

@@ -287,14 +287,16 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             float OffsetX = 0;
             float CurX = 0;
-            float length = 0;
+            float strLength = 0;
+            float Width = 0;
             for (int i = 0; i < str.Length; i++)
             {
                 OffsetX = this.charset.Chars[str[i]].XOffset;
-                length += (float)CurX + OffsetX;
+                Width = this.charset.Chars[str[i]].Width;
+                strLength += (float)CurX + OffsetX + Width;
             }
 
-            return length;
+            return strLength;
         }
 
         public void SetText(string text)

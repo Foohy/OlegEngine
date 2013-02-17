@@ -41,11 +41,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             for (int i = elements.Count-1; i >= 0; i--)
             {
                 Panel p = elements[i];
-                if (p.IsMouseOver())
-                {
-                    p.MouseUp(e);
-                    //break; //Only trigger it for the top-clicked element
-                }
+                p.MouseUp(e);
             }
         }
 
