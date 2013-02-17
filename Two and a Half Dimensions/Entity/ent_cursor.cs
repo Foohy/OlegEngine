@@ -26,7 +26,7 @@ namespace Two_and_a_Half_Dimensions.Entity
             pl.Linear = 2.0f;
             pl.Position = this.Position;
             //pl.Color = new Vector3(1.0f, 1.0f, 1.0f);
-            this.EmitSound("Resources/Audio/horn.mp3");
+            //this.EmitSound("Resources/Audio/horn.mp3");
         }
 
         void effect_SetLights(object sender, EventArgs e)
