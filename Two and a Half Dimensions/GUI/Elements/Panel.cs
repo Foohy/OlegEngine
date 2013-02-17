@@ -17,7 +17,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         Material Mat;
         Mesh panelMesh = Resource.GetMesh("debug/quad.obj");
-        Matrix4 modelview;
+        public Matrix4 modelview;
 
         public void SetMaterial(int TextureBuffer)
         {

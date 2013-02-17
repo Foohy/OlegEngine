@@ -28,7 +28,6 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public override void Draw()
         {
-            //this.Position = new Vector2(500 + (float)Math.Sin(Utilities.Time) * 200f, 500 );
             this.Width = 150 + (float)Math.Cos(Utilities.Time) * 100;
             this.Height = 150 + (float)Math.Sin(Utilities.Time) * 100;
 
@@ -37,8 +36,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             Title.Width = this.Width;
 
             base.Draw();
-            Title.Draw();
-            
+            Title.Draw();    
         }
     }
 }

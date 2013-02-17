@@ -1,0 +1,258 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using System.IO;
+
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
+
+namespace Two_and_a_Half_Dimensions.GUI
+{
+    class font
+    {
+        public struct CharDescriptor
+        {
+            public ushort x, y;
+            public ushort Width, Height;
+            public ushort XOffset, YOffset;
+            public ushort XAdvance;
+        }
+
+        public class Charset
+        {
+            public ushort LineHeight;
+            public ushort Base;
+            public ushort Width, Height;
+            public ushort Pages;
+            public CharDescriptor[] Chars;
+
+            public Charset()
+            {
+                Chars = new CharDescriptor[256];
+            }
+        }
+
+        public const string FontPath = "Resources/Fonts/";
+        public const string FontmapPath = "gui/fontmaps/"; //Relative to the directory for materials
+
+        public static Charset CreateFrontFromBitmap(string font)
+        {
+            return ParseFont(font);
+
+        }
+
+        public static void ConstructVertexArray(Charset ch, string str, out Vector3[] verts, out Vector2[] UV, out int[] elements )
+        {
+            ushort CharX;
+            ushort CharY;
+            ushort Width;
+            ushort Height;
+            ushort OffsetX;
+            ushort OffsetY;
+            int CurX = 0;
+
+            //vert stuff
+            verts = new Vector3[str.Length * 4];
+            UV = new Vector2[str.Length * 4];
+            elements = new int[str.Length * 4];
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                char curChar = str[i];
+                CharX = ch.Chars[curChar].x;
+                CharY = ch.Chars[curChar].y;
+                Width = ch.Chars[curChar].Width;
+                Height = ch.Chars[curChar].Height;
+                OffsetX = ch.Chars[curChar].XOffset;
+                OffsetY = ch.Chars[curChar].YOffset;
+
+                //upper left
+                UV[i * 4].X = (float)CharX / (float)ch.Width;
+                UV[i * 4].Y = (float)CharY / (float)ch.Height;
+                verts[i * 4].X = (float)CurX + OffsetX;
+                verts[i * 4].Y = (float)OffsetY;
+                elements[i*4] = i*4;
+
+                //upper right
+                UV[i * 4 + 1].X = (float)(CharX + Width) / (float)ch.Width;
+                UV[i * 4 + 1].Y = (float)CharY / (float)ch.Height;
+                verts[i * 4 + 1].X = (float)Width + CurX + OffsetX;
+                verts[i * 4 + 1].Y = (float)OffsetY;
+                elements[i*4 + 1] = i*4 + 1;
+
+                //lower right
+                UV[i * 4 + 2].X = (float)(CharX + Width) / (float)ch.Width;
+                UV[i * 4 + 2].Y = (float)(CharY + Height) / (float)ch.Height;
+                verts[i * 4 + 2].X = (float)Width + CurX + OffsetX;
+                verts[i * 4 + 2].Y = (float)Height + OffsetY;
+                elements[i*4 + 2] = i*4 + 2;
+
+                //lower left
+                UV[i * 4 + 3].X = (float)CharX / (float)ch.Width;
+                UV[i * 4 + 3].Y = (float)(CharY + Height) / (float)ch.Height;
+                verts[i * 4 + 3].X = (float)CurX + OffsetX;
+                verts[i * 4 + 3].Y = (float)Height + OffsetY;
+                elements[i*4 + 3] = i*4 + 3;
+
+
+
+                CurX += ch.Chars[curChar].XAdvance;
+            }
+        }
+
+        static Charset ParseFont(string FNT)
+        {
+            Charset charset = new Charset();
+            if (!File.Exists(FNT))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Failed to load font: " + FNT);
+                Console.ResetColor();
+                return charset;
+            }
+
+            StreamReader sr = new StreamReader(FNT);
+
+            string Line;
+            string Read, Key, Value;
+            string FirstWord;
+
+            while (!sr.EndOfStream)
+            {
+                Read = sr.ReadLine();
+                FirstWord = GetFirstWord(Read);
+                switch (FirstWord)
+                {
+                    case "common":
+                        string[] sections = Read.Split(' ');
+                        for (int i = 0; i < sections.Length; i++)
+                        {
+                            Key = GetFirstWord(sections[i]);
+                            Value = sections[i].Substring(sections[i].IndexOf('=') + 1);
+                            switch (Key)
+                            {
+                                case "lineHeight":
+                                    charset.LineHeight = StringToShort(Value);
+                                    break;
+
+                                case "base":
+                                    charset.Base = StringToShort(Value);
+                                    break;
+
+                                case "scaleW":
+                                    charset.Width = StringToShort(Value);
+                                    break;
+
+                                case "scaleH":
+                                    charset.Height = StringToShort(Value);
+                                    break;
+                            }
+                        }
+
+                        break;
+
+                    case "char":
+                        ushort CharID = 0;
+                        string[] keys = Read.Split(' ');
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            Key = GetFirstWord(keys[i]);
+                            Value = keys[i].Substring(keys[i].IndexOf('=') + 1);
+                            if (CharID > charset.Chars.Length) continue;
+                            switch (Key)
+                            {
+                                case "id":
+                                    CharID = StringToShort(Value);
+                                    break;
+
+                                case "x":
+                                    charset.Chars[CharID].x = StringToShort(Value);
+                                    break;
+
+                                case "y":
+                                    charset.Chars[CharID].y = StringToShort(Value);
+                                    break;
+
+                                case "width":
+                                    charset.Chars[CharID].Width = StringToShort(Value);
+                                    break;
+
+                                case "height":
+                                    charset.Chars[CharID].Height = StringToShort(Value);
+                                    break;
+
+                                case "xoffset":
+                                    charset.Chars[CharID].XOffset = StringToShort(Value);
+                                    break;
+
+                                case "yoffset":
+                                    charset.Chars[CharID].YOffset = StringToShort(Value);
+                                    break;
+
+                                case "xadvance":
+                                    charset.Chars[CharID].XAdvance = StringToShort(Value);
+                                    break;
+
+                            }
+
+                        }
+                        break;
+                }
+
+            }
+
+            return charset;
+        }
+
+        private static ushort StringToShort(string str, ushort def = 1)
+        {
+            ushort.TryParse(str, out def);
+            return def;
+        }
+
+        private static string GetFirstWord( string str )
+        {
+            char[] limit = {' ', '='};
+            if (str.IndexOfAny(limit) <= 0) return "";
+            return str.Substring(0, str.IndexOfAny(limit));
+        }
+
+
+        //instanced class
+        public Charset charset { get; private set; }
+
+        private Mesh textMesh;
+        public font( string font, string text )
+        {
+            this.charset = ParseFont(FontPath + font + ".fnt");
+
+
+            this.SetText(text);
+            this.textMesh.mat = new Material(Resource.GetTexture(FontmapPath + font + ".png"), Resource.GetProgram("hud"));
+        }
+
+        public void SetText(string text)
+        {
+            Vector3[] verts;
+            Vector2[] UV;
+            int[] elements;
+            ConstructVertexArray(this.charset, text, out verts, out UV, out elements);
+            if (textMesh == null)
+            {
+                textMesh = new Mesh(verts, elements, new Vector3[verts.Length], null, UV);
+                textMesh.DrawMode = BeginMode.Quads;
+            }
+            else
+            {
+                textMesh.UpdateMesh(verts, elements, new Vector3[verts.Length], null, UV);
+            }
+        }
+
+        public void Draw()
+        {
+            this.textMesh.Render(Matrix4.Identity);
+        }
+    }
+}

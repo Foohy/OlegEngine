@@ -29,6 +29,7 @@ namespace Two_and_a_Half_Dimensions
 
         private Matrix4 defaultViewMatrix = Matrix4.Identity;
         private Matrix4 defaultOrthoMatrix = Matrix4.Identity;
+        private GUI.font counter;
         public Program()
             : base(1900, 900, new GraphicsMode(32, 24, 0, 4), "BY NO MEANS.", GameWindowFlags.Default) //GraphicsMode(32, 24, 0, 4)
         {
@@ -60,6 +61,7 @@ namespace Two_and_a_Half_Dimensions
             GL.ClearColor(fogColor[0], fogColor[1], fogColor[2], 0.0f);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             //Fog
             GL.Fog(FogParameter.FogStart, 30.0f);
@@ -93,6 +95,25 @@ namespace Two_and_a_Half_Dimensions
             //Create a camera matrix
             Vector3 point = new Vector3((float)Math.Cos(-0.6f), (float)Math.Sin(-0.52) - 0.21f, (float)Math.Sin(-0.6));
             camMat = Matrix4.LookAt(new Vector3(88.94199f, 22.27345f, 5.085441f) + new Vector3(0, 1, 0), new Vector3(88.94199f, 22.27345f, 5.085441f) + point + new Vector3(0, 1, 0), Vector3.UnitY);
+
+            //Create our little FPS counter
+            counter = new GUI.font("ultra", "frick off");
+            GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
+        }
+
+        double last = 0.0d;
+        string fps = "frasd";
+        void GUIManager_PostDrawHUD(EventArgs e)
+        {        
+            if (last < Utilities.Time)
+            {
+                last = Utilities.Time + 0.5;
+
+                fps = (this.RenderPeriod * 1000).ToString() + " ms (" + (int)(1 / this.RenderPeriod) + " FPS)";
+                counter.SetText(fps);
+            }
+
+            counter.Draw();
         }
 
         /// <summary>
@@ -142,7 +163,6 @@ namespace Two_and_a_Half_Dimensions
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
-            updateTitle();
 
             //Reset the view matrix, just in case it's been altered
             Utilities.ViewMatrix = defaultViewMatrix;
@@ -200,17 +220,6 @@ namespace Two_and_a_Half_Dimensions
             Levels.LevelManager.Draw(e);
             Entity.EntManager.Draw(e);
             ply.Draw(e);
-        }
-
-        double last = 0.0d;
-        private void updateTitle()
-        {
-            if (last < Utilities.Time)
-            {
-                last = Utilities.Time + 0.5;
-
-                this.Title = (this.RenderPeriod * 1000).ToString() + " ms (" + (int)(1 / this.RenderPeriod) + " FPS)";
-            }
         }
 
         /// <summary>
