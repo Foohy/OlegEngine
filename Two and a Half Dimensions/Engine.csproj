@@ -79,6 +79,7 @@
     <Compile Include="Entity\ent_speaker.cs" />
     <Compile Include="Entity\ent_testball.cs" />
     <Compile Include="Graphics.cs" />
+    <Compile Include="GUI\Elements\Button.cs" />
     <Compile Include="GUI\Elements\Window.cs" />
     <Compile Include="GUI\Elements\Panel.cs" />
     <Compile Include="GUI\font.cs" />

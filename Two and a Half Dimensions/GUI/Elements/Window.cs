@@ -14,12 +14,16 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         Panel Title;
         font TitleText;
+        Button closeButton;
         Vector2 Offset = Vector2.Zero;
         bool dragging = false;
         bool resizing = false;
         public override void Init()
         {
             this.WindowTitle = "Untitled";
+
+            Width = 150;
+            Height = 150;
 
             this.SetMaterial(Resource.GetTexture("gui/window.png"));
             Title = GUIManager.Create<Panel>();
@@ -30,8 +34,17 @@ namespace Two_and_a_Half_Dimensions.GUI
             Title.OnMouseUp += new OnMouseUpDel(Title_OnMouseUp);
             Title.SetParent(this);
 
-            Width = 150;
-            Height = 150;
+            //Create the close button
+            closeButton = GUIManager.Create<Button>();
+            closeButton.TexIdle = Resource.GetTexture("gui/x_idle.png");
+            closeButton.TexPressed = Resource.GetTexture("gui/x_pressed.png");
+            closeButton.TexHovered = Resource.GetTexture("gui/x_hover.png");
+            closeButton.Width = 20;
+            closeButton.Height = 20;
+            closeButton.Position = new Vector2(this.Width - closeButton.Width, 0);
+            closeButton.SetParent(this);
+            //TODO: align left
+
 
             this.Position = new Vector2(200, 480);
             TitleText = new font("title", WindowTitle);
@@ -81,6 +94,8 @@ namespace Two_and_a_Half_Dimensions.GUI
                 Vector2 Screenpos = this.GetScreenPos();
                 this.Width = Utilities.Clamp(Utilities.window.Mouse.X - Screenpos.X, 10000, this.TitleText.GetTextLength(WindowTitle) + 10);
                 this.Height = Utilities.Clamp( Utilities.window.Mouse.Y - Screenpos.Y, 10000, 30 );
+
+                closeButton.Position = new Vector2(this.Width - closeButton.Width, 0);
             }
         }
 
@@ -118,10 +133,13 @@ namespace Two_and_a_Half_Dimensions.GUI
             TitleText.SetPos(this.Position.X + 5, this.Position.Y);
 
             Title.ShouldDraw = true;
+            closeButton.ShouldDraw = true;
             base.Draw();
             Title.Draw();
             TitleText.Draw();
+            closeButton.Draw();
             Title.ShouldDraw = false; //override it's drawing with our own
+            closeButton.ShouldDraw = false;
         }
     }
 }
