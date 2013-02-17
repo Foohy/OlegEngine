@@ -13,6 +13,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         public float Width { get; set; }
         public float Height { get; set; }
         public bool ShouldDraw { get; set; }
+        public bool AlphaBlendmode { get; set; }
         public Vector2 Position;
 
         Material Mat;
@@ -48,20 +49,21 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.Position = new Vector2(500, 400);
 
             ShouldDraw = true;
+            AlphaBlendmode = true;
         }
 
         public virtual void Draw()
         {
             if (!ShouldDraw) { return; }
 
+            if (!AlphaBlendmode) { GL.Disable(EnableCap.Blend); }
             panelMesh.mat = Mat;
             modelview = Matrix4.CreateTranslation(Vector3.Zero);
             modelview *= Matrix4.Scale(Width, Height, 1.0f);
-            //modelview *= Matrix4.CreateRotationY((float)Utilities.Time);
-            //modelview *= Matrix4.CreateRotationZ((float)Utilities.Time -1);
             modelview *= Matrix4.CreateTranslation(Position.X, Position.Y, 3.0f);
 
             panelMesh.Render(modelview);
+            if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
         }
     }
 }

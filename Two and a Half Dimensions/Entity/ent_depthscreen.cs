@@ -24,6 +24,7 @@ namespace Two_and_a_Half_Dimensions.Entity
             DepthScreen.Width = Utilities.window.Width / Size;
             DepthScreen.Height = Utilities.window.Height / Size;
             DepthScreen.Position = new Vector2(0, Utilities.window.Height - DepthScreen.Height);
+            DepthScreen.AlphaBlendmode = false;
 
             Utilities.window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
