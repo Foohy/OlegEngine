@@ -70,10 +70,14 @@ namespace Two_and_a_Half_Dimensions.Levels
 
             //HUD?!?!?!?!?!?
             //GUI.GUIManager.Create<GUI.Panel>();
-            GUI.GUIManager.Create<GUI.Window>();
-            GUI.GUIManager.Create<GUI.Window>();
             GUI.Window w = GUI.GUIManager.Create<GUI.Window>();
             w.Position = new Vector2(100, 100);
+            w.SetTitle("Friggin nerds");
+            GUI.GUIManager.Create<GUI.Window>();
+            w = GUI.GUIManager.Create<GUI.Window>();
+            w.Position = new Vector2(200, 400);
+            w.SetTitle("Stop seriously");
+
 
             //Make us some nice environmental lighting
             DirectionalLight light = new DirectionalLight();

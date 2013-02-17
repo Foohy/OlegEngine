@@ -16,7 +16,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         public delegate void OnDrawHUD(EventArgs e);
         public static event OnDrawHUD PostDrawHUD;
 
-        public static List<GUI.Panel> elements = new List<Panel>();
+        private static List<GUI.Panel> elements = new List<Panel>();
         private static EventArgs ev = new EventArgs();
 
         public static T Create<T>() where T : Panel, new()
@@ -29,34 +29,6 @@ namespace Two_and_a_Half_Dimensions.GUI
             return panel;
         }
 
-        public class FontProperties
-        {
-            public float fontSize = 12;
-            public StyleSimulations style = StyleSimulations.None;
-            public string Name = "myfont";
-
-            public FontProperties( string uniqueName )
-            {
-                Name = uniqueName;
-            }
-        }
-
-        public static void CreateFont(string font, FontProperties properties)
-        {
-            string url = Environment.CurrentDirectory + "\\" + font;
-            GlyphTypeface face = new GlyphTypeface(new Uri(url), properties.style);
-            GlyphRunDrawing p = new GlyphRunDrawing();
-
-            DrawingVisual dv = new DrawingVisual();
-            using (DrawingContext dc = dv.RenderOpen())
-            {
-                dc.DrawGlyphRun(Brushes.Red, new GlyphRun());
-            }
-
-            RenderTargetBitmap bitmap = new RenderTargetBitmap(256, 256, 30, 30, new System.Windows.Media.PixelFormat());
-            bitmap.Render(dv);
-        }
-
         public static void Init()
         {
             Utilities.window.Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
@@ -66,9 +38,14 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         static void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs e)
         {
-            foreach (Panel p in elements)
+            for (int i = elements.Count-1; i >= 0; i--)
             {
-                p.MouseUp(e);
+                Panel p = elements[i];
+                if (p.IsMouseOver())
+                {
+                    p.MouseUp(e);
+                    //break; //Only trigger it for the top-clicked element
+                }
             }
         }
 
@@ -82,11 +59,13 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         static void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs e)
         {
-            foreach (Panel p in elements)
+            for (int i = elements.Count-1; i >= 0; i--)
             {
+                Panel p = elements[i];
                 if (p.IsMouseOver())
                 {
                     p.MouseDown(e);
+                    break;
                 }
             }
         }

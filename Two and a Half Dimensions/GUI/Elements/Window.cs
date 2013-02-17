@@ -10,7 +10,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 {
     class Window : Panel
     {
-        public string WindowTitle { get; set; }
+        public string WindowTitle { get; private set; }
 
         Panel Title;
         font TitleText;
@@ -28,9 +28,10 @@ namespace Two_and_a_Half_Dimensions.GUI
             Title.OnMouseDown += new OnMouseDownDel(Title_OnMouseDown);
             Title.OnMouseMove += new OnMouseMoveDel(Title_OnMouseMove);
             Title.OnMouseUp += new OnMouseUpDel(Title_OnMouseUp);
+            Title.SetParent(this);
 
-            Width = 600;
-            Height = 400;
+            Width = 150;
+            Height = 150;
 
             this.Position = new Vector2(200, 480);
             TitleText = new font("title", WindowTitle);
@@ -79,7 +80,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             {
                 Vector2 Screenpos = this.GetScreenPos();
                 this.Width = Utilities.Clamp(Utilities.window.Mouse.X - Screenpos.X, 10000, this.TitleText.GetTextLength(WindowTitle));
-                this.Height = Utilities.Clamp( Utilities.window.Mouse.Y - Screenpos.Y, 10000, 10 );
+                this.Height = Utilities.Clamp( Utilities.window.Mouse.Y - Screenpos.Y, 10000, 30 );
             }
         }
 
@@ -89,6 +90,12 @@ namespace Two_and_a_Half_Dimensions.GUI
             {
                 this.resizing = false;
             }
+        }
+
+        public void SetTitle(string str)
+        {
+            this.WindowTitle = str;
+            this.TitleText.SetText(str);
         }
 
         private static int size = 10; //must be within a box of this many pixels wide
@@ -106,10 +113,9 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public override void Draw()
         {
-            Title.Position = this.Position - new Vector2(0, Title.Height);
             Title.Width = this.Width;
 
-            TitleText.SetPos(Title.Position.X + 5, Title.Position.Y);
+            TitleText.SetPos(this.Position.X + 5, this.Position.Y);
 
             Title.ShouldDraw = true;
             base.Draw();

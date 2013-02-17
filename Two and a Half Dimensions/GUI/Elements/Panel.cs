@@ -163,7 +163,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             Width = 200;
             Height = 200;
 
-            this.Position = new Vector2(500, 400);
+            this.Position = new Vector2(0, 0);
 
             ShouldDraw = true;
             AlphaBlendmode = true;
