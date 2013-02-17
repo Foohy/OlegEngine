@@ -12,7 +12,8 @@ namespace Two_and_a_Half_Dimensions.GUI
     {
         Panel Title;
         font TitleText;
-
+        Vector2 Offset = Vector2.Zero;
+        bool dragging = false;
         public override void Init()
         {
             this.SetMaterial(Resource.GetTexture("gui/window.png"));
@@ -28,12 +29,34 @@ namespace Two_and_a_Half_Dimensions.GUI
             TitleText = new font("title", "this is my favorite window");
         }
 
+        public override void MouseDown(OpenTK.Input.MouseButtonEventArgs e)
+        {
+            if (Title.IsMouseOver())
+            {
+                this.dragging = true;
+                Offset = new Vector2(Utilities.window.Mouse.X - this.Position.X, Utilities.window.Mouse.Y - this.Position.Y);
+            }
+        }
+
+        public override void MouseMove(OpenTK.Input.MouseMoveEventArgs e)
+        {
+            if (dragging)
+            {
+                this.Position = new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y) - Offset;
+            }
+        }
+
+        public override void MouseUp(OpenTK.Input.MouseButtonEventArgs e)
+        {
+            if (dragging)
+            {
+                dragging = false;
+                Offset = Vector2.Zero;
+            }
+        }
+
         public override void Draw()
         {
-            this.Width = 250 + (float)Math.Cos(Utilities.Time) * 100;
-            this.Height = 250 + (float)Math.Sin(Utilities.Time) * 100;
-
-
             Title.Position = this.Position - new Vector2(0, Title.Height);
             Title.Width = this.Width;
 

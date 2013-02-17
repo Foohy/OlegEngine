@@ -59,7 +59,33 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public static void Init()
         {
-            
+            Utilities.window.Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.window.Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
+            Utilities.window.Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
+        }
+
+        static void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs e)
+        {
+            foreach (Panel p in elements)
+            {
+                p.MouseUp(e);
+            }
+        }
+
+        static void Mouse_Move(object sender, OpenTK.Input.MouseMoveEventArgs e)
+        {
+            foreach (Panel p in elements)
+            {
+                p.MouseMove(e);
+            }
+        }
+
+        static void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs e)
+        {
+            foreach (Panel p in elements)
+            {
+                p.MouseDown(e);
+            }
         }
 
         public static void Draw()

@@ -89,6 +89,9 @@ namespace Two_and_a_Half_Dimensions
             //Initialize skybox
             skybox.Init();
 
+            //Initalize our gui system
+            GUI.GUIManager.Init();
+
             ply = new Player(this, new Vector3(88.94199f, 23.27345f, 5.085441f));
             Levels.LevelManager.InitalizeLevel(new Levels.Level1());
 
