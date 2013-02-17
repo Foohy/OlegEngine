@@ -11,6 +11,7 @@ namespace Two_and_a_Half_Dimensions.GUI
     class Window : Panel
     {
         Panel Title;
+        font TitleText;
 
         public override void Init()
         {
@@ -23,20 +24,24 @@ namespace Two_and_a_Half_Dimensions.GUI
             Width = 600;
             Height = 400;
 
-            this.Position = new Vector2(500, 380);
+            this.Position = new Vector2(200, 480);
+            TitleText = new font("title", "this is my favorite window");
         }
 
         public override void Draw()
         {
-            this.Width = 150 + (float)Math.Cos(Utilities.Time) * 100;
-            this.Height = 150 + (float)Math.Sin(Utilities.Time) * 100;
+            this.Width = 250 + (float)Math.Cos(Utilities.Time) * 100;
+            this.Height = 250 + (float)Math.Sin(Utilities.Time) * 100;
 
 
             Title.Position = this.Position - new Vector2(0, Title.Height);
             Title.Width = this.Width;
 
+            TitleText.SetPos(Title.Position.X + 5, Title.Position.Y);
+
             base.Draw();
-            Title.Draw();    
+            Title.Draw();
+            TitleText.Draw();
         }
     }
 }

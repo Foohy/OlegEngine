@@ -26,14 +26,11 @@ namespace Two_and_a_Half_Dimensions
         public static BaseEntity SelectedEnt;
         public static ent_cursor Cursor;
 
+        private static GUI.font CurrentModeText;
         private static float goalZoom = 5.0f;
-
         private static Vector3 Pos = new Vector3();
-
         private static float multiplier = 8;
-
         private static float halfPI = -1.570796326794896f;
-
         private static float Multiplier = 0.000924f;
 
         private static List<Vector2> Points = new List<Vector2>();
@@ -48,9 +45,20 @@ namespace Two_and_a_Half_Dimensions
             Cursor.SetPos(new Vector3(0, 0, 0));
             //Cursor.Scale = Vector3.One * 0.25f;
 
+
+            //Slap some text on the screen
+            CurrentModeText = new GUI.font("debug", "Mode: " + CurrentMode.ToString());
+            CurrentModeText.SetPos(0, 15);
+            GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
+
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
             Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+        }
+
+        static void GUIManager_PostDrawHUD(EventArgs e)
+        {
+            CurrentModeText.Draw();
         }
 
         static void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
@@ -76,6 +84,7 @@ namespace Two_and_a_Half_Dimensions
                 if (CurrentMode < 0) CurrentMode = EditMode.Transform;
 
                 Console.WriteLine("EDIT MODE: {0}", CurrentMode.ToString());
+                CurrentModeText.SetText("Mode: " + CurrentMode.ToString());
             }
         }
 
@@ -312,6 +321,8 @@ namespace Two_and_a_Half_Dimensions
 
             Utilities.window.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Mouse.ButtonUp -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
+
+            GUI.GUIManager.PostDrawHUD -= new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
         }
 
 

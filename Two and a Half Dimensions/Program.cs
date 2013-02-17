@@ -97,7 +97,7 @@ namespace Two_and_a_Half_Dimensions
             camMat = Matrix4.LookAt(new Vector3(88.94199f, 22.27345f, 5.085441f) + new Vector3(0, 1, 0), new Vector3(88.94199f, 22.27345f, 5.085441f) + point + new Vector3(0, 1, 0), Vector3.UnitY);
 
             //Create our little FPS counter
-            counter = new GUI.font("ultra", "frick off");
+            counter = new GUI.font("debug", "frick off");
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
         }
 

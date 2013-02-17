@@ -18,6 +18,7 @@ namespace Two_and_a_Half_Dimensions.Levels
         Vector3 Angle = new Vector3();
         ent_spotlight spotlight;
         ent_car playerCar;
+
         public override void Preload()
         {
             levelmodel = Resource.GetMesh("Levels/level1.obj");
