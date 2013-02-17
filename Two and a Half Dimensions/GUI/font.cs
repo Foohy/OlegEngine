@@ -279,6 +279,24 @@ namespace Two_and_a_Half_Dimensions.GUI
             view *= Matrix4.CreateTranslation(this.X, this.Y, 3.0f);
         }
 
+        /// <summary>
+        /// Get the length, in pixels, of the given text string/charset combo
+        /// </summary>
+        /// <returns>The length in pixels of the string</returns>
+        public float GetTextLength( string str )
+        {
+            float OffsetX = 0;
+            float CurX = 0;
+            float length = 0;
+            for (int i = 0; i < str.Length; i++)
+            {
+                OffsetX = this.charset.Chars[str[i]].XOffset;
+                length += (float)CurX + OffsetX;
+            }
+
+            return length;
+        }
+
         public void SetText(string text)
         {
             Vector3[] verts;

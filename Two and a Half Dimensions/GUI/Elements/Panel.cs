@@ -58,6 +58,26 @@ namespace Two_and_a_Half_Dimensions.GUI
             parent.Children.Add(this);
         }
 
+        public void SendToFront()
+        {
+            if (this.Parent != null)
+            {
+                for (int i = 0; i < this.Parent.Children.Count; i++)
+                {
+                    if (this.Parent.Children[i] == this)
+                    {
+                        Panel p = this.Parent.Children[i];
+                        this.Parent.Children.RemoveAt(i);
+                        this.Parent.Children.Insert(0, p);
+                    }
+                }
+            }
+            else
+            {
+                GUIManager.SendToFront(this);
+            }
+        }
+
         public bool IsMouseOver()
         {
             Vector2 MousePos = new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y);
