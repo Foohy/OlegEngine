@@ -61,11 +61,11 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public override void MouseUp(MouseButtonEventArgs e)
         {
-            this.CurrentState = State.Idle;
             if (this.IsMouseOver() && this.CurrentState == State.Pressed)
             {
                 this.OnPressed();
             }
+            this.CurrentState = State.Idle;
         }
 
         public void OnPressed()

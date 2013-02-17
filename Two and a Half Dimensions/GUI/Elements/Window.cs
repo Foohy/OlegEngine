@@ -43,11 +43,17 @@ namespace Two_and_a_Half_Dimensions.GUI
             closeButton.Height = 20;
             closeButton.Position = new Vector2(this.Width - closeButton.Width, 0);
             closeButton.SetParent(this);
+            closeButton.OnButtonPress += new Button.OnButtonPressDel(closeButton_OnButtonPress);
             //TODO: align left
 
 
             this.Position = new Vector2(200, 480);
             TitleText = new font("title", WindowTitle);
+        }
+
+        void closeButton_OnButtonPress()
+        {
+            this.Remove();
         }
 
         void Title_OnMouseUp(OpenTK.Input.MouseButtonEventArgs e)

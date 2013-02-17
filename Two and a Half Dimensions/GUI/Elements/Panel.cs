@@ -19,6 +19,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public Panel Parent { get; set; }
         public List<Panel> Children = new List<Panel>();
+        public bool _ToRemove = false;
 
         //Events
         public delegate void OnMouseDownDel(MouseButtonEventArgs e);
@@ -33,6 +34,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         Material Mat;
         Mesh panelMesh = Resource.GetMesh("debug/quad.obj");
         public Matrix4 modelview;
+
 
         public void SetMaterial(int TextureBuffer)
         {
@@ -103,6 +105,16 @@ namespace Two_and_a_Half_Dimensions.GUI
             }
 
             return Pos;
+        }
+
+        public virtual void Remove()
+        {
+            foreach (Panel p in this.Children)
+            {
+                p.Remove();
+            }
+
+            this._ToRemove = true;
         }
 
         #region inputs

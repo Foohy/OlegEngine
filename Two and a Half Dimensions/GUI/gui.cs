@@ -79,25 +79,37 @@ namespace Two_and_a_Half_Dimensions.GUI
             back_queue.Insert(0, p);
         }
 
-        private static void UpdateDrawOrder()
+        private static void UpdatePanels()
         {
-            if (front_queue.Count < 1 && back_queue.Count < 1) return;
-
-            foreach (Panel p in front_queue)
+            if (front_queue.Count > 0 || back_queue.Count > 0)
             {
-                elements.Remove(p);
-                elements.Add(p);
+                //Send all the panels in the queue to the front
+                foreach (Panel p in front_queue)
+                {
+                    elements.Remove(p);
+                    elements.Add(p);
+                }
+                front_queue.Clear();
+
+                //And these to the back
+                foreach (Panel p in back_queue)
+                {
+                    elements.Remove(p);
+                    elements.Insert(0, p);
+                }
+                back_queue.Clear();
             }
 
-            front_queue.Clear();
-
-            foreach (Panel p in back_queue)
+            //Clear panels marked to be removed
+            for (int i = 0; i < elements.Count; i++)
             {
-                elements.Remove(p);
-                elements.Insert(0, p);
-            }
+                if (elements[i]._ToRemove)
+                {
+                    elements.RemoveAt(i);
+                    i--;
+                }
 
-            back_queue.Clear();
+            }
         }
 
         public static void Draw()
@@ -106,7 +118,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             GL.DepthFunc(DepthFunction.Always);
             GL.Enable(EnableCap.Blend);
 
-            UpdateDrawOrder();
+            UpdatePanels();
 
             foreach (Panel p in elements)
             {
