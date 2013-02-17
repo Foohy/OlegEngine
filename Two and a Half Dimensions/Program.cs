@@ -103,15 +103,28 @@ namespace Two_and_a_Half_Dimensions
 
         double last = 0.0d;
         string fps = "frasd";
+        
         void GUIManager_PostDrawHUD(EventArgs e)
         {        
             if (last < Utilities.Time)
             {
                 last = Utilities.Time + 0.5;
+                int FPS = (int)(1 / this.RenderPeriod);
 
-                fps = (this.RenderPeriod * 1000).ToString() + " ms (" + (int)(1 / this.RenderPeriod) + " FPS)";
+                fps = (this.RenderPeriod * 1000).ToString() + " ms (" + FPS+ " FPS)";
                 counter.SetText(fps);
+
+                counter.SetColor(0, 1, 0);
+                if (FPS < 45)
+                {
+                    counter.SetColor(1, 1, 0);
+                }
+                if (FPS < 30)
+                {
+                    counter.SetColor(1, 0, 0);
+                }
             }
+            
 
             counter.Draw();
         }

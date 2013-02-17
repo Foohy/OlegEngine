@@ -222,7 +222,13 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         //instanced class
         public Charset charset { get; private set; }
+        public float X { get; private set; }
+        public float Y { get; private set; }
+        public float ScaleW { get; private set; }
+        public float ScaleH { get; private set; }
+        public Vector3 Color = Vector3.One;
 
+        private Matrix4 view;
         private Mesh textMesh;
         public font( string font, string text )
         {
@@ -231,6 +237,46 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             this.SetText(text);
             this.textMesh.mat = new Material(Resource.GetTexture(FontmapPath + font + ".png"), Resource.GetProgram("hud"));
+
+            this.ScaleH = 1;
+            this.ScaleW = 1;
+
+            this.UpdateMatrix(); //Update the model matrix
+        }
+
+        public void SetPos(float x, float y)
+        {
+            this.X = x;
+            this.Y = y;
+
+            this.UpdateMatrix();
+        }
+
+        public void SetScale(float Width, float Height)
+        {
+            this.ScaleW = Width;
+            this.ScaleH = Height;
+
+            this.UpdateMatrix();
+        }
+
+        public void SetColor(Vector3 colorvec)
+        {
+            this.Color = colorvec;
+            this.textMesh.Color = this.Color;
+        }
+
+        public void SetColor(float R, float G, float B)
+        {
+            this.Color = new Vector3(R, G, B);
+            this.textMesh.Color = this.Color;
+        }
+
+        public void UpdateMatrix()
+        {
+            view = Matrix4.CreateTranslation(Vector3.Zero);
+            view *= Matrix4.Scale(this.ScaleW, this.ScaleH, 1.0f);
+            view *= Matrix4.CreateTranslation(this.X, this.Y, 3.0f);
         }
 
         public void SetText(string text)
@@ -252,7 +298,8 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public void Draw()
         {
-            this.textMesh.Render(Matrix4.Identity);
+            this.textMesh.mat.Properties.Color = this.Color;
+            this.textMesh.Render(view);
         }
     }
 }
