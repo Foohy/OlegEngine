@@ -84,7 +84,10 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             foreach (Panel p in elements)
             {
-                p.MouseDown(e);
+                if (p.IsMouseOver())
+                {
+                    p.MouseDown(e);
+                }
             }
         }
 

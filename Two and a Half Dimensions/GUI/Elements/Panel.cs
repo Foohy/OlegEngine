@@ -20,6 +20,16 @@ namespace Two_and_a_Half_Dimensions.GUI
         public Panel Parent { get; set; }
         public List<Panel> Children = new List<Panel>();
 
+        //Events
+        public delegate void OnMouseDownDel(MouseButtonEventArgs e);
+        public event OnMouseDownDel OnMouseDown;
+
+        public delegate void OnMouseUpDel(MouseButtonEventArgs e);
+        public event OnMouseUpDel OnMouseUp;
+
+        public delegate void OnMouseMoveDel(MouseMoveEventArgs e);
+        public event OnMouseMoveDel OnMouseMove;
+
         Material Mat;
         Mesh panelMesh = Resource.GetMesh("debug/quad.obj");
         public Matrix4 modelview;
@@ -81,7 +91,15 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             foreach (Panel child in this.Children)
             {
-                child.MouseDown(e);
+                if (child.IsMouseOver())
+                {
+                    child.MouseDown(e);
+                }
+            }
+
+            if (OnMouseDown != null)
+            {
+                OnMouseDown(e);
             }
         }
 
@@ -89,7 +107,16 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             foreach (Panel child in this.Children)
             {
-                child.MouseUp(e);
+                if (child.IsMouseOver())
+                {
+                    child.MouseUp(e);
+                }
+            }
+
+
+            if (OnMouseUp != null)
+            {
+                OnMouseUp(e);
             }
         }
 
@@ -98,6 +125,11 @@ namespace Two_and_a_Half_Dimensions.GUI
             foreach (Panel child in this.Children)
             {
                 child.MouseMove(e);
+            }
+
+            if (OnMouseMove != null)
+            {
+                OnMouseMove(e);
             }
         }
 

@@ -14,13 +14,16 @@ namespace Two_and_a_Half_Dimensions.GUI
         font TitleText;
         Vector2 Offset = Vector2.Zero;
         bool dragging = false;
+        bool resizing = false;
         public override void Init()
         {
             this.SetMaterial(Resource.GetTexture("gui/window.png"));
-            Title = new Panel();
-            Title.Init();
+            Title = GUIManager.Create<Panel>();
             Title.SetMaterial(Resource.GetTexture("gui/title.png"));
             Title.Height = 20;
+            Title.OnMouseDown += new OnMouseDownDel(Title_OnMouseDown);
+            Title.OnMouseMove += new OnMouseMoveDel(Title_OnMouseMove);
+            Title.OnMouseUp += new OnMouseUpDel(Title_OnMouseUp);
 
             Width = 600;
             Height = 400;
@@ -29,16 +32,16 @@ namespace Two_and_a_Half_Dimensions.GUI
             TitleText = new font("title", "this is my favorite window");
         }
 
-        public override void MouseDown(OpenTK.Input.MouseButtonEventArgs e)
+        void Title_OnMouseUp(OpenTK.Input.MouseButtonEventArgs e)
         {
-            if (Title.IsMouseOver())
+            if (dragging)
             {
-                this.dragging = true;
-                Offset = new Vector2(Utilities.window.Mouse.X - this.Position.X, Utilities.window.Mouse.Y - this.Position.Y);
+                dragging = false;
+                Offset = Vector2.Zero;
             }
         }
 
-        public override void MouseMove(OpenTK.Input.MouseMoveEventArgs e)
+        void Title_OnMouseMove(OpenTK.Input.MouseMoveEventArgs e)
         {
             if (dragging)
             {
@@ -46,13 +49,53 @@ namespace Two_and_a_Half_Dimensions.GUI
             }
         }
 
+        void Title_OnMouseDown(OpenTK.Input.MouseButtonEventArgs e)
+        {
+            this.dragging = true;
+            Offset = new Vector2(Utilities.window.Mouse.X - this.Position.X, Utilities.window.Mouse.Y - this.Position.Y);
+        }
+
+        public override void MouseDown(OpenTK.Input.MouseButtonEventArgs e)
+        {
+            base.MouseDown(e);
+
+            if (this.MouseWithinCorner())
+            {
+                this.resizing = true;
+            } 
+        }
+
+        public override void MouseMove(OpenTK.Input.MouseMoveEventArgs e)
+        {
+            base.MouseMove(e);
+
+            if (this.resizing)
+            {
+                Vector2 Screenpos = this.GetScreenPos();
+                this.Width = Utilities.Clamp( Utilities.window.Mouse.X - Screenpos.X, 10000, 150 );
+                this.Height = Utilities.Clamp( Utilities.window.Mouse.Y - Screenpos.Y, 10000, 10 );
+            }
+        }
+
         public override void MouseUp(OpenTK.Input.MouseButtonEventArgs e)
         {
-            if (dragging)
+            if (this.resizing)
             {
-                dragging = false;
-                Offset = Vector2.Zero;
+                this.resizing = false;
             }
+        }
+
+        private static int size = 10; //must be within a box of this many pixels wide
+        private bool MouseWithinCorner()
+        {
+            Vector2 MousePos = new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y);
+            Vector2 CornerPos = this.GetScreenPos() + new Vector2( this.Width, this.Height );
+            if (MousePos.X < CornerPos.X - size) return false;
+            if (MousePos.X > CornerPos.X + size) return false;
+            if (MousePos.Y < CornerPos.Y - size) return false;
+            if (MousePos.Y > CornerPos.Y + size) return false;
+
+            return true;
         }
 
         public override void Draw()
