@@ -35,19 +35,30 @@ namespace Two_and_a_Half_Dimensions.GUI
         Mesh panelMesh = Resource.GetMesh("debug/quad.obj");
         public Matrix4 modelview;
 
-
+        /// <summary>
+        /// Set the material of the panel
+        /// </summary>
+        /// <param name="TextureBuffer"></param>
         public void SetMaterial(int TextureBuffer)
         {
             if (Mat == null) Mat = new Material(TextureBuffer, Resource.GetProgram("hud"));
             else Mat.Properties.BaseTexture = TextureBuffer;
         }
 
+        /// <summary>
+        /// Set the material of the panel
+        /// </summary>
+        /// <param name="Material"></param>
         public void SetMaterial(Material mat)
         {
             if (Mat == null) Mat = new Material(mat.Properties);
             else Mat.SetProperties(mat.Properties);
         }
 
+        /// <summary>
+        /// Set the shader of the panel
+        /// </summary>
+        /// <param name="Shader Program"></param>
         public void SetShader(int Program)
         {
             if (Mat == null) Mat = new Material(Resource.GetTexture("gui/window.png"), Program);
@@ -56,12 +67,19 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         #region Positioning Functions
 
+        /// <summary>
+        /// Parent this panel to the given panel. Position will be relative to the parent's location.
+        /// </summary>
+        /// <param name="parent"></param>
         public void SetParent(Panel parent)
         {
             this.Parent = parent;
             parent.Children.Add(this);
         }
 
+        /// <summary>
+        /// Send the panel to the top of the rendering stack, so it'll be drawn first.
+        /// </summary>
         public void SendToFront()
         {
             if (this.Parent != null)
@@ -82,25 +100,37 @@ namespace Two_and_a_Half_Dimensions.GUI
             }
         }
 
-        public void AlignRight()
+        /// <summary>
+        /// Align the panel to the rightmost edge of the parent panel
+        /// </summary>
+        /// <param name="offset">Distance away from the edge</param>
+        public void AlignRight(int offset = 0)
         {
             if (this.Parent != null)
             {
-                this.Position = new Vector2(this.Parent.Width - this.Width, this.Position.Y);
+                this.Position = new Vector2(this.Parent.Width - (this.Width + offset), this.Position.Y);
             }
             else
             {
-                this.Position = new Vector2(Utilities.window.X - this.Width, this.Position.Y);
+                this.Position = new Vector2(Utilities.window.X - (this.Width + offset), this.Position.Y);
             }
         }
 
-        public void AlignLeft()
+        /// <summary>
+        /// Align the panel to the leftmost edge of the parent panel
+        /// </summary>
+        /// <param name="offset">Distance away from the edge</param>
+        public void AlignLeft( int offset = 0 )
         {
-            this.Position = new Vector2(0, this.Position.Y);
+            this.Position = new Vector2(offset, this.Position.Y);
         }
 
         #endregion
 
+        /// <summary>
+        /// Whether the mouse is currently hovering over the box of the panel
+        /// </summary>
+        /// <returns>True - Mouse is over the panel, False - the mouse is not</returns>
         public bool IsMouseOver()
         {
             Vector2 MousePos = new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y);
@@ -114,6 +144,10 @@ namespace Two_and_a_Half_Dimensions.GUI
             return true;   
         }
 
+        /// <summary>
+        /// Get the 'true' position of a panel (one relative to the screen, not the parent panel)
+        /// </summary>
+        /// <returns>Screen position of the panel</returns>
         public Vector2 GetScreenPos()
         {
             Panel cur = this;
@@ -128,6 +162,9 @@ namespace Two_and_a_Half_Dimensions.GUI
             return Pos;
         }
 
+        /// <summary>
+        /// Remove the panel and all of its children
+        /// </summary>
         public virtual void Remove()
         {
             foreach (Panel p in this.Children)
