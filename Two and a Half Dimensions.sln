@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Two and a Half Dimensions", "Two and a Half Dimensions\Two and a Half Dimensions.csproj", "{78402D63-5943-49C3-9DA8-D957BE2E96A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Two and a Half Dimensions\Engine.csproj", "{78402D63-5943-49C3-9DA8-D957BE2E96A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
