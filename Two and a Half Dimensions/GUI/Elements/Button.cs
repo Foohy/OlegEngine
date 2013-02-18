@@ -42,7 +42,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             {
                 this.CurrentState = State.Hover;
             }
-            else
+            else if (this.CurrentState != State.Pressed )
             {
                 this.CurrentState = State.Idle;
             }
