@@ -41,8 +41,8 @@ namespace Two_and_a_Half_Dimensions.GUI
             closeButton.TexHovered = Resource.GetTexture("gui/x_hover.png");
             closeButton.Width = 20;
             closeButton.Height = 20;
-            closeButton.Position = new Vector2(this.Width - closeButton.Width, 0);
             closeButton.SetParent(this);
+            closeButton.AlignRight();
             closeButton.OnButtonPress += new Button.OnButtonPressDel(closeButton_OnButtonPress);
             //TODO: align left
 
@@ -98,7 +98,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             if (this.resizing)
             {
                 Vector2 Screenpos = this.GetScreenPos();
-                this.Width = Utilities.Clamp(Utilities.window.Mouse.X - Screenpos.X, 10000, this.TitleText.GetTextLength(WindowTitle) + 10);
+                this.Width = Utilities.Clamp(Utilities.window.Mouse.X - Screenpos.X, 10000, this.TitleText.GetTextLength(WindowTitle) + closeButton.Width + 10);
                 this.Height = Utilities.Clamp( Utilities.window.Mouse.Y - Screenpos.Y, 10000, 30 );
 
                 closeButton.Position = new Vector2(this.Width - closeButton.Width, 0);

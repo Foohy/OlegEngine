@@ -54,6 +54,8 @@ namespace Two_and_a_Half_Dimensions.GUI
             else Mat.SetShader(Program);
         }
 
+        #region Positioning Functions
+
         public void SetParent(Panel parent)
         {
             this.Parent = parent;
@@ -79,6 +81,25 @@ namespace Two_and_a_Half_Dimensions.GUI
                 GUIManager.SendToFront(this);
             }
         }
+
+        public void AlignRight()
+        {
+            if (this.Parent != null)
+            {
+                this.Position = new Vector2(this.Parent.Width - this.Width, this.Position.Y);
+            }
+            else
+            {
+                this.Position = new Vector2(Utilities.window.X - this.Width, this.Position.Y);
+            }
+        }
+
+        public void AlignLeft()
+        {
+            this.Position = new Vector2(0, this.Position.Y);
+        }
+
+        #endregion
 
         public bool IsMouseOver()
         {
