@@ -40,7 +40,7 @@
   <ItemGroup>
     <Reference Include="Bass.Net, Version=2.4.9.0, Culture=neutral, PublicKeyToken=b7566c273e6ef480, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\Scott\Documents\Visual Studio 2010\Projects\AeroVisualizerRedux\AeroVisualizerRedux\Bass.Net.dll</HintPath>
+      <HintPath>.\Bass.Net.dll</HintPath>
     </Reference>
     <Reference Include="FarseerPhysics">
       <HintPath>.\FarseerPhysics.dll</HintPath>
