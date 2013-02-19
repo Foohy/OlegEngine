@@ -101,7 +101,7 @@ namespace Two_and_a_Half_Dimensions
 
             //Create our little FPS counter
             counter = new GUI.font("debug", "frick off");
-            counter.SetPos(0, 30);
+            counter.SetPos(this.Width - counter.GetTextLength("frick off"), 30 );
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
         }
 
@@ -117,6 +117,7 @@ namespace Two_and_a_Half_Dimensions
 
                 fps = (this.RenderPeriod * 1000).ToString() + " ms (" + FPS+ " FPS)";
                 counter.SetText(fps);
+                counter.SetPos(this.Width - counter.GetTextLength(fps) - 20, 30);
 
                 counter.SetColor(0, 1, 0);
                 if (FPS < 45)

@@ -23,6 +23,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             T panel = new T();
             panel.ShouldDraw = true;
+            panel.ShouldDrawChildren = true;
             panel.Init();
 
             elements.Add(panel);
@@ -61,7 +62,11 @@ namespace Two_and_a_Half_Dimensions.GUI
                 if (p.IsMouseOver())
                 {
                     p.MouseDown(e);
-                    break;
+
+                    if (!p.ShouldPassInput || !p.ShouldDraw)
+                    {
+                        break;
+                    }
                 }
             }
         }

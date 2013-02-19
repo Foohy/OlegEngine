@@ -15,6 +15,9 @@ namespace Two_and_a_Half_Dimensions.GUI
         public float Height { get; set; }
         public bool ShouldDraw { get; set; }
         public bool AlphaBlendmode { get; set; }
+        public bool ShouldDrawChildren { get; set; }
+        public bool ShouldPassInput { get; set; } //Clicks should pass 'through' this panel to underlying panels
+        public bool Enabled { get; set; }
         public Vector2 Position;
 
         public Panel Parent { get; set; }
@@ -286,7 +289,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             if (this.Parent != null)
             {
-                posOffset = this.Parent.Position;
+                posOffset = this.Parent.GetScreenPos();
             }
 
             panelMesh.mat = Mat;
@@ -298,7 +301,10 @@ namespace Two_and_a_Half_Dimensions.GUI
             if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
 
             //Draw our children
-            DrawChildren();
+            if (ShouldDrawChildren)
+            {
+                DrawChildren();
+            }
         }
 
         private void DrawChildren()
