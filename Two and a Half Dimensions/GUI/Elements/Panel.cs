@@ -297,7 +297,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             modelview *= Matrix4.Scale(Width, Height, 1.0f);
             modelview *= Matrix4.CreateTranslation(Position.X + posOffset.X, Position.Y + posOffset.Y, 3.0f);
 
-            panelMesh.Render(modelview);
+            panelMesh.Draw(modelview);
             if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
 
             //Draw our children

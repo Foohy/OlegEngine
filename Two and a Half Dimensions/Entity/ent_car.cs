@@ -182,14 +182,14 @@ namespace Two_and_a_Half_Dimensions.Entity
             wheelmat *= Matrix4.Scale(this.Scale);
             wheelmat *= Matrix4.CreateRotationZ(wheelang[0]);
             wheelmat *= Matrix4.CreateTranslation(wheelpos[0]);
-            wheel.Render(wheelmat);
+            wheel.Draw(wheelmat);
 
             wheelmat = Matrix4.CreateTranslation(Vector3.Zero);
             wheelmat *= Matrix4.Scale(this.Scale);
             wheelmat *= Matrix4.CreateRotationZ(wheelang[1]);
             wheelmat *= Matrix4.CreateTranslation(wheelpos[1]);
 
-            wheel.Render(wheelmat);
+            wheel.Draw(wheelmat);
         }
 
         public override void Remove()

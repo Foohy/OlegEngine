@@ -451,7 +451,7 @@ namespace Two_and_a_Half_Dimensions
             modelview *= Matrix4.Scale(1.5f);
             modelview *= Matrix4.CreateTranslation(Player.ply.Pos);
 
-            skymodel.Render(modelview);
+            skymodel.Draw(modelview);
 
             GL.CullFace(CullFaceMode.Back);
             GL.DepthFunc(DepthFunction.Less);

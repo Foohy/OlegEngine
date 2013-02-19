@@ -96,13 +96,13 @@ namespace Two_and_a_Half_Dimensions.Entity
             if (Built)
             {
                 //base.Draw();
-                previewMesh.Render(Matrix4.Identity);
+                previewMesh.Draw(Matrix4.Identity);
             }
             else
             {
                 Vector3 oldPos = this.Position;
                 GL.LineWidth(3.0f);
-                this.previewMesh.Render(Matrix4.Identity);
+                this.previewMesh.Draw(Matrix4.Identity);
                 for (int i = 0; i < Points.Count; i++)
                 {
                     this.SetPos(Points[i]);

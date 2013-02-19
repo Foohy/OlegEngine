@@ -72,7 +72,7 @@ namespace Two_and_a_Half_Dimensions.Entity
                 modelview *= Matrix4.CreateRotationX(this.Angle.X);
                 modelview *= Matrix4.CreateTranslation(Position);
                 
-                Model.Render(modelview);
+                Model.Draw(modelview);
 
                 if (this.DisableLighting) GL.Enable(EnableCap.Lighting);
             }

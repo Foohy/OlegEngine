@@ -420,11 +420,11 @@ namespace Two_and_a_Half_Dimensions
             GL.BindVertexArray(0);
         }
 
-        public void Render( Matrix4 mmatrix, Matrix4 vmatrix, Matrix4 pmatrix )
+        public void Draw( Matrix4 mmatrix, Matrix4 vmatrix, Matrix4 pmatrix )
         {
             render(mmatrix, vmatrix, pmatrix);
         }
-        public void Render( Matrix4 vmatrix)
+        public void Draw( Matrix4 vmatrix)
         {
             render(Utilities.ViewMatrix, vmatrix, Utilities.ProjectionMatrix);
         }
