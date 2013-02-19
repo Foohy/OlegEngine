@@ -101,6 +101,7 @@ namespace Two_and_a_Half_Dimensions
 
             //Create our little FPS counter
             counter = new GUI.font("debug", "frick off");
+            counter.SetPos(0, 30);
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
         }
 

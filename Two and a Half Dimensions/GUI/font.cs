@@ -301,6 +301,8 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public void SetText(string text)
         {
+            if (text.Length < 1) return;
+
             Vector3[] verts;
             Vector2[] UV;
             int[] elements;
@@ -318,6 +320,8 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public void Draw()
         {
+            if (this.textMesh == null) return;
+
             this.textMesh.mat.Properties.Color = this.Color;
             this.textMesh.Render(view);
         }

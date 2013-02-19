@@ -93,7 +93,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resource.cs" />
-    <Compile Include="GUI\Surface.cs" />
     <Compile Include="Techniques.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>

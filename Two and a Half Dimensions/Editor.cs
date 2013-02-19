@@ -7,6 +7,7 @@ using OpenTK;
 using OpenTK.Input;
 
 using Two_and_a_Half_Dimensions.Entity;
+using Two_and_a_Half_Dimensions.GUI;
 
 namespace Two_and_a_Half_Dimensions
 {
@@ -33,6 +34,9 @@ namespace Two_and_a_Half_Dimensions
         private static float halfPI = -1.570796326794896f;
         private static float Multiplier = 0.000924f;
 
+        //Editor GUI
+        private static Panel TopControl;
+
         private static List<Vector2> Points = new List<Vector2>();
         
         
@@ -48,12 +52,56 @@ namespace Two_and_a_Half_Dimensions
 
             //Slap some text on the screen
             CurrentModeText = new GUI.font("debug", "Mode: " + CurrentMode.ToString());
-            CurrentModeText.SetPos(0, 15);
+            CurrentModeText.SetPos(0, 45);
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
 
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
             Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+
+            //Create our GUI stuff, if neccessary
+            if (TopControl == null)
+            {
+                TopControl = GUIManager.Create<Panel>();
+                TopControl.Width = Utilities.window.Width;
+                TopControl.Height = 20;
+                TopControl.SetMaterial(Resource.GetTexture("gui/toolbar.png"));
+
+                //Buttons
+                Button file = GUIManager.Create<Button>();
+                file.SetText("File  ");
+                file.DrawText.SetColor(0, 0, 0);
+                file.SizeToText(15);
+                file.Height = TopControl.Height;
+                file.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
+                file.TexIdle = Resource.GetTexture("gui/toolbar.png");
+                file.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+                file.SetParent(TopControl);
+
+                Button edit = GUIManager.Create<Button>();
+                edit.SetText("Edit  ");
+                edit.DrawText.SetColor(0, 0, 0);
+                edit.SizeToText(15);
+                edit.Height = TopControl.Height;
+                edit.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
+                edit.TexIdle = Resource.GetTexture("gui/toolbar.png");
+                edit.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+                edit.SetParent(TopControl);
+                edit.RightOf(file);
+
+                Button help = GUIManager.Create<Button>();
+                help.SetText("Help  ");
+                help.DrawText.SetColor(0, 0, 0);
+                help.SizeToText(15);
+                help.Height = TopControl.Height;
+                help.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
+                help.TexIdle = Resource.GetTexture("gui/toolbar.png");
+                help.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+                help.SetParent(TopControl);
+                help.RightOf(edit);
+            }
+
+            TopControl.ShouldDraw = true;
         }
 
         static void GUIManager_PostDrawHUD(EventArgs e)
@@ -323,6 +371,8 @@ namespace Two_and_a_Half_Dimensions
             Utilities.window.Mouse.ButtonUp -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
 
             GUI.GUIManager.PostDrawHUD -= new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
+
+            TopControl.ShouldDraw = false;
         }
 
 

@@ -122,7 +122,10 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             foreach (Panel p in elements)
             {
-                p.Draw();
+                if (p.Parent == null)
+                {
+                    p.Draw();
+                }
             }
 
             if (PostDrawHUD != null)

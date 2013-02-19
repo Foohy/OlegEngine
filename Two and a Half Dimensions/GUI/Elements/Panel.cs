@@ -88,15 +88,33 @@ namespace Two_and_a_Half_Dimensions.GUI
                 {
                     if (this.Parent.Children[i] == this)
                     {
-                        Panel p = this.Parent.Children[i];
                         this.Parent.Children.RemoveAt(i);
-                        this.Parent.Children.Insert(0, p);
+                        this.Parent.Children.Add(this);
                     }
                 }
             }
             else
             {
                 GUIManager.SendToFront(this);
+            }
+        }
+
+        public void SendToBack()
+        {
+            if (this.Parent != null)
+            {
+                for (int i = 0; i < this.Parent.Children.Count; i++)
+                {
+                    if (this.Parent.Children[i] == this)
+                    {
+                        this.Parent.Children.RemoveAt(i);
+                        this.Parent.Children.Insert(0, this);
+                    }
+                }
+            }
+            else
+            {
+                GUIManager.SendToBack(this);
             }
         }
 
@@ -123,6 +141,26 @@ namespace Two_and_a_Half_Dimensions.GUI
         public void AlignLeft( int offset = 0 )
         {
             this.Position = new Vector2(offset, this.Position.Y);
+        }
+
+        public void RightOf(Panel p, int offset = 0)
+        {
+            this.Position = new Vector2(p.Position.X + p.Width + offset, this.Position.Y);
+        }
+
+        public void LeftOf(Panel p, int offset = 0)
+        {
+            this.Position = new Vector2(p.Position.X - offset, this.Position.Y);
+        }
+
+        public void Below(Panel p, int offset = 0)
+        {
+            this.Position = new Vector2(this.Position.X, p.Position.Y + p.Height + offset);
+        }
+
+        public void Above(Panel p, int offset = 0)
+        {
+            this.Position = new Vector2(this.Position.X, p.Position.Y - offset);
         }
 
         #endregion
@@ -258,6 +296,17 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             panelMesh.Render(modelview);
             if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
+
+            //Draw our children
+            DrawChildren();
+        }
+
+        private void DrawChildren()
+        {
+            foreach (Panel p in this.Children)
+            {
+                p.Draw();
+            }
         }
     }
 }
