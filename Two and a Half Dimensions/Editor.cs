@@ -35,7 +35,7 @@ namespace Two_and_a_Half_Dimensions
         private static float Multiplier = 0.000924f;
 
         //Editor GUI
-        private static Panel TopControl;
+        private static Toolbar TopControl;
 
         private static List<Vector2> Points = new List<Vector2>();
         
@@ -52,7 +52,7 @@ namespace Two_and_a_Half_Dimensions
 
             //Slap some text on the screen
             CurrentModeText = new GUI.font("debug", "Mode: " + CurrentMode.ToString());
-            CurrentModeText.SetPos(0, 45);
+            CurrentModeText.SetPos(Utilities.window.Width - 200, 45 );
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
 
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
@@ -62,43 +62,17 @@ namespace Two_and_a_Half_Dimensions
             //Create our GUI stuff, if neccessary
             if (TopControl == null)
             {
-                TopControl = GUIManager.Create<Panel>();
+                TopControl = GUIManager.Create<Toolbar>();
                 TopControl.Width = Utilities.window.Width;
-                TopControl.Height = 20;
-                TopControl.SetMaterial(Resource.GetTexture("gui/toolbar.png"));
 
-                //Buttons
-                Button file = GUIManager.Create<Button>();
-                file.SetText("File  ");
-                file.DrawText.SetColor(0, 0, 0);
-                file.SizeToText(15);
-                file.Height = TopControl.Height;
-                file.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-                file.TexIdle = Resource.GetTexture("gui/toolbar.png");
-                file.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
-                file.SetParent(TopControl);
+                ButtonDropDown dd = TopControl.AddButtonDropDown("File");
+                dd.AddButton("Load");
+                dd.AddButton("Save");
+                dd.AddButton("Exit");
 
-                Button edit = GUIManager.Create<Button>();
-                edit.SetText("Edit  ");
-                edit.DrawText.SetColor(0, 0, 0);
-                edit.SizeToText(15);
-                edit.Height = TopControl.Height;
-                edit.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-                edit.TexIdle = Resource.GetTexture("gui/toolbar.png");
-                edit.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
-                edit.SetParent(TopControl);
-                edit.RightOf(file);
+                TopControl.AddButton("Edit");
+                TopControl.AddButton("Help...");
 
-                Button help = GUIManager.Create<Button>();
-                help.SetText("Help  ");
-                help.DrawText.SetColor(0, 0, 0);
-                help.SizeToText(15);
-                help.Height = TopControl.Height;
-                help.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-                help.TexIdle = Resource.GetTexture("gui/toolbar.png");
-                help.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
-                help.SetParent(TopControl);
-                help.RightOf(edit);
             }
 
             TopControl.ShouldDraw = true;
@@ -129,9 +103,15 @@ namespace Two_and_a_Half_Dimensions
             if (e.Key == Key.Left)
             {
                 CurrentMode--;
-                if (CurrentMode < 0) CurrentMode = EditMode.Transform;
+                if (CurrentMode < 0) CurrentMode = (EditMode)Enum.GetNames(typeof(EditMode)).Length-1;
 
-                Console.WriteLine("EDIT MODE: {0}", CurrentMode.ToString());
+                CurrentModeText.SetText("Mode: " + CurrentMode.ToString());
+            }
+            if (e.Key == Key.Right)
+            {
+                CurrentMode++;
+                if ((int)CurrentMode > Enum.GetNames(typeof(EditMode)).Length-1) CurrentMode = EditMode.CreatePhys;
+
                 CurrentModeText.SetText("Mode: " + CurrentMode.ToString());
             }
         }
