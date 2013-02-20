@@ -436,7 +436,6 @@ namespace Two_and_a_Half_Dimensions
             {
                 mat.Properties.Color = this.Color;
                 mat.BindMaterial();
-                
 
                 //Set the matrix to the shader
                 GL.UniformMatrix4(mat.locMMatrix, false, ref mmatrix);
@@ -476,6 +475,8 @@ namespace Two_and_a_Half_Dimensions
         public int locShadowMap = -1;
         public int locShadowMapTexture = -1;
         public int locColor = -1;
+        public int locSpecularIntensity = -1;
+        public int locSpecularPower = -1;
 
         /// <summary>
         /// Initialize a new material object - all by yourself!
@@ -554,6 +555,8 @@ namespace Two_and_a_Half_Dimensions
                 locShadowMap = GL.GetUniformLocation(Program, "sampler_shadow");
                 locShadowMapTexture = GL.GetUniformLocation(Program, "sampler_shadow_tex");
                 locColor = GL.GetUniformLocation(Program, "_color");
+                locSpecularIntensity = GL.GetUniformLocation(Program, "gMatSpecularIntensity");
+                locSpecularPower = GL.GetUniformLocation(Program, "gSpecularPower");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -594,6 +597,8 @@ namespace Two_and_a_Half_Dimensions
                 locShadowMap = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_shadow");
                 locShadowMapTexture = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_shadow_tex");
                 locColor = GL.GetUniformLocation(Properties.ShaderProgram, "_color");
+                locSpecularIntensity = GL.GetUniformLocation(Properties.ShaderProgram, "gMatSpecularIntensity");
+                locSpecularPower = GL.GetUniformLocation(Properties.ShaderProgram, "gSpecularPower");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -642,8 +647,8 @@ namespace Two_and_a_Half_Dimensions
             //Bind the program and set some parameters to the lighting
             GL.UseProgram(Properties.ShaderProgram);
 
-            Utilities.window.effect.SetMatSpecularIntensity(Properties.SpecularIntensity);
-            Utilities.window.effect.SetMatSpecularPower(Properties.SpecularPower);
+            GL.Uniform1(locSpecularIntensity, Properties.SpecularIntensity);
+            GL.Uniform1(locSpecularPower, Properties.SpecularPower);
 
             GL.Uniform3(this.locColor, this.Properties.Color);
         }

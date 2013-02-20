@@ -228,7 +228,9 @@ namespace Two_and_a_Half_Dimensions
             //Draw surface stuff
             Utilities.ViewMatrix = defaultOrthoMatrix;
             Utilities.ProjectionMatrix = Matrix4.Identity;
+
             GUI.GUIManager.Draw();
+
             SwapBuffers();
         }
 

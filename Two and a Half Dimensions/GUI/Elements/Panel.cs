@@ -289,7 +289,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         public virtual void Draw()
         {
             if (!ShouldDraw) { return; }
-
+  
             if (!AlphaBlendmode) { GL.Disable(EnableCap.Blend); }
             Vector2 posOffset = Vector2.Zero;
 
@@ -311,6 +311,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             {
                 DrawChildren();
             }
+
         }
 
         private void DrawChildren()
