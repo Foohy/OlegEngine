@@ -289,19 +289,21 @@ namespace Two_and_a_Half_Dimensions.GUI
         public virtual void Draw()
         {
             if (!ShouldDraw) { return; }
+
+            Vector2 posOffset = this.GetScreenPos();
   
             if (!AlphaBlendmode) { GL.Disable(EnableCap.Blend); }
-            Vector2 posOffset = Vector2.Zero;
-
-            if (this.Parent != null)
+            bool clipping = (this.ClipChildren && ((this.Parent != null && !this.Parent.ClipChildren ) || this.Parent == null)); //Clip if clipping is enabled, our parent isn't clipping, or our parent is null
+            if (clipping)
             {
-                posOffset = this.Parent.GetScreenPos();
+                GL.Enable(EnableCap.ScissorTest);
+                GL.Scissor( (int)posOffset.X, (int)(Utilities.window.Height - posOffset.Y - this.Height), (int)this.Width, (int)this.Height );
             }
 
             panelMesh.mat = Mat;
             modelview = Matrix4.CreateTranslation(Vector3.Zero);
             modelview *= Matrix4.Scale(Width, Height, 1.0f);
-            modelview *= Matrix4.CreateTranslation(Position.X + posOffset.X, Position.Y + posOffset.Y, 3.0f);
+            modelview *= Matrix4.CreateTranslation(posOffset.X, posOffset.Y, 3.0f);
 
             panelMesh.Draw(modelview);
             if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
@@ -310,6 +312,11 @@ namespace Two_and_a_Half_Dimensions.GUI
             if (ShouldDrawChildren)
             {
                 DrawChildren();
+            }
+
+            if (clipping)
+            {
+                GL.Disable(EnableCap.ScissorTest);
             }
 
         }

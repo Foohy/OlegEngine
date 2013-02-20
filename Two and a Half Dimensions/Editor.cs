@@ -71,11 +71,31 @@ namespace Two_and_a_Half_Dimensions
                 dd.AddButton("Exit");
 
                 TopControl.AddButton("Edit");
-                TopControl.AddButton("Help...");
+                Button help = TopControl.AddButton("Help...");
+                help.OnButtonPress += new Button.OnButtonPressDel(help_OnButtonPress);
 
             }
 
             TopControl.ShouldDraw = true;
+        }
+
+        static void help_OnButtonPress()
+        {
+            Window w = GUIManager.Create<Window>();
+            w.SetTitle("So you need help?");
+            w.ClipChildren = true;
+
+            Button button = GUIManager.Create<Button>();
+            button.SetText("Clip test!");
+            button.DrawText.SetColor(0, 0, 0);
+            button.SizeToText(15);
+            button.Height = 40;
+            button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
+            button.TexIdle = Resource.GetTexture("gui/toolbar.png");
+            button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+            button.SetParent(w);
+            button.Position = new Vector2((w.Width / 2) - (button.Width / 2), w.Height - 50);
+            button.Width = 1000;
         }
 
         static void GUIManager_PostDrawHUD(EventArgs e)
