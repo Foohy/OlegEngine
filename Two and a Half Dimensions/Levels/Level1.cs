@@ -68,17 +68,6 @@ namespace Two_and_a_Half_Dimensions.Levels
             spotlight.Constant = 1.0f;
             spotlight.Cutoff = 20.0f;
 
-            //HUD?!?!?!?!?!?
-            //GUI.GUIManager.Create<GUI.Panel>();
-            GUI.Window w = GUI.GUIManager.Create<GUI.Window>();
-            w.Position = new Vector2(100, 100);
-            w.SetTitle("Friggin nerds");
-            GUI.GUIManager.Create<GUI.Window>();
-            w = GUI.GUIManager.Create<GUI.Window>();
-            w.Position = new Vector2(200, 400);
-            w.SetTitle("Stop seriously");
-
-
             //Make us some nice environmental lighting
             DirectionalLight light = new DirectionalLight();
             light.AmbientIntensity = 0.4f;

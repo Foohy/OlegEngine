@@ -39,7 +39,6 @@ namespace Two_and_a_Half_Dimensions.GUI
             base.Init();
 
             contextPanel = GUIManager.Create<Panel>();
-            contextPanel.SetParent(this);
             contextPanel.ShouldPassInput = true;
             contextPanel.Width = 150;
             this.ShouldDrawChildren = false;
@@ -203,8 +202,14 @@ namespace Two_and_a_Half_Dimensions.GUI
             //Draw the context panel
             if (this.CurrentState == State.Pressed)
             {
-                contextPanel.Position = new Vector2(0, this.Height);
-                contextPanel.Draw();
+                contextPanel.Position = new Vector2(this.Position.X, this.Position.Y + this.Height);
+                contextPanel.ShouldDraw = true;
+                contextPanel.ShouldPassInput = false;
+            }
+            else
+            {
+                contextPanel.ShouldDraw = false;
+                contextPanel.ShouldPassInput = true;
             }
         }
     }

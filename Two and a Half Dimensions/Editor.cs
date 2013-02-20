@@ -136,6 +136,8 @@ namespace Two_and_a_Half_Dimensions
 
         static void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (GUIManager.IsMouseOverElement) return;
+
             switch (CurrentMode)
             {
                 case EditMode.CreateEnt:

@@ -17,6 +17,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         public bool AlphaBlendmode { get; set; }
         public bool ShouldDrawChildren { get; set; }
         public bool ShouldPassInput { get; set; } //Clicks should pass 'through' this panel to underlying panels
+        public bool ClipChildren { get; set; } //Should the panel clip child panels when they go off the edge?
         public bool Enabled { get; set; }
         public Vector2 Position;
 
@@ -37,6 +38,11 @@ namespace Two_and_a_Half_Dimensions.GUI
         Material Mat;
         Mesh panelMesh = Resource.GetMesh("debug/quad.obj");
         public Matrix4 modelview;
+
+        public Panel()
+        {
+            this.ClipChildren = true;
+        }
 
         /// <summary>
         /// Set the material of the panel

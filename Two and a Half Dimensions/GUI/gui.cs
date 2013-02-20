@@ -15,6 +15,7 @@ namespace Two_and_a_Half_Dimensions.GUI
     {
         public delegate void OnDrawHUD(EventArgs e);
         public static event OnDrawHUD PostDrawHUD;
+        public static bool IsMouseOverElement { get; private set; }
 
         private static List<GUI.Panel> elements = new List<Panel>();
         private static EventArgs ev = new EventArgs();
@@ -35,6 +36,20 @@ namespace Two_and_a_Half_Dimensions.GUI
             Utilities.window.Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
             Utilities.window.Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
+        }
+
+        private static void UpdateIsOverElement()
+        {
+            for (int i = 0; i < elements.Count; i++)
+            {
+                if (elements[i].Parent == null && elements[i].IsMouseOver() && (!elements[i].ShouldPassInput))
+                {
+                    IsMouseOverElement = true;
+                    break;
+                }
+
+                if (i == elements.Count - 1) IsMouseOverElement = false; //If we managed to get through everything in the list, the mouse isn't over anything
+            }
         }
 
         static void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs e)
@@ -124,6 +139,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             GL.Enable(EnableCap.Blend);
 
             UpdatePanels();
+            UpdateIsOverElement();
 
             foreach (Panel p in elements)
             {
