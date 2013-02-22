@@ -19,6 +19,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         public bool ShouldPassInput { get; set; } //Clicks should pass 'through' this panel to underlying panels
         public bool ClipChildren { get; set; } //Should the panel clip child panels when they go off the edge?
         public bool Enabled { get; set; }
+        public Vector3 Color { get; set; }
         public Vector2 Position;
 
         public Panel Parent { get; set; }
@@ -209,6 +210,11 @@ namespace Two_and_a_Half_Dimensions.GUI
             return Pos;
         }
 
+        public void SetColor(float x, float y, float z)
+        {
+            this.Color = new Vector3(x, y, z);
+        }
+
         /// <summary>
         /// Remove the panel and all of its children
         /// </summary>
@@ -305,6 +311,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             modelview *= Matrix4.Scale(Width, Height, 1.0f);
             modelview *= Matrix4.CreateTranslation(posOffset.X, posOffset.Y, 3.0f);
 
+            this.panelMesh.mat.Properties.Color = this.Color;
             panelMesh.Draw(modelview);
             if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
 

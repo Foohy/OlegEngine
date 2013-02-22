@@ -87,7 +87,7 @@ namespace Two_and_a_Half_Dimensions
 
             Button button = GUIManager.Create<Button>();
             button.SetText("Clip test!");
-            button.DrawText.SetColor(0, 0, 0);
+            button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
             button.Height = 40;
             button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
@@ -96,6 +96,11 @@ namespace Two_and_a_Half_Dimensions
             button.SetParent(w);
             button.Position = new Vector2((w.Width / 2) - (button.Width / 2), w.Height - 50);
             button.Width = 1000;
+
+            Label label = GUIManager.Create<Label>();
+            label.SetText("Howdy!");
+            label.SetParent(w);
+            label.Position = new Vector2(10, 30);
         }
 
         static void GUIManager_PostDrawHUD(EventArgs e)

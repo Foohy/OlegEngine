@@ -24,14 +24,12 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public float ElementHeight = 20;
 
-        public string Text { get; set; }
-
         public delegate void OnButtonPressDel();
         public event OnButtonPressDel OnButtonPress;
 
         public State CurrentState = State.Idle;
 
-        public font DrawText;
+        public Label TextLabel;
         public Panel contextPanel;
 
         public override void Init()
@@ -42,6 +40,10 @@ namespace Two_and_a_Half_Dimensions.GUI
             contextPanel.ShouldPassInput = true;
             contextPanel.Width = 150;
             this.ShouldDrawChildren = false;
+
+            //Create our text label
+            TextLabel = GUIManager.Create<Label>();
+            TextLabel.SetParent(this);
 
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
 
@@ -111,7 +113,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             Button button = GUIManager.Create<Button>();
             button.SetText(text);
-            button.DrawText.SetColor(0, 0, 0);
+            button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
             button.Height = ElementHeight;
             button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
@@ -146,21 +148,12 @@ namespace Two_and_a_Half_Dimensions.GUI
         /// <param name="str"></param>
         public void SetText(string str)
         {
-            if (DrawText == null)
-            {
-                DrawText = new font("title", str);
-            }
-
-            this.Text = str;
-            this.DrawText.SetText(str);
+            this.TextLabel.SetText(str);
         }
 
         public void SizeToText(int offset = 0)
         {
-            if (DrawText != null)
-            {
-                this.Width = DrawText.GetTextLength(this.Text) + offset;
-            }
+            this.Width = TextLabel.GetTextLength() + offset;
         }
 
         public override void Remove()
@@ -193,11 +186,8 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             base.Draw();
 
-            if (DrawText != null)
-            {
-                DrawText.SetPos(this.Position.X + 5, this.Position.Y);
-                DrawText.Draw();
-            }
+            //Because we're set to not draw our children, draw the label manually
+            this.TextLabel.Draw();
 
             //Draw the context panel
             if (this.CurrentState == State.Pressed)

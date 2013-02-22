@@ -30,7 +30,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             Button button = GUIManager.Create<Button>();
             button.SetText(text);
-            button.DrawText.SetColor(0, 0, 0);
+            button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
             button.Height = this.Height;
             button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
@@ -45,7 +45,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             ButtonDropDown button = GUIManager.Create<ButtonDropDown>();
             button.SetText(text);
-            button.DrawText.SetColor(0, 0, 0);
+            button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
             button.Height = this.Height;
             button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");

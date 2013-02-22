@@ -235,6 +235,10 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.charset = ParseFont(FontPath + font + ".fnt");
 
 
+            //Create a blank vertex buffer which we'll update later with our text info
+            textMesh = new Mesh(new Vector3[0], new int[0], new Vector3[0], null, new Vector2[0]);
+            textMesh.DrawMode = BeginMode.Quads;
+
             this.SetText(text);
             this.textMesh.mat = new Material(Resource.GetTexture(FontmapPath + font + ".png"), Resource.GetProgram("hud"));
 
@@ -285,6 +289,8 @@ namespace Two_and_a_Half_Dimensions.GUI
         /// <returns>The length in pixels of the string</returns>
         public float GetTextLength( string str )
         {
+            if (string.IsNullOrEmpty(str)) return 0;
+
             float OffsetX = 0;
             float CurX = 0;
             float strLength = 0;
@@ -301,7 +307,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public void SetText(string text)
         {
-            if (text.Length < 1) return;
+            if (string.IsNullOrEmpty(text)) return;
 
             Vector3[] verts;
             Vector2[] UV;
@@ -322,7 +328,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             if (this.textMesh == null) return;
 
-            this.textMesh.mat.Properties.Color = this.Color;
+            this.SetColor(this.Color); //HACK HACK: make some sort of render.SetColor
             this.textMesh.Draw(view);
         }
     }

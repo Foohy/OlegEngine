@@ -22,14 +22,20 @@ namespace Two_and_a_Half_Dimensions.GUI
         public int TexPressed = -1;
         public int TexHovered = -1;
 
-        public string Text { get; set; }
-
         public delegate void OnButtonPressDel();
         public event OnButtonPressDel OnButtonPress;
 
         public State CurrentState = State.Idle;
 
-        public font DrawText;
+        //public font DrawText;
+        public Label TextLabel;
+
+        public Button()
+        {
+            TextLabel = GUIManager.Create<Label>();
+            TextLabel.SetColor(0, 0, 0);
+            TextLabel.SetParent(this);
+        }
 
         public override void Init()
         {
@@ -84,27 +90,14 @@ namespace Two_and_a_Half_Dimensions.GUI
         /// <param name="str"></param>
         public void SetText(string str)
         {
-            if (DrawText == null)
-            {
-                DrawText = new font("title", str);
-            }
-
-            this.Text = str;
-            this.DrawText.SetText(str);
+            this.TextLabel.SetText(str);
         }
 
         public void SizeToText(int offset = 0)
         {
-            if (DrawText != null)
-            {
-                this.Width = DrawText.GetTextLength(this.Text) + offset;
-            }
+            this.Width = this.TextLabel.GetTextLength() + offset;
         }
 
-        private void SoftSetMaterial(int texBuf)
-        {
-
-        }
 
         public override void Draw()
         {
@@ -129,12 +122,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             base.Draw();
 
-            if (DrawText != null)
-            {
-                Vector2 pos = this.GetScreenPos();
-                DrawText.SetPos(pos.X + 5, pos.Y);
-                DrawText.Draw();
-            }
+            //TextLabel.Draw();
         }
     }
 }
