@@ -21,8 +21,8 @@ namespace Two_and_a_Half_Dimensions.Entity
 
             DepthScreen = GUI.GUIManager.Create<GUI.Panel>();
             DepthScreen.SetMaterial(Resource.GetMaterial("engine/depth"));
-            DepthScreen.Width = Utilities.window.Width / Size;
-            DepthScreen.Height = Utilities.window.Height / Size;
+            DepthScreen.SetWidth(Utilities.window.Width / Size);
+            DepthScreen.SetHeight(Utilities.window.Height / Size);
             DepthScreen.Position = new Vector2(0, Utilities.window.Height - DepthScreen.Height);
             DepthScreen.AlphaBlendmode = false;
 

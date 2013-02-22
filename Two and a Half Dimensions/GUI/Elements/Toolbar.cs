@@ -18,7 +18,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         public void AddToolPanel(Panel p)
         {
             p.SetParent(this);
-            p.Height = this.Height;
+            p.SetHeight(this.Height);
 
             if (this.Children.Count > 1)
             {
@@ -32,7 +32,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             button.SetText(text);
             button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
-            button.Height = this.Height;
+            button.SetHeight(this.Height);
             button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
             button.TexIdle = Resource.GetTexture("gui/toolbar.png");
             button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
@@ -47,7 +47,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             button.SetText(text);
             button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
-            button.Height = this.Height;
+            button.SetHeight(this.Height);
             button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
             button.TexIdle = Resource.GetTexture("gui/toolbar.png");
             button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");

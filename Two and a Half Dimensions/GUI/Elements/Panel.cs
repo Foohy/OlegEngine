@@ -11,8 +11,8 @@ namespace Two_and_a_Half_Dimensions.GUI
 {
     class Panel
     {
-        public float Width { get; set; }
-        public float Height { get; set; }
+        public float Width { get; protected set; }
+        public float Height { get; protected set; }
         public bool ShouldDraw { get; set; }
         public bool AlphaBlendmode { get; set; }
         public bool ShouldDrawChildren { get; set; }
@@ -175,6 +175,20 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         #endregion
 
+        #region Sizing Functions
+        public void SetWidth(float width)
+        {
+            this.Width = width;
+            this.Resize();
+        }
+
+        public void SetHeight(float height)
+        {
+            this.Height = height;
+            this.Resize();
+        }
+        #endregion
+
         /// <summary>
         /// Whether the mouse is currently hovering over the box of the panel
         /// </summary>
@@ -213,6 +227,11 @@ namespace Two_and_a_Half_Dimensions.GUI
         public void SetColor(float x, float y, float z)
         {
             this.Color = new Vector3(x, y, z);
+        }
+
+        public virtual void Resize()
+        {
+
         }
 
         /// <summary>

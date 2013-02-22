@@ -13,12 +13,12 @@ namespace Two_and_a_Half_Dimensions.GUI
         public string Text { get; private set; }
         public bool AutoStretch { get; set; }
 
-        private font DrawText;
+        private Font DrawText;
 
         public Label()
         {
             this.Text = "";
-            DrawText = new font("title", this.Text);
+            DrawText = new Font("title", this.Text);
             this.ShouldPassInput = true;
         }
 
@@ -29,7 +29,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             if (this.AutoStretch)
             {
-                this.Width = DrawText.GetTextLength(this.Text);
+                this.SetWidth( DrawText.GetTextLength( this.Text ));
             }
         }
 

@@ -27,7 +27,7 @@ namespace Two_and_a_Half_Dimensions
         public static BaseEntity SelectedEnt;
         public static ent_cursor Cursor;
 
-        private static GUI.font CurrentModeText;
+        private static GUI.Font CurrentModeText;
         private static float goalZoom = 5.0f;
         private static Vector3 Pos = new Vector3();
         private static float multiplier = 8;
@@ -51,7 +51,7 @@ namespace Two_and_a_Half_Dimensions
 
 
             //Slap some text on the screen
-            CurrentModeText = new GUI.font("debug", "Mode: " + CurrentMode.ToString());
+            CurrentModeText = new GUI.Font("debug", "Mode: " + CurrentMode.ToString());
             CurrentModeText.SetPos(Utilities.window.Width - 200, 45 );
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
 
@@ -63,7 +63,7 @@ namespace Two_and_a_Half_Dimensions
             if (TopControl == null)
             {
                 TopControl = GUIManager.Create<Toolbar>();
-                TopControl.Width = Utilities.window.Width;
+                TopControl.SetWidth(Utilities.window.Width);
 
                 ButtonDropDown dd = TopControl.AddButtonDropDown("File");
                 dd.AddButton("Load");
@@ -89,13 +89,13 @@ namespace Two_and_a_Half_Dimensions
             button.SetText("Clip test!");
             button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
-            button.Height = 40;
             button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
             button.TexIdle = Resource.GetTexture("gui/toolbar.png");
             button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
             button.SetParent(w);
             button.Position = new Vector2((w.Width / 2) - (button.Width / 2), w.Height - 50);
-            button.Width = 1000;
+            button.SetWidth(1000);
+            button.SetHeight(40);
 
             Label label = GUIManager.Create<Label>();
             label.SetText("Howdy!");

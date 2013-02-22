@@ -13,22 +13,28 @@ namespace Two_and_a_Half_Dimensions.GUI
         public string WindowTitle { get; private set; }
 
         Panel Title;
-        font TitleText;
+        Font TitleText;
         Button closeButton;
         Vector2 Offset = Vector2.Zero;
         bool dragging = false;
         bool resizing = false;
+
+        public Window()
+        {
+
+        }
+
         public override void Init()
         {
             this.WindowTitle = "Untitled";
-
-            Width = 150;
-            Height = 150;
-
+            this.Width = 150;
+            this.Height = 150;
             this.SetMaterial(Resource.GetTexture("gui/window.png"));
+
             Title = GUIManager.Create<Panel>();
             Title.SetMaterial(Resource.GetTexture("gui/title.png"));
-            Title.Height = 20;
+            Title.SetHeight(20);
+            Title.SetWidth(this.Width);
             Title.OnMouseDown += new OnMouseDownDel(Title_OnMouseDown);
             Title.OnMouseMove += new OnMouseMoveDel(Title_OnMouseMove);
             Title.OnMouseUp += new OnMouseUpDel(Title_OnMouseUp);
@@ -39,8 +45,8 @@ namespace Two_and_a_Half_Dimensions.GUI
             closeButton.TexIdle = Resource.GetTexture("gui/x_idle.png");
             closeButton.TexPressed = Resource.GetTexture("gui/x_pressed.png");
             closeButton.TexHovered = Resource.GetTexture("gui/x_hover.png");
-            closeButton.Width = 20;
-            closeButton.Height = 20;
+            closeButton.SetWidth(20);
+            closeButton.SetHeight(20);
             closeButton.SetParent(this);
             closeButton.AlignRight();
             closeButton.OnButtonPress += new Button.OnButtonPressDel(closeButton_OnButtonPress);
@@ -48,7 +54,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
 
             this.Position = new Vector2(200, 480);
-            TitleText = new font("title", WindowTitle);
+            TitleText = new Font("title", WindowTitle);
         }
 
         void closeButton_OnButtonPress()
@@ -98,10 +104,11 @@ namespace Two_and_a_Half_Dimensions.GUI
             if (this.resizing)
             {
                 Vector2 Screenpos = this.GetScreenPos();
-                this.Width = Utilities.Clamp(Utilities.window.Mouse.X - Screenpos.X, 10000, this.TitleText.GetTextLength(WindowTitle) + closeButton.Width + 10);
-                this.Height = Utilities.Clamp( Utilities.window.Mouse.Y - Screenpos.Y, 10000, 30 );
+                this.SetWidth(Utilities.Clamp(Utilities.window.Mouse.X - Screenpos.X, 10000, this.TitleText.GetTextLength(WindowTitle) + closeButton.Width));
+                this.SetHeight( Utilities.Clamp( Utilities.window.Mouse.Y - Screenpos.Y, 10000, 30 ));
 
                 closeButton.Position = new Vector2(this.Width - closeButton.Width, 0);
+                Title.SetWidth(this.Width);
             }
         }
 
@@ -110,6 +117,8 @@ namespace Two_and_a_Half_Dimensions.GUI
             if (this.resizing)
             {
                 this.resizing = false;
+
+                Title.SetWidth(this.Width);
             }
         }
 
@@ -134,8 +143,6 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public override void Draw()
         {
-            Title.Width = this.Width;
-
             TitleText.SetPos(this.Position.X + 5, this.Position.Y);
 
             Title.ShouldDraw = true;

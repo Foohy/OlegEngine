@@ -38,7 +38,8 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             contextPanel = GUIManager.Create<Panel>();
             contextPanel.ShouldPassInput = true;
-            contextPanel.Width = 150;
+            contextPanel.SetWidth(150);
+
             this.ShouldDrawChildren = false;
 
             //Create our text label
@@ -101,7 +102,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             p.SetParent(this.contextPanel);
             p.ShouldPassInput = true;
-            p.Width = contextPanel.Width;
+            p.SetWidth(contextPanel.Width);
 
             if (this.contextPanel.Children.Count > 1)
             {
@@ -115,7 +116,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             button.SetText(text);
             button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
-            button.Height = ElementHeight;
+            button.SetHeight(ElementHeight);
             button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
             button.TexIdle = Resource.GetTexture("gui/toolbar.png");
             button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
@@ -128,7 +129,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         private void UpdateContextContents()
         {
-            contextPanel.Height = contextPanel.Children.Count * ElementHeight;
+            contextPanel.SetHeight(contextPanel.Children.Count * ElementHeight);
         }
 
 
@@ -153,7 +154,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public void SizeToText(int offset = 0)
         {
-            this.Width = TextLabel.GetTextLength() + offset;
+            this.SetWidth(TextLabel.GetTextLength() + offset);
         }
 
         public override void Remove()
