@@ -11,6 +11,16 @@ namespace Two_and_a_Half_Dimensions.GUI
 {
     class Panel
     {
+        public enum DockStyle
+        {
+            NODOCK,
+            LEFT,
+            RIGHT,
+            TOP,
+            BOTTOM,
+            FILL
+        }
+
         public float Width { get; protected set; }
         public float Height { get; protected set; }
         public bool ShouldDraw { get; set; }
@@ -19,8 +29,14 @@ namespace Two_and_a_Half_Dimensions.GUI
         public bool ShouldPassInput { get; set; } //Clicks should pass 'through' this panel to underlying panels
         public bool ClipChildren { get; set; } //Should the panel clip child panels when they go off the edge?
         public bool Enabled { get; set; }
+        public DockStyle DockingStyle { get; protected set; }
         public Vector3 Color { get; set; }
-        public Vector2 Position;
+        public Vector2 Position { get; protected set; }
+
+        public float PaddingLeft { get; protected set; }
+        public float PaddingRight { get; protected set; }
+        public float PaddingTop { get; protected set; }
+        public float PaddingBottom { get; protected set; }
 
         public Panel Parent { get; set; }
         public List<Panel> Children = new List<Panel>();
@@ -35,6 +51,9 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public delegate void OnMouseMoveDel(MouseMoveEventArgs e);
         public event OnMouseMoveDel OnMouseMove;
+
+        public delegate void OnResizeDel();
+        public event OnResizeDel OnResize;
 
         Material Mat;
         Mesh panelMesh = Resource.GetMesh("debug/quad.obj");
@@ -173,6 +192,24 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.Position = new Vector2(this.Position.X, p.Position.Y - offset);
         }
 
+        public void SetPos(Vector2 pos)
+        {
+            this.Position = pos;
+
+            this.Reposition();
+        }
+
+        public void SetPos(float x, float y)
+        {
+            this.Position = new Vector2(x, y);
+
+            this.Reposition();
+        }
+
+        protected virtual void Reposition()
+        {
+        }
+
         #endregion
 
         #region Sizing Functions
@@ -186,6 +223,71 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             this.Height = height;
             this.Resize();
+        }
+
+        public void Dock(DockStyle style)
+        {
+            this.DockingStyle = style;
+            this.ParentResized();
+        }
+
+        public void DockPadding(float left, float right, float top, float bottom)
+        {
+            this.PaddingLeft = left;
+            this.PaddingRight = right;
+            this.PaddingTop = top;
+            this.PaddingBottom = bottom;
+
+            this.ParentResized();
+        }
+
+        protected virtual void ParentResized()
+        {
+            if (this.Parent == null) return;
+
+            //Handle docking
+            if (this.DockingStyle == DockStyle.NODOCK ) return;
+            if (this.DockingStyle == DockStyle.FILL )
+            {
+                this.Width = this.Parent.Width - (PaddingLeft + PaddingRight);
+                this.Height = this.Parent.Height - (PaddingTop + PaddingBottom );
+                this.Position = new Vector2(PaddingLeft, PaddingTop);
+            }
+
+
+            if (this.DockingStyle == DockStyle.TOP )
+            {
+                this.Position = new Vector2(PaddingLeft, PaddingTop);
+                this.Width = this.Parent.Width - (PaddingLeft + PaddingRight);
+            }
+            if (this.DockingStyle == DockStyle.BOTTOM)
+            {
+                this.Position = new Vector2(0, this.Parent.Height - this.Height);
+                this.Width = this.Parent.Width - (PaddingLeft + PaddingRight);
+            }
+            if (this.DockingStyle == DockStyle.LEFT)
+            {
+                this.Position = new Vector2(PaddingLeft, PaddingTop);
+                this.Height = this.Parent.Height - (PaddingTop + PaddingBottom);
+            }
+            if (this.DockingStyle == DockStyle.RIGHT)
+            {
+                this.Position = new Vector2(this.Parent.Width - (this.Width + PaddingRight), PaddingTop);
+                this.Height = this.Parent.Height - (PaddingTop + PaddingBottom);
+            }
+        }
+
+        public virtual void Resize()
+        {
+            foreach (Panel child in Children)
+            {
+                child.ParentResized();
+            }
+
+            if (OnResize != null)
+            {
+                OnResize();
+            }
         }
         #endregion
 
@@ -227,11 +329,6 @@ namespace Two_and_a_Half_Dimensions.GUI
         public void SetColor(float x, float y, float z)
         {
             this.Color = new Vector3(x, y, z);
-        }
-
-        public virtual void Resize()
-        {
-
         }
 
         /// <summary>

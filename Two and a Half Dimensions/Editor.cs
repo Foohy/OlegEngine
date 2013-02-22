@@ -93,14 +93,16 @@ namespace Two_and_a_Half_Dimensions
             button.TexIdle = Resource.GetTexture("gui/toolbar.png");
             button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
             button.SetParent(w);
-            button.Position = new Vector2((w.Width / 2) - (button.Width / 2), w.Height - 50);
-            button.SetWidth(1000);
-            button.SetHeight(40);
+            button.SetPos(new Vector2((w.Width / 2) - (button.Width / 2), w.Height - 50));
+            //button.SetWidth(1000);
+            button.DockPadding(20, 20, 20, 20);
+            button.SetHeight(70);
+            button.Dock(Panel.DockStyle.TOP);
 
-            Label label = GUIManager.Create<Label>();
-            label.SetText("Howdy!");
-            label.SetParent(w);
-            label.Position = new Vector2(10, 30);
+            //Label label = GUIManager.Create<Label>();
+            //label.SetText("Howdy!");
+            //label.SetParent(w);
+            //label.Position = new Vector2(10, 30);
         }
 
         static void GUIManager_PostDrawHUD(EventArgs e)

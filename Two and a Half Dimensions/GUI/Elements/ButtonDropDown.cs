@@ -39,6 +39,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             contextPanel = GUIManager.Create<Panel>();
             contextPanel.ShouldPassInput = true;
             contextPanel.SetWidth(150);
+            contextPanel.SetPos(this.Position.X, this.Position.Y + this.Height);
 
             this.ShouldDrawChildren = false;
 
@@ -47,7 +48,6 @@ namespace Two_and_a_Half_Dimensions.GUI
             TextLabel.SetParent(this);
 
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
-
         }
 
         void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
@@ -157,6 +157,20 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.SetWidth(TextLabel.GetTextLength() + offset);
         }
 
+        protected override void Reposition()
+        {
+            base.Reposition();
+
+            contextPanel.SetPos(this.Position.X, this.Position.Y + this.Height);
+        }
+
+        public override void Resize()
+        {
+            base.Resize();
+
+            contextPanel.SetPos(this.Position.X, this.Position.Y + this.Height);
+        }
+
         public override void Remove()
         {
             base.Remove();
@@ -193,7 +207,6 @@ namespace Two_and_a_Half_Dimensions.GUI
             //Draw the context panel
             if (this.CurrentState == State.Pressed)
             {
-                contextPanel.Position = new Vector2(this.Position.X, this.Position.Y + this.Height);
                 contextPanel.ShouldDraw = true;
                 contextPanel.ShouldPassInput = false;
             }
