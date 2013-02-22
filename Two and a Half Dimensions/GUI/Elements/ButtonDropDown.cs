@@ -45,7 +45,10 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             //Create our text label
             TextLabel = GUIManager.Create<Label>();
+            TextLabel.SetColor(0, 0, 0);
             TextLabel.SetParent(this);
+            TextLabel.Dock(DockStyle.FILL);
+            TextLabel.SetAlignment(Label.TextAlign.MiddleCenter);
 
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
         }
@@ -120,6 +123,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
             button.TexIdle = Resource.GetTexture("gui/toolbar.png");
             button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+            button.TextLabel.SetAlignment(Label.TextAlign.MiddleLeft);
             this.AddToolPanel(button);
 
             UpdateContextContents();

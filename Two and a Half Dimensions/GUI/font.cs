@@ -303,6 +303,11 @@ namespace Two_and_a_Half_Dimensions.GUI
             return strLength;
         }
 
+        public float GetTextHeight()
+        {
+            return this.charset.LineHeight;
+        }
+
         public void SetText(string text)
         {
             if (string.IsNullOrEmpty(text)) return;

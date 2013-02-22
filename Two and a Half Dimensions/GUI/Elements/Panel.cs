@@ -275,6 +275,10 @@ namespace Two_and_a_Half_Dimensions.GUI
                 this.Position = new Vector2(this.Parent.Width - (this.Width + PaddingRight), PaddingTop);
                 this.Height = this.Parent.Height - (PaddingTop + PaddingBottom);
             }
+
+            //Alert that we've just resized ourselves
+            this.Resize();
+
         }
 
         public virtual void Resize()

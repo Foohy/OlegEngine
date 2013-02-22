@@ -35,6 +35,8 @@ namespace Two_and_a_Half_Dimensions.GUI
             TextLabel = GUIManager.Create<Label>();
             TextLabel.SetColor(0, 0, 0);
             TextLabel.SetParent(this);
+            TextLabel.Dock(DockStyle.FILL);
+            TextLabel.SetAlignment(Label.TextAlign.MiddleCenter);
         }
 
         public override void Init()
@@ -91,6 +93,9 @@ namespace Two_and_a_Half_Dimensions.GUI
         public void SetText(string str)
         {
             this.TextLabel.SetText(str);
+
+            //center text
+            //this.TextLabel.SetPos((this.Width / 2) - (this.TextLabel.Width / 2), (this.Height / 2) - (this.TextLabel.Height / 2));
         }
 
         public void SizeToText(int offset = 0)
@@ -98,6 +103,13 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.Width = this.TextLabel.GetTextLength() + offset;
         }
 
+        public override void Resize()
+        {
+            base.Resize();
+
+            //center text
+            //this.TextLabel.SetPos((this.Width / 2) - (this.TextLabel.Width / 2), (this.Height / 2) - (this.TextLabel.Height / 2));
+        }
 
         public override void Draw()
         {
