@@ -62,17 +62,14 @@ namespace Two_and_a_Half_Dimensions.Entity
             {
                 if (this.DisableLighting) GL.Disable(EnableCap.Lighting);
 
-                Model.mat = this.Mat;
-                Model.Color = this.Color;
+                Model.mat       = this.Mat;
+                Model.Color     = this.Color;
 
-                modelview = Matrix4.CreateTranslation(Vector3.Zero);
-                modelview *= Matrix4.Scale(Scale);
-                modelview *= Matrix4.CreateRotationZ(this.Angle.Z);
-                modelview *= Matrix4.CreateRotationY(this.Angle.Y);
-                modelview *= Matrix4.CreateRotationX(this.Angle.X);
-                modelview *= Matrix4.CreateTranslation(Position);
-                
-                Model.Draw(modelview);
+                Model.Position  = this.Position;
+                Model.Scale     = this.Scale;
+                Model.Angle     = this.Angle;
+
+                Model.Draw();
 
                 if (this.DisableLighting) GL.Enable(EnableCap.Lighting);
             }

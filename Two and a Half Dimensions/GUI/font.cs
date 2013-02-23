@@ -332,7 +332,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             if (this.textMesh == null) return;
 
             this.SetColor(this.Color); //HACK HACK: make some sort of render.SetColor
-            this.textMesh.Draw(view);
+            this.textMesh.DrawSimple(view);
         }
     }
 }

@@ -442,7 +442,8 @@ namespace Two_and_a_Half_Dimensions
                 for (int i = 0; i < ents.Length; i++)
                 {
                     Vector3 dif = ents[i].Position - Editor.MousePos;
-                    if (dif.LengthSquared < curDist && !(ents[i] is ent_cursor))
+                    Vector3 hitPos = new Vector3();
+                    if (ents[i].Model != null && dif.LengthSquared < curDist && !(ents[i] is ent_cursor) && ents[i].Model.LineIntersectsBox(Editor.MousePos - new Vector3(0, 0, -100), Editor.MousePos + new Vector3(0, 0, -100), ref hitPos))
                     {
                         curDist = dif.LengthSquared;
                         closest = ents[i];

@@ -10,17 +10,39 @@ namespace Two_and_a_Half_Dimensions
 {
     class Graphics
     {
-        public static void DrawLine(Vector3 Modelview, Vector3 Point1, Vector3 Point2)
+        public static bool DrawBoundingBoxes = true;
+
+        private static Mesh box;
+
+        public static void DrawBox(Vector3 Position, Vector3 BottomLeft, Vector3 TopRight)
+        {
+            if (Utilities.CurrentPass == 1) return;
+
+            if (box == null)
+            {
+                box = Resource.GetMesh("debug/box.obj");
+                box.mat = new Material("engine/white.png", "default");
+            }
+            
+            Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
+            modelview *= Matrix4.Scale((TopRight - BottomLeft ) / 2 );
+            modelview *= Matrix4.CreateTranslation(Position);
+
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            DrawBoundingBoxes = false;
+            box.DrawSimple(modelview);
+            DrawBoundingBoxes = true;
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+        }
+
+        public static void DrawLine(Matrix4 matrix, Vector3 Point1, Vector3 Point2)
         {
             GL.UseProgram(0);
-            Matrix4 modelview = Utilities.ViewMatrix;
-            Matrix4 curpos = Matrix4.Identity;
             //Teehee deprecated functions
             GL.LineWidth(1.0f);
             GL.Color3(0.0f, 0.0f, 1.0f);
             GL.PushMatrix();
-                GL.MultMatrix(ref modelview);
-                GL.MultMatrix(ref curpos);
+                GL.MultMatrix(ref matrix);
                 GL.Color3(0.0f, 1.0f, 1.0f);
                 GL.Begin(BeginMode.Lines);
                 GL.LineWidth(9.0f);
@@ -262,6 +284,11 @@ namespace Two_and_a_Half_Dimensions
         public BeginMode DrawMode = BeginMode.Triangles;
         public BufferUsageHint UsageHint = BufferUsageHint.StaticDraw;
         public Vector3 Color = Vector3.One;
+        public BoundingBox BBox = new BoundingBox();
+
+        public Vector3 Position { get; set; }
+        public Vector3 Scale { get; set; }
+        public Vector3 Angle { get; set; }
 
         public const int INDEX_BUFFER  = 0;
         public const int POS_VB        = 1;
@@ -278,24 +305,28 @@ namespace Two_and_a_Half_Dimensions
 
         public class BoundingBox
         {
-            public Vector3 BottomLeft = -Vector3.One;
-            public Vector3 TopRight = Vector3.One;
+            public Vector3 BottomLeft = -Vector3.One * 0.1f;
+            public Vector3 TopRight = Vector3.One * 0.1f;
         }
 
         public Mesh()
         {
+            this.Scale = Vector3.One;
         }
         public Mesh(string filename)
         {
             this.LoadMesh(filename);
+            this.Scale = Vector3.One;
         }
         public Mesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] texcoords = null)
         {
             loadMesh(verts, elements, tangents, normals, texcoords);
+            this.Scale = Vector3.One;
         }
         public Mesh(Vector3[] verts, int[] elements, Vector3[] tangents)
         {
             loadMesh(verts, elements, tangents);
+            this.Scale = Vector3.One;
         }
 
         public void LoadMesh(string filename)
@@ -308,6 +339,7 @@ namespace Two_and_a_Half_Dimensions
             Mesh.BoundingBox boundingbox;
 
             Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox );
+            this.BBox = boundingbox;
 
             loadMesh(verts, elements, tangents, normals, lsUV);
         }
@@ -322,6 +354,7 @@ namespace Two_and_a_Half_Dimensions
             Mesh.BoundingBox boundingbox;
 
             Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
+            this.BBox = boundingbox;
 
             UpdateMesh(verts, elements, tangents, normals, lsUV);
         }
@@ -374,6 +407,60 @@ namespace Two_and_a_Half_Dimensions
             GL.BindVertexArray(0);
         }
 
+        public bool PointWithinBox(Vector3 point)
+        {
+            Vector3 boxPosL = BBox.BottomLeft + this.Position;
+            Vector3 boxPosR = BBox.TopRight + this.Position;
+
+            return (point.X > boxPosL.X && point.X < boxPosR.X &&
+                    point.Y > boxPosL.Y && point.Y < boxPosR.Y &&
+                    point.Z > boxPosL.Z && point.Y < boxPosR.Z  );
+        }
+
+        public bool LineIntersectsBox(Vector3 L1, Vector3 L2, ref Vector3 Hit)
+        {
+            Vector3 B1 = this.BBox.BottomLeft + this.Position; ;
+            Vector3 B2 = this.BBox.TopRight + this.Position; ;
+            if (L2.X < B1.X && L1.X < B1.X) return false;
+            if (L2.X > B2.X && L1.X > B2.X) return false;
+            if (L2.Y < B1.Y && L1.Y < B1.Y) return false;
+            if (L2.Y > B2.Y && L1.Y > B2.Y) return false;
+            if (L2.Z < B1.Z && L1.Z < B1.Z) return false;
+            if (L2.Z > B2.Z && L1.Z > B2.Z) return false;
+            if (L1.X > B1.X && L1.X < B2.X &&
+                L1.Y > B1.Y && L1.Y < B2.Y &&
+                L1.Z > B1.Z && L1.Z < B2.Z)
+            {
+                Hit = L1;
+                return true;
+            }
+            if ((GetIntersection(L1.X - B1.X, L2.X - B1.X, L1, L2, ref Hit) && InBox(Hit, B1, B2, 1))
+              || (GetIntersection(L1.Y - B1.Y, L2.Y - B1.Y, L1, L2, ref Hit) && InBox(Hit, B1, B2, 2))
+              || (GetIntersection(L1.Z - B1.Z, L2.Z - B1.Z, L1, L2, ref Hit) && InBox(Hit, B1, B2, 3))
+              || (GetIntersection(L1.X - B2.X, L2.X - B2.X, L1, L2, ref Hit) && InBox(Hit, B1, B2, 1))
+              || (GetIntersection(L1.Y - B2.Y, L2.Y - B2.Y, L1, L2, ref Hit) && InBox(Hit, B1, B2, 2))
+              || (GetIntersection(L1.Z - B2.Z, L2.Z - B2.Z, L1, L2, ref Hit) && InBox(Hit, B1, B2, 3)))
+                return true;
+
+            return false;
+        }
+
+        bool GetIntersection(float fDst1, float fDst2, Vector3 P1, Vector3 P2, ref Vector3 Hit)
+        {
+            if ((fDst1 * fDst2) >= 0.0f) return false;
+            if (fDst1 == fDst2) return false;
+            Hit = P1 + (P2 - P1) * (-fDst1 / (fDst2 - fDst1));
+            return true;
+        }
+
+        bool InBox(Vector3 Hit, Vector3 B1, Vector3 B2, int Axis)
+        {
+            if (Axis == 1 && Hit.Z > B1.Z && Hit.Z < B2.Z && Hit.Y > B1.Y && Hit.Y < B2.Y) return true;
+            if (Axis == 2 && Hit.Z > B1.Z && Hit.Z < B2.Z && Hit.X > B1.X && Hit.X < B2.X) return true;
+            if (Axis == 3 && Hit.X > B1.X && Hit.X < B2.X && Hit.Y > B1.Y && Hit.Y < B2.Y) return true;
+            return false;
+        }
+
         private void loadMesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] lsUV = null )
         {
             GL.GenVertexArrays(1, out VAO);
@@ -419,14 +506,34 @@ namespace Two_and_a_Half_Dimensions
 
             GL.BindVertexArray(0);
         }
-
-        public void Draw( Matrix4 mmatrix, Matrix4 vmatrix, Matrix4 pmatrix )
+        /*
+        public void Draw( Matrix4 mmatrix, Matrix4 vmatrix, Matrix4 pmatrix, Vector3 Position )
         {
             render(mmatrix, vmatrix, pmatrix);
+            this.Position = Position;
         }
-        public void Draw( Matrix4 vmatrix)
+        public void Draw( Matrix4 vmatrix, Vector3 Position)
         {
             render(Utilities.ViewMatrix, vmatrix, Utilities.ProjectionMatrix);
+            this.Position = Position;
+        }
+        */
+        public void DrawSimple(Matrix4 vmatrix)
+        {
+            render(Utilities.ViewMatrix, vmatrix, Utilities.ProjectionMatrix);
+        }
+
+        public void Draw()
+        {
+            Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
+            modelview *= Matrix4.Scale(Scale);
+            modelview *= Matrix4.CreateRotationZ(this.Angle.Z);
+            modelview *= Matrix4.CreateRotationX(this.Angle.X);
+            modelview *= Matrix4.CreateRotationY(this.Angle.Y);
+
+            modelview *= Matrix4.CreateTranslation(Position);
+
+            render(Utilities.ViewMatrix, modelview, Utilities.ProjectionMatrix);
         }
 
         private void render(Matrix4 mmatrix, Matrix4 vmatrix, Matrix4 pmatrix)
@@ -453,6 +560,13 @@ namespace Two_and_a_Half_Dimensions
             //GL.DrawElements(BeginMode.Triangles, NumIndices, DrawElementsType.UnsignedInt, IntPtr.Zero);
 
             GL.BindVertexArray(0);
+
+            //Draw the bounding box
+            if (Graphics.DrawBoundingBoxes)
+            {
+                Graphics.DrawBox(this.Position , this.BBox.BottomLeft, this.BBox.TopRight);
+
+            }
         }
 
         public void Remove()

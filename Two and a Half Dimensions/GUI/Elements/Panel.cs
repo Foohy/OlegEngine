@@ -432,7 +432,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             modelview *= Matrix4.CreateTranslation(posOffset.X, posOffset.Y, 3.0f);
 
             this.panelMesh.mat.Properties.Color = this.Color;
-            panelMesh.Draw(modelview);
+            panelMesh.DrawSimple(modelview);
             if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
 
             //Draw our children

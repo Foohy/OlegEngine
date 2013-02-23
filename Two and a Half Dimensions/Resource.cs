@@ -91,6 +91,7 @@ namespace Two_and_a_Half_Dimensions
 
                 Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
                 Meshes[filename] = new Mesh(verts, elements,tangents, normals, lsUV);
+                Meshes[filename].BBox = boundingbox;
             }
 
             return Meshes[filename];

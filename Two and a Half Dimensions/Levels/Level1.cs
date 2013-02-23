@@ -161,7 +161,7 @@ namespace Two_and_a_Half_Dimensions.Levels
 
             if (levelmodel != null)
             {
-                levelmodel.Draw(Matrix4.Identity);
+                levelmodel.Draw();
             }
         }
     }

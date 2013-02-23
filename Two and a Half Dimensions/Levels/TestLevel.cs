@@ -322,12 +322,12 @@ namespace Two_and_a_Half_Dimensions.Levels
 
             if (geometry != null)
             {
-                geometry.Draw(Matrix4.Identity );
+                geometry.Draw();
             }
             GL.Enable(EnableCap.CullFace);
             if (geometry_front != null)
             {
-                geometry_front.Draw(Matrix4.Identity);
+                geometry_front.Draw();
             }
 
             if (background != null && bg_texture != null)

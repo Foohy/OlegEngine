@@ -178,18 +178,14 @@ namespace Two_and_a_Half_Dimensions.Entity
             this.Mat.Properties.SpecularPower = 0;
             this.Mat.Properties.SpecularIntensity = 0;
             
-            wheelmat = Matrix4.CreateTranslation(Vector3.Zero); //
-            wheelmat *= Matrix4.Scale(this.Scale);
-            wheelmat *= Matrix4.CreateRotationZ(wheelang[0]);
-            wheelmat *= Matrix4.CreateTranslation(wheelpos[0]);
-            wheel.Draw(wheelmat);
+            wheel.Scale = this.Scale;
+            wheel.Angle = new Vector3(0, 0, wheelang[0]);
+            wheel.Position = wheelpos[0];
+            wheel.Draw();
 
-            wheelmat = Matrix4.CreateTranslation(Vector3.Zero);
-            wheelmat *= Matrix4.Scale(this.Scale);
-            wheelmat *= Matrix4.CreateRotationZ(wheelang[1]);
-            wheelmat *= Matrix4.CreateTranslation(wheelpos[1]);
-
-            wheel.Draw(wheelmat);
+            wheel.Angle = new Vector3(0, 0, wheelang[1]);
+            wheel.Position = wheelpos[1];
+            wheel.Draw();
         }
 
         public override void Remove()
