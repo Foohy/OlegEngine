@@ -99,6 +99,24 @@ namespace Two_and_a_Half_Dimensions.GUI
             back_queue.Insert(0, p);
         }
 
+        public static bool IsPanelAbovePoint(Vector2 pos, Panel p)
+        {
+            for (int i = elements.Count - 1; i >= 0; i--)
+            {
+                Panel panel = elements[i];
+                if (panel.Parent == null && panel.IsMouseOver() && !panel.ShouldPassInput && panel.ShouldDraw)
+                {
+                    if (panel == p || p.IsParent(panel))
+                    {
+                        return false;
+                    }
+                    else return true;
+                }
+            }
+
+            return false;
+        }
+
         private static void UpdatePanels()
         {
             if (front_queue.Count > 0 || back_queue.Count > 0)

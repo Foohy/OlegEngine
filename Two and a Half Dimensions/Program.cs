@@ -33,7 +33,7 @@ namespace Two_and_a_Half_Dimensions
         public Program()
             : base(1350,680, new GraphicsMode(32, 24, 0, 4), "BY NO MEANS.", GameWindowFlags.Default) //GraphicsMode(32, 24, 0, 4)
         {
-            VSync = VSyncMode.Off;
+            VSync = VSyncMode.Adaptive;
         }
 
         /// <summary>Load resources here.</summary>

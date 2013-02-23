@@ -39,6 +39,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         public float PaddingBottom { get; protected set; }
 
         public Panel Parent { get; set; }
+        public Panel TopParent { get; set; }
         public List<Panel> Children = new List<Panel>();
         public bool _ToRemove = false;
 
@@ -104,6 +105,29 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             this.Parent = parent;
             parent.Children.Add(this);
+            UpdateTopParent();
+        }
+
+        public bool IsParent(Panel parent)
+        {
+            Panel p = this.Parent;
+            while (p != null)
+            {
+                if (p == parent) return true;
+                p = p.Parent;
+            }
+
+            return false;
+        }
+
+        public void UpdateTopParent()
+        {
+            Panel p = this.Parent;
+            while (p != null)
+            {
+                p = p.Parent;
+            }
+            TopParent = p;
         }
 
         /// <summary>
@@ -301,13 +325,17 @@ namespace Two_and_a_Half_Dimensions.GUI
         /// <returns>True - Mouse is over the panel, False - the mouse is not</returns>
         public bool IsMouseOver()
         {
-            Vector2 MousePos = new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y);
+            return IsPointOver( new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y ));
+        }
+
+        public bool IsPointOver(Vector2 point)
+        {
             Vector2 PanelPos = this.GetScreenPos();
 
-            if (MousePos.X < PanelPos.X) return false;
-            if (MousePos.X > PanelPos.X + this.Width) return false;
-            if (MousePos.Y < PanelPos.Y) return false;
-            if (MousePos.Y > PanelPos.Y + this.Height) return false;
+            if (point.X < PanelPos.X) return false;
+            if (point.X > PanelPos.X + this.Width) return false;
+            if (point.Y < PanelPos.Y) return false;
+            if (point.Y > PanelPos.Y + this.Height) return false;
 
             return true;   
         }

@@ -23,11 +23,12 @@ namespace Two_and_a_Half_Dimensions.GUI
         public int TexHovered = -1;
 
         public float ElementHeight = 20;
+        public int ElementSpacing = 1;
 
         public delegate void OnButtonPressDel();
         public event OnButtonPressDel OnButtonPress;
 
-        public State CurrentState = State.Idle;
+        public State CurrentState { get; private set; }
 
         public Label TextLabel;
         public Panel contextPanel;
@@ -50,6 +51,8 @@ namespace Two_and_a_Half_Dimensions.GUI
             TextLabel.Dock(DockStyle.FILL);
             TextLabel.SetAlignment(Label.TextAlign.MiddleCenter);
 
+            this.SetButtonState(State.Idle);
+
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
         }
 
@@ -57,7 +60,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             if (!this.IsMouseOver() && !this.contextPanel.IsMouseOver())
             {
-                this.CurrentState = State.Idle;
+                SetButtonState(State.Idle);
             }
         }
 
@@ -65,13 +68,14 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             base.MouseMove(e);
 
-            if (this.IsMouseOver() && this.CurrentState != State.Pressed)
+            if (this.IsMouseOver() && this.CurrentState != State.Pressed && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y), this))
             {
-                this.CurrentState = State.Hover;
+                SetButtonState(State.Hover);
+                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Hand;
             }
             else if (this.CurrentState != State.Pressed )
             {
-                this.CurrentState = State.Idle;
+                SetButtonState(State.Idle);
             }
         }
 
@@ -83,12 +87,14 @@ namespace Two_and_a_Half_Dimensions.GUI
             {
                 if (this.CurrentState == State.Pressed)
                 {
-                    this.CurrentState = State.Idle;
+                    SetButtonState(State.Idle);
+                    this.SetPassInput(true); //Ignore any input given
                 }
                 else
                 {
-                    this.CurrentState = State.Pressed;
+                    SetButtonState(State.Pressed);
                     this.OnPressed();
+                    this.SetPassInput(false); //Let the context menu accept input
                 }
             }
         }
@@ -101,6 +107,23 @@ namespace Two_and_a_Half_Dimensions.GUI
             }
         }
 
+        public void SetPassInput(bool passinput)
+        {
+            this.contextPanel.ShouldPassInput = passinput;
+            foreach (Panel p in contextPanel.Children)
+            {
+                p.ShouldPassInput = passinput;
+            }
+        }
+
+        public void SetButtonState(State state)
+        {
+            this.CurrentState = state;
+
+            if (state == State.Pressed) { this.SetPassInput(false); }
+            else { this.SetPassInput(true); }
+        }
+
         public void AddToolPanel(Panel p)
         {
             p.SetParent(this.contextPanel);
@@ -109,7 +132,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             if (this.contextPanel.Children.Count > 1)
             {
-                p.Below(this.contextPanel.Children[this.contextPanel.Children.Count - 2]);//Align ourselves below the last panel over
+                p.Below(this.contextPanel.Children[this.contextPanel.Children.Count - 2], ElementSpacing );//Align ourselves below the last panel over
             }
         }
 
@@ -133,7 +156,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         private void UpdateContextContents()
         {
-            contextPanel.SetHeight(contextPanel.Children.Count * ElementHeight);
+            contextPanel.SetHeight(contextPanel.Children.Count * ElementHeight + (ElementSpacing * (contextPanel.Children.Count-1)) );
         }
 
 
@@ -212,12 +235,10 @@ namespace Two_and_a_Half_Dimensions.GUI
             if (this.CurrentState == State.Pressed)
             {
                 contextPanel.ShouldDraw = true;
-                contextPanel.ShouldPassInput = false;
             }
             else
             {
                 contextPanel.ShouldDraw = false;
-                contextPanel.ShouldPassInput = true;
             }
         }
     }

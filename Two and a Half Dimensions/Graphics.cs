@@ -10,7 +10,7 @@ namespace Two_and_a_Half_Dimensions
 {
     class Graphics
     {
-        public static bool DrawBoundingBoxes = true;
+        public static bool DrawBoundingBoxes = false;
 
         private static Mesh box;
 
