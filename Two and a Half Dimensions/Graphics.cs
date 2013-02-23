@@ -506,18 +506,7 @@ namespace Two_and_a_Half_Dimensions
 
             GL.BindVertexArray(0);
         }
-        /*
-        public void Draw( Matrix4 mmatrix, Matrix4 vmatrix, Matrix4 pmatrix, Vector3 Position )
-        {
-            render(mmatrix, vmatrix, pmatrix);
-            this.Position = Position;
-        }
-        public void Draw( Matrix4 vmatrix, Vector3 Position)
-        {
-            render(Utilities.ViewMatrix, vmatrix, Utilities.ProjectionMatrix);
-            this.Position = Position;
-        }
-        */
+
         public void DrawSimple(Matrix4 vmatrix)
         {
             render(Utilities.ViewMatrix, vmatrix, Utilities.ProjectionMatrix);

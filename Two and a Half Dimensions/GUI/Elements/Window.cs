@@ -43,9 +43,12 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             TitleText = GUIManager.Create<Label>();
             TitleText.SetParent(Title);
-            TitleText.SetPos(10, 2);
+            TitleText.SetPos(0, 0);
             TitleText.SetColor(1, 1, 1);
             TitleText.SetText(this.WindowTitle);
+            TitleText.Dock(DockStyle.LEFT);
+            TitleText.SetAlignment(Label.TextAlign.MiddleLeft);
+            TitleText.DockPadding(10, 10, 0, 0);
 
             //Create the close button
             closeButton = GUIManager.Create<Button>();
@@ -92,16 +95,17 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.dragging = true;
             Offset = new Vector2(Utilities.window.Mouse.X - this.Position.X, Utilities.window.Mouse.Y - this.Position.Y);
             this.SendToFront();
+            Title.SendToFront();
         }
 
         public override void MouseDown(OpenTK.Input.MouseButtonEventArgs e)
         {
             base.MouseDown(e);
-            GUIManager.SendToFront(this);
+            this.SendToFront();
+            Title.SendToFront();
             if (this.MouseWithinCorner())
             {
                 this.resizing = true;
-                this.SendToFront();
             } 
         }
 
