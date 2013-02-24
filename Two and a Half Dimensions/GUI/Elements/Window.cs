@@ -64,7 +64,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             //TODO: align left
         }
 
-        void closeButton_OnButtonPress()
+        void closeButton_OnButtonPress(Panel sender)
         {
             this.Remove();
             closeButton.Remove();
@@ -72,7 +72,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             Title.Remove();
         }
 
-        void Title_OnMouseUp(OpenTK.Input.MouseButtonEventArgs e)
+        void Title_OnMouseUp(Panel sender, OpenTK.Input.MouseButtonEventArgs e)
         {
             if (dragging)
             {
@@ -81,7 +81,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             }
         }
 
-        void Title_OnMouseMove(OpenTK.Input.MouseMoveEventArgs e)
+        void Title_OnMouseMove(Panel sender, OpenTK.Input.MouseMoveEventArgs e)
         {
             if (dragging)
             {
@@ -90,7 +90,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             }
         }
 
-        void Title_OnMouseDown(OpenTK.Input.MouseButtonEventArgs e)
+        void Title_OnMouseDown(Panel sender, OpenTK.Input.MouseButtonEventArgs e)
         {
             this.dragging = true;
             Offset = new Vector2(Utilities.window.Mouse.X - this.Position.X, Utilities.window.Mouse.Y - this.Position.Y);
@@ -138,6 +138,12 @@ namespace Two_and_a_Half_Dimensions.GUI
             base.Reposition();
 
             this.Title.SetPos(this.Position - new Vector2(0, this.Title.Height));
+        }
+
+        public override void Resize()
+        {
+            base.Resize();
+            Title.SetWidth(this.Width);
         }
 
         public void SetTitle(string str)

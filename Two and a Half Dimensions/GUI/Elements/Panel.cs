@@ -44,16 +44,16 @@ namespace Two_and_a_Half_Dimensions.GUI
         public bool _ToRemove = false;
 
         //Events
-        public delegate void OnMouseDownDel(MouseButtonEventArgs e);
+        public delegate void OnMouseDownDel(Panel sender, MouseButtonEventArgs e);
         public event OnMouseDownDel OnMouseDown;
 
-        public delegate void OnMouseUpDel(MouseButtonEventArgs e);
+        public delegate void OnMouseUpDel(Panel sender, MouseButtonEventArgs e);
         public event OnMouseUpDel OnMouseUp;
 
-        public delegate void OnMouseMoveDel(MouseMoveEventArgs e);
+        public delegate void OnMouseMoveDel(Panel sender, MouseMoveEventArgs e);
         public event OnMouseMoveDel OnMouseMove;
 
-        public delegate void OnResizeDel();
+        public delegate void OnResizeDel(Panel sender);
         public event OnResizeDel OnResize;
 
         Material Mat;
@@ -314,7 +314,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             if (OnResize != null)
             {
-                OnResize();
+                OnResize(this);
             }
         }
         #endregion
@@ -390,7 +390,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             if (OnMouseDown != null)
             {
-                OnMouseDown(e);
+                OnMouseDown(this, e);
             }
         }
 
@@ -407,7 +407,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             if (OnMouseUp != null)
             {
-                OnMouseUp(e);
+                OnMouseUp(this, e);
             }
         }
 
@@ -420,7 +420,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             if (OnMouseMove != null)
             {
-                OnMouseMove(e);
+                OnMouseMove(this, e);
             }
         }
 

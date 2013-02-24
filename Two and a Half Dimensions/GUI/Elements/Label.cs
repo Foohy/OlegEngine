@@ -41,20 +41,21 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             this.Text = str;
             DrawText.SetText(this.Text);
-
+            if (this.Autosize) { SizeToText(); }
             PositionText();
         }
 
         public void SetAlignment(TextAlign align)
         {
             this.Alignment = align;
+            if (this.Autosize) { SizeToText(); }
             this.PositionText();
         }
 
         protected override void ParentResized()
         {
             base.ParentResized();
-          
+            if (this.Autosize) { SizeToText(); }
             PositionText();
         }
 
@@ -103,6 +104,12 @@ namespace Two_and_a_Half_Dimensions.GUI
             {
                 PosOffset += new Vector2(0, this.Height - this.GetTextHeight());
             }
+        }
+
+        protected override void Reposition()
+        {
+            base.Reposition();
+            PositionText();
         }
 
         public float GetTextLength()

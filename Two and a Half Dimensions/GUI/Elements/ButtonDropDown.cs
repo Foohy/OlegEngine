@@ -48,6 +48,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             TextLabel = GUIManager.Create<Label>();
             TextLabel.SetColor(0, 0, 0);
             TextLabel.SetParent(this);
+            TextLabel.Autosize = false;
             TextLabel.Dock(DockStyle.FILL);
             TextLabel.SetAlignment(Label.TextAlign.MiddleCenter);
 

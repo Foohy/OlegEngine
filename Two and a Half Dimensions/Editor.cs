@@ -66,9 +66,10 @@ namespace Two_and_a_Half_Dimensions
                 TopControl.SetWidth(Utilities.window.Width);
 
                 ButtonDropDown dd = TopControl.AddButtonDropDown("File");
-                dd.AddButton("Load");
-                dd.AddButton("Save");
-                dd.AddButton("Exit");
+                Button add = dd.AddButton("Load");
+                Button save = dd.AddButton("Save");
+                Button exit = dd.AddButton("Exit");
+                exit.OnButtonPress += new Button.OnButtonPressDel(exit_OnButtonPress);
 
                 TopControl.AddButton("Edit");
                 Button help = TopControl.AddButton("Help...");
@@ -79,7 +80,62 @@ namespace Two_and_a_Half_Dimensions
             TopControl.ShouldDraw = true;
         }
 
-        static void help_OnButtonPress()
+        static Window exitMessageBox;
+        static void exit_OnButtonPress(Panel sender)
+        {
+            exitMessageBox = GUIManager.Create<Window>();
+            exitMessageBox.SetTitle("Hold the fucking phone");
+            exitMessageBox.SetWidth(exitMessageBox.Width);
+            exitMessageBox.ClipChildren = true;
+            exitMessageBox.SetPos((Utilities.window.Width / 2) - (exitMessageBox.Width / 2), (Utilities.window.Height / 2) - (exitMessageBox.Height / 2));
+
+            exitMessageBox.SetWidth(195);
+            exitMessageBox.SetHeight(65);
+            
+            Label label = GUIManager.Create<Label>();
+            label.SetParent(exitMessageBox);
+            label.SetText("Are you sure you'd like to leave?");
+            label.SetColor(0, 0, 0);
+            label.SetPos(15, 10);
+
+            Button button = GUIManager.Create<Button>();
+            button.SetText("Yes");
+            button.TextLabel.SetColor(0, 0, 0);
+            button.SizeToText(15);
+            button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
+            button.TexIdle = Resource.GetTexture("gui/toolbar.png");
+            button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+            button.SetParent(exitMessageBox);
+            button.DockPadding(20, 20, 20, 20);
+            button.SetHeight(20);
+            button.SetPos(20, 30);
+            button.OnButtonPress += new Button.OnButtonPressDel(button_OnYesButtonPress);
+
+            button = GUIManager.Create<Button>();
+            button.SetText("Cancel");
+            button.TextLabel.SetColor(0, 0, 0);
+            button.SizeToText(15);
+            button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
+            button.TexIdle = Resource.GetTexture("gui/toolbar.png");
+            button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+            button.SetParent(exitMessageBox);
+            button.DockPadding(20, 20, 20, 20);
+            button.SetHeight(20);
+            button.SetPos(exitMessageBox.Width - button.Width - 20, 30);
+            button.OnButtonPress += new Button.OnButtonPressDel(button_OnNoButtonPress);
+        }
+
+        static void button_OnYesButtonPress(Panel sender)
+        {
+            Utilities.window.Exit();
+        }
+
+        static void button_OnNoButtonPress(Panel sender)
+        {
+            exitMessageBox.Remove();
+        }
+
+        static void help_OnButtonPress(Panel sender)
         {
             Window w = GUIManager.Create<Window>();
             w.SetTitle("So you need help?");
@@ -94,7 +150,6 @@ namespace Two_and_a_Half_Dimensions
             button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
             button.SetParent(w);
             button.SetPos(new Vector2((w.Width / 2) - (button.Width / 2), w.Height - 50));
-            //button.SetWidth(1000);
             button.DockPadding(20, 20, 20, 20);
             button.SetHeight(70);
             button.Dock(Panel.DockStyle.TOP);

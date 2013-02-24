@@ -22,7 +22,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         public int TexPressed = -1;
         public int TexHovered = -1;
 
-        public delegate void OnButtonPressDel();
+        public delegate void OnButtonPressDel(Panel sender);
         public event OnButtonPressDel OnButtonPress;
 
         public State CurrentState = State.Idle;
@@ -35,6 +35,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             TextLabel = GUIManager.Create<Label>();
             TextLabel.SetColor(0, 0, 0);
             TextLabel.SetParent(this);
+            TextLabel.Autosize = false;
             TextLabel.Dock(DockStyle.FILL);
             TextLabel.SetAlignment(Label.TextAlign.MiddleCenter);
         }
@@ -84,7 +85,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             if (OnButtonPress != null)
             {
-                OnButtonPress();
+                OnButtonPress(this);
             }
         }
 
