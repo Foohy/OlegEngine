@@ -97,6 +97,8 @@ uniform sampler2D sampler;
 uniform sampler2D sampler_normal;
 uniform sampler2D sampler_shadow;
 uniform sampler2D sampler_shadow_tex;
+uniform sampler2D sampler_spec;
+uniform sampler2D sampler_alpha;
 
 // Returns a random number based on a vec3 and an int.
 float random(vec3 seed, int i){
@@ -151,7 +153,7 @@ vec4 CalcLightInternal( BaseLight Light, vec3 LightDirection, vec3 Normal, float
         vec3 VertexToEye = normalize(gEyeWorldPos - WorldPos0);                             
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));                     
         float SpecularFactor = dot(VertexToEye, LightReflect);                              
-        SpecularFactor = pow(SpecularFactor, gSpecularPower);                               
+        SpecularFactor = pow(SpecularFactor, gSpecularPower) * texture( sampler_spec, ex_UV.st);                            
         if (SpecularFactor > 0) {                                                           
             SpecularColor = vec4(Light.Color, 1.0f) *                                       
                             gMatSpecularIntensity * SpecularFactor;                         
@@ -282,5 +284,5 @@ void main()
 		TotalLight += CalcShadowSpotLight(gShadowCasters[i], Normal, ex_LightSpacePos );
 	}
 
-	gl_FragColor = texture2D( sampler, ex_UV.st) * TotalLight * vec4(_color, 1.0);
+	gl_FragColor = vec4(texture2D( sampler, ex_UV.st).rgb, texture2D( sampler, ex_UV.st).a * texture(sampler_alpha, ex_UV.st) ) * vec4(_color * TotalLight.rgb, 1.0 );
 }

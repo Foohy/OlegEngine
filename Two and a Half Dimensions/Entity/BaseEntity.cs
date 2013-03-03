@@ -14,10 +14,17 @@ namespace Two_and_a_Half_Dimensions.Entity
 {
     class BaseEntity
     {
+        public enum RenderModes
+        {
+            Opaque,
+            Translucent
+        }
+
         public string Name { get; set; }
         public string Class { get; set; }
         public Mesh Model { get; set; }
         public Material Mat { get; set; }
+        public RenderModes RenderMode { get; set; }
         public bool DisableLighting { get; set; }
         public OpenTK.Graphics.OpenGL.BeginMode drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
         public bool WorldSpawn = false;
@@ -37,6 +44,7 @@ namespace Two_and_a_Half_Dimensions.Entity
             this.Color = Vector3.One;
             this.Scale = Vector3.One;
             this.DisableLighting = false;
+            this.RenderMode = RenderModes.Opaque;
             this.Init();
 
             if (this.Mat == null) this.Mat = Utilities.ErrorMat;

@@ -39,11 +39,12 @@ namespace Two_and_a_Half_Dimensions.Levels
             ent_static oleg = (ent_static)Entity.EntManager.Create<ent_static>();
             oleg.Spawn();
             oleg.Model = Resource.GetMesh("props/oleg.obj");
-            oleg.Mat = Resource.GetMaterial("models/props/oleg");
+            oleg.Mat = Resource.GetMaterial("models/props/oleg"); //Resource.GetMaterial("models/props/oleg");
             oleg.Name = "Oleg";
             oleg.SetPos(OlegPos);
             oleg.Scale = new Vector3(0.75f);
             oleg.SetAngle(new Vector3(0, 0, 0.25f));
+            oleg.RenderMode = BaseEntity.RenderModes.Translucent;
 
             oleg = (ent_static)Entity.EntManager.Create<ent_static>();
             oleg.Spawn();
@@ -51,6 +52,14 @@ namespace Two_and_a_Half_Dimensions.Levels
             oleg.Mat = Resource.GetMaterial("engine/white");
             oleg.Name = "Popcorn Machine";
             oleg.SetPos(new Vector3( 60.614f, 0.0f, -2.1119f ));
+            oleg.Scale = new Vector3(0.45f);
+
+            oleg = (ent_static)Entity.EntManager.Create<ent_static>();
+            oleg.Spawn();
+            oleg.Model = Resource.GetMesh("props/foilage/ivy_01.obj");
+            oleg.Mat = Resource.GetMaterial("models/props/foilage/ivy01");
+            //oleg.Mat.SetShader("default"); //Temporary until I can figure out shadowmapping on a single plane for alphatested things
+            oleg.SetPos(new Vector3(10.614f, 0.45f, -15.5119f));
             oleg.Scale = new Vector3(0.45f);
 
             ent_pointlight pointlight = (ent_pointlight)EntManager.Create<ent_pointlight>();
@@ -96,7 +105,8 @@ namespace Two_and_a_Half_Dimensions.Levels
                 Entity.ent_testball ball = (Entity.ent_testball)Entity.EntManager.Create<Entity.ent_testball>();
                 //ball.radius = rand.Next(0, 3000) / (float)1000;
                 ball.Spawn();
-                ball.SetPos(new Vector2(Player.ply.Pos.X, Player.ply.Pos.Y + 3.0f));
+                ball.SetPos(new Vector2(Player.ply.Pos.X, Player.ply.Pos.Y + 3.00f));
+                ball.RenderMode = BaseEntity.RenderModes.Translucent;
             }
             if (e.Key == OpenTK.Input.Key.F12) //Debug print
             {

@@ -18,6 +18,9 @@ namespace Two_and_a_Half_Dimensions
         public static double Time = 0.0d;
         public static double Frametime = 0.0d;
         public static int ErrorTex { get; set; }
+        public static int NormalTex { get; set; }
+        public static int AlphaTex { get; set; }
+        public static int SpecTex { get; set; }
         public static Material ErrorMat { get; set; }
         public static Material NormalUp { get; private set; }
         public static Program window { get; private set; }
@@ -41,6 +44,9 @@ namespace Two_and_a_Half_Dimensions
             ErrorTex = GenerateErrorTex();
             ErrorMat = new Material(ErrorTex, "default");
             NormalUp = new Material(GenerateNormalTex(), "default");
+            NormalTex = GenerateNormalTex();
+            SpecTex = GenerateWhite();
+            AlphaTex = GenerateWhite();
         }
 
         public static Material LoadMaterial(string filename)
@@ -72,34 +78,55 @@ namespace Two_and_a_Half_Dimensions
             {
                 if (reader.Value != null)
                 {
+                    lastVal = lastVal.ToLower();
                     switch (lastVal)
                     {
-                        case "Shader":
+                        case "shader":
                             properties.ShaderProgram = Resource.GetProgram( reader.Value.ToString() );
                             break;
 
-                        case "Basetexture":
+                        case "basetexture":
                             properties.BaseTexture = Resource.GetTexture(reader.Value.ToString());
                             Name = reader.Value.ToString();
                             break;
 
-                        case "Normalmap":
+                        case "normalmap":
                             properties.NormalMapTexture = Resource.GetTexture(reader.Value.ToString());
                             break;
 
-                        case "SpecPower":
+                        case "specmap":
+                            properties.SpecMapTexture = Resource.GetTexture(reader.Value.ToString());
+                            break;
+
+                        case "alphamap":
+                            properties.AlphaMapTexture = Resource.GetTexture(reader.Value.ToString());
+                            break;
+
+                        case "nocull":
+                            bool nocull = false;
+                            bool.TryParse(reader.Value.ToString(), out nocull);
+                            properties.NoCull = nocull;
+                            break;
+
+                        case "alphatest":
+                            bool alphatest = false;
+                            bool.TryParse(reader.Value.ToString(), out alphatest);
+                            properties.AlphaTest = alphatest;
+                            break;
+
+                        case "specpower":
                             float pwr = 0.0f;
                             float.TryParse(reader.Value.ToString(), out pwr );
                             properties.SpecularPower = pwr;
                             break;
 
-                        case "SpecIntensity":
+                        case "specintensity":
                             float intensity = 0.0f;
                             float.TryParse(reader.Value.ToString(), out intensity);
                             properties.SpecularIntensity = intensity;
                             break;
 
-                        case "Color":
+                        case "color":
                             string curline = reader.Value.ToString();
                             string[] components = curline.Split(' ');
                             if (components.Length > 2)
@@ -549,9 +576,6 @@ namespace Two_and_a_Half_Dimensions
 
             tex.UnlockBits(bmp_data);
 
-            // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
-            // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
-            // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest );
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -563,6 +587,30 @@ namespace Two_and_a_Half_Dimensions
             Bitmap tex = new Bitmap(1, 1);
             
             tex.SetPixel(0, 0, Color.FromArgb( 133, 119, 253 ));
+
+            //Create the opengl texture
+            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, id);
+
+            System.Drawing.Imaging.BitmapData bmp_data = tex.LockBits(new Rectangle(0, 0, tex.Width, tex.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            tex.UnlockBits(bmp_data);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            return id;
+        }
+
+        private static int GenerateWhite()
+        {
+            Bitmap tex = new Bitmap(1, 1);
+
+            tex.SetPixel(0, 0, Color.White);
 
             //Create the opengl texture
             GL.ActiveTexture(TextureUnit.Texture6);//Something farish away

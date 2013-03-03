@@ -541,12 +541,14 @@ namespace Two_and_a_Half_Dimensions
                 GL.Uniform1(mat.locTime, (float)Utilities.Time);
 
             }
+            if (mat.Properties.NoCull) { GL.Disable(EnableCap.CullFace); }
+            if (mat.Properties.AlphaTest) { GL.Enable(EnableCap.AlphaTest); }
             
-            //GL.DrawElementsBaseVertex(BeginMode.Triangles, NumIndices, DrawElementsType.UnsignedInt, BaseIndex, 0);
+            //Draw it
             GL.DrawElements(DrawMode, NumIndices, DrawElementsType.UnsignedInt, IntPtr.Zero);
-            //Matrix4 newmatlmao = vmatrix * Matrix4.CreateTranslation(new Vector3(10.0f, 10.0f, 0));
-            //GL.UniformMatrix4(mat.locVMatrix, false, ref newmatlmao);
-            //GL.DrawElements(BeginMode.Triangles, NumIndices, DrawElementsType.UnsignedInt, IntPtr.Zero);
+
+            if (mat.Properties.AlphaTest) { GL.Disable(EnableCap.AlphaTest); }
+            if (mat.Properties.NoCull) { GL.Enable(EnableCap.CullFace); }
 
             GL.BindVertexArray(0);
 
@@ -554,7 +556,6 @@ namespace Two_and_a_Half_Dimensions
             if (Graphics.DrawBoundingBoxes)
             {
                 Graphics.DrawBox(this.Position , this.BBox.BottomLeft, this.BBox.TopRight);
-
             }
         }
 
@@ -575,6 +576,8 @@ namespace Two_and_a_Half_Dimensions
         public int locTime = -1;
         public int locBaseTexture = -1;
         public int locNormalMap = -1;
+        public int locSpecMap = -1;
+        public int locAlphaMap = -1;
         public int locShadowMap = -1;
         public int locShadowMapTexture = -1;
         public int locColor = -1;
@@ -656,6 +659,8 @@ namespace Two_and_a_Half_Dimensions
                 locBaseTexture = GL.GetUniformLocation(Program, "sampler");
                 locNormalMap = GL.GetUniformLocation(Program, "sampler_normal");
                 locShadowMap = GL.GetUniformLocation(Program, "sampler_shadow");
+                locSpecMap = GL.GetUniformLocation(Program, "sampler_spec");
+                locAlphaMap = GL.GetUniformLocation(Program, "sampler_alpha");
                 locShadowMapTexture = GL.GetUniformLocation(Program, "sampler_shadow_tex");
                 locColor = GL.GetUniformLocation(Program, "_color");
                 locSpecularIntensity = GL.GetUniformLocation(Program, "gMatSpecularIntensity");
@@ -673,6 +678,12 @@ namespace Two_and_a_Half_Dimensions
 
                 GL.ActiveTexture(TextureUnit.Texture3);
                 GL.Uniform1(locShadowMapTexture, 3);
+
+                GL.ActiveTexture(TextureUnit.Texture4);
+                GL.Uniform1(locSpecMap, 4);
+
+                GL.ActiveTexture(TextureUnit.Texture5);
+                GL.Uniform1(locAlphaMap, 5);
 
                 GL.ActiveTexture(TextureUnit.Texture0);
             }
@@ -698,6 +709,8 @@ namespace Two_and_a_Half_Dimensions
                 locBaseTexture = GL.GetUniformLocation(Properties.ShaderProgram, "sampler");
                 locNormalMap = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_normal");
                 locShadowMap = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_shadow");
+                locSpecMap = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_spec");
+                locAlphaMap = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_alpha");
                 locShadowMapTexture = GL.GetUniformLocation(Properties.ShaderProgram, "sampler_shadow_tex");
                 locColor = GL.GetUniformLocation(Properties.ShaderProgram, "_color");
                 locSpecularIntensity = GL.GetUniformLocation(Properties.ShaderProgram, "gMatSpecularIntensity");
@@ -715,6 +728,12 @@ namespace Two_and_a_Half_Dimensions
 
                 GL.ActiveTexture(TextureUnit.Texture3);
                 GL.Uniform1(locShadowMapTexture, 3);
+
+                GL.ActiveTexture(TextureUnit.Texture4);
+                GL.Uniform1(locSpecMap, 4);
+
+                GL.ActiveTexture(TextureUnit.Texture5);
+                GL.Uniform1(locAlphaMap, 5);
 
                 GL.ActiveTexture(TextureUnit.Texture0);
 
@@ -734,16 +753,17 @@ namespace Two_and_a_Half_Dimensions
             GL.Enable(EnableCap.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, Properties.BaseTexture);
 
-            //Bind the normal map
+            //Bind the normal map, if it exists
             GL.ActiveTexture(TextureUnit.Texture1);
-            if (Properties.NormalMapTexture > 0)
-            {
-                GL.BindTexture(TextureTarget.Texture2D, Properties.NormalMapTexture );             
-            }
-            else
-            {
-                 GL.BindTexture(TextureTarget.Texture2D, Utilities.NormalUp.Properties.BaseTexture);
-            }
+            GL.BindTexture(TextureTarget.Texture2D, (Properties.NormalMapTexture > 0) ? Properties.NormalMapTexture : Utilities.NormalTex);
+
+            //Bind the specularity map, if it exists
+            GL.ActiveTexture(TextureUnit.Texture4);
+            GL.BindTexture(TextureTarget.Texture2D, (Properties.SpecMapTexture > 0) ? Properties.SpecMapTexture : Utilities.SpecTex);
+
+            //Bind the alpha map, if it exists
+            GL.ActiveTexture(TextureUnit.Texture5);
+            GL.BindTexture(TextureTarget.Texture2D, (Properties.AlphaMapTexture > 0) ? Properties.AlphaMapTexture : Utilities.AlphaTex);
 
             //The shadow map is bound to texture unit three in Techniques.cs. It only needs to be bound once.
 
@@ -762,13 +782,18 @@ namespace Two_and_a_Half_Dimensions
         public int ShaderProgram;
         public int BaseTexture;
         public int NormalMapTexture;
+        public int SpecMapTexture;
+        public int AlphaMapTexture;
         public float SpecularPower;
         public float SpecularIntensity;
         public Vector3 Color;
+        public bool NoCull;
+        public bool AlphaTest;
 
         public MaterialProperties()
         {
             Color = Vector3.One;
+            AlphaTest = false;
         }
     }
 

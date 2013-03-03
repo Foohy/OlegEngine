@@ -63,6 +63,8 @@ namespace Two_and_a_Half_Dimensions
             GL.Enable(EnableCap.CullFace);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
+            GL.AlphaFunc(AlphaFunction.Greater, 0.1f);
+
             //Fog
             GL.Fog(FogParameter.FogStart, 30.0f);
             GL.Fog(FogParameter.FogEnd, 250.0f);
@@ -236,10 +238,16 @@ namespace Two_and_a_Half_Dimensions
 
         private void RenderScene(FrameEventArgs e)
         {
-            //Draw stuff
+            //Draw opaque geometry
             Levels.LevelManager.Draw(e);
-            Entity.EntManager.Draw(e);
+            Entity.EntManager.DrawOpaque(e);
             ply.Draw(e);
+
+            //Now draw geometry that is potentially transcluent
+            GL.Enable(EnableCap.Blend);
+            Entity.EntManager.DrawTranslucent(e);
+            GL.Disable(EnableCap.Blend);
+
         }
 
         /// <summary>

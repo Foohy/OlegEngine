@@ -61,11 +61,25 @@ namespace Two_and_a_Half_Dimensions.Entity
             }
         }
 
-        public static void Draw(FrameEventArgs e)
+        public static void DrawOpaque(FrameEventArgs e)
         {
             foreach (BaseEntity ent in Ents)
             {
-                ent.Draw();
+                if (ent.RenderMode == BaseEntity.RenderModes.Opaque)
+                {
+                    ent.Draw();
+                }
+            }
+        }
+
+        public static void DrawTranslucent(FrameEventArgs e)
+        {
+            foreach (BaseEntity ent in Ents)
+            {
+                if (ent.RenderMode == BaseEntity.RenderModes.Translucent)
+                {
+                    ent.Draw();
+                }
             }
         }
 
