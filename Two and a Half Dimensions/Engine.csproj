@@ -92,6 +92,7 @@
     <Compile Include="Levels\Level1.cs" />
     <Compile Include="Levels\LevelBase.cs" />
     <Compile Include="Levels\LevelManager.cs" />
+    <Compile Include="Levels\TargaImage.cs" />
     <Compile Include="Levels\TestLevel.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />

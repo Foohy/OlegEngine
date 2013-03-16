@@ -13,7 +13,7 @@ namespace Two_and_a_Half_Dimensions.Levels
 {
     class Level1 : LevelBase
     {
-        Mesh levelmodel;
+        MeshGroup levelmodel;
         bool SetShadow = true;
         Vector3 Angle = new Vector3();
         ent_spotlight spotlight;
@@ -21,12 +21,13 @@ namespace Two_and_a_Half_Dimensions.Levels
 
         public override void Preload()
         {
-            levelmodel = Resource.GetMesh("Levels/level1.obj");
-            levelmodel.mat = Resource.GetMaterial("levels/level1");
+            levelmodel = Utilities.LoadOBJMulti("Levels/sponza.obj");
+            //levelmodel = Resource.GetMesh("Levels/level1.obj");
+            //levelmodel.mat = Resource.GetMaterial("levels/level1");
 
             //Create the physics mesh on the ground
             //TODO: create a level format or something
-            Body level = FarseerPhysics.Factories.BodyFactory.CreateRectangle(LevelManager.physWorld, 1000, 100, 1.0f);
+            Body level = FarseerPhysics.Factories.BodyFactory.CreateRectangle(LevelManager.physWorld, 1000, 100, 1.00f);
             level.Position = new Microsoft.Xna.Framework.Vector2(-400, -52);
             level.BodyType = BodyType.Static;
 
@@ -98,7 +99,8 @@ namespace Two_and_a_Half_Dimensions.Levels
             }
             if (e.Key == OpenTK.Input.Key.F3)
             {
-                spotlight.ExpensiveShadows = !spotlight.ExpensiveShadows;
+                //spotlight.ExpensiveShadows = !spotlight.ExpensiveShadows;
+                ShadowTechnique.Enabled = !ShadowTechnique.Enabled;
             }
             if (e.Key == OpenTK.Input.Key.Q)
             {

@@ -565,6 +565,103 @@ namespace Two_and_a_Half_Dimensions
         }
     }
 
+    class MeshGroup : ICollection<Mesh>
+    {
+        public Vector3 Scale { get; set; }
+        public Vector3 Angle { get; set; }
+        public Vector3 Position { get; set; }
+
+        //Private inner collection of meshes
+        private List<Mesh> meshes = new List<Mesh>();
+
+        public MeshGroup(Mesh[] meshArray)
+        {
+            meshes = meshArray.ToList<Mesh>();
+
+            this.Scale = Vector3.One;
+        }
+
+        public MeshGroup(List<Mesh> meshList)
+        {
+            meshes = meshList;
+
+            this.Scale = Vector3.One;
+        }
+
+        /// <summary>
+        /// Draw the group of meshes
+        /// </summary>
+        public void Draw()
+        {
+            Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
+            modelview *= Matrix4.Scale(Scale);
+            modelview *= Matrix4.CreateRotationZ(this.Angle.Z);
+            modelview *= Matrix4.CreateRotationX(this.Angle.X);
+            modelview *= Matrix4.CreateRotationY(this.Angle.Y);
+
+            modelview *= Matrix4.CreateTranslation(Position);
+
+            foreach (Mesh m in this)
+            {
+                m.DrawSimple(modelview);
+            }
+        }
+
+        public IEnumerator<Mesh> GetEnumerator()
+        {
+            return meshes.GetEnumerator();
+        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        private bool isRO = false;
+
+        public bool Contains(Mesh item)
+        {
+            return meshes.Contains(item);
+        }
+
+        public bool Contains(Mesh item, EqualityComparer<Mesh> comp)
+        {
+            return meshes.Contains(item, comp);
+        }
+
+        public void Add( Mesh m)
+        {
+            meshes.Add(m);
+        }
+
+        public void Clear()
+        {
+            meshes.Clear();
+        }
+
+        public void CopyTo(Mesh[] array, int arrayIndex)
+        {
+            meshes.CopyTo(array, arrayIndex);
+        }
+
+        public int Count
+        {
+            get
+            {
+                return meshes.Count;
+            }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return isRO; }
+        }
+
+        public bool Remove(Mesh item)
+        {
+            return meshes.Remove(item);
+        }
+    }
+
     class Material
     {
         public MaterialProperties Properties = new MaterialProperties();
@@ -800,7 +897,17 @@ namespace Two_and_a_Half_Dimensions
     class FBO
     {
         private int fbo = 0;
-        public int shadowMap = 0;
+        private int _shadowMap = 0;
+        private int _disabledTex = 0;
+        public bool Enabled = true;
+
+        public int shadowMap
+        {
+            get
+            {
+                return (this.Enabled) ? _shadowMap : _disabledTex;
+            }
+        }
 
         public FBO()
         {
@@ -808,24 +915,18 @@ namespace Two_and_a_Half_Dimensions
         }
         ~FBO()
         {
-            if (fbo != 0)
-            {
-                //GL.DeleteFramebuffers(1, ref fbo);
-            }
 
-            if (shadowMap != 0)
-            {
-               // GL.DeleteTexture(shadowMap);
-            }
         }
 
         public bool Init(int Width, int Height)
         {
+            _disabledTex = Utilities.AlphaTex;
+
             //Create our shadow framebuffer
             GL.GenFramebuffers(1, out fbo);
 
-            GL.GenTextures(1, out shadowMap);
-            GL.BindTexture(TextureTarget.Texture2D, shadowMap);
+            GL.GenTextures(1, out _shadowMap);
+            GL.BindTexture(TextureTarget.Texture2D, _shadowMap);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent, Width, Height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -835,7 +936,7 @@ namespace Two_and_a_Half_Dimensions
 
             //Attach the depth texture to the framebuffer
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, fbo);
-            GL.FramebufferTexture2D(FramebufferTarget.DrawFramebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, shadowMap, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.DrawFramebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, _shadowMap, 0);
 
             //Tell opengl we are not going to render into the color buffer
             GL.DrawBuffer(DrawBufferMode.None);

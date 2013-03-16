@@ -193,10 +193,10 @@ namespace Two_and_a_Half_Dimensions
             //Set them accordingly
             //TODO: make it support multiple points (and optimize the hell out of it)
             ShadowInfo info = shadows.GetShadowInfo();
-
-            if (shadows.Enabled)
+            shadowFBO.Enabled = ShadowTechnique.Enabled;
+            shadows.SetLightInfo(info);
+            if (ShadowTechnique.Enabled)
             {
-                shadows.SetLightInfo(info);
                 plyView = info.matrix;
                 Utilities.ProjectionMatrix = info.matrix;
 

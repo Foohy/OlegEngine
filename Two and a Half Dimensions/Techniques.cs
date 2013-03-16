@@ -487,10 +487,10 @@ namespace Two_and_a_Half_Dimensions
     class ShadowTechnique : Technique
     {
         const int MAX_SHADOWCASTERS = 2;
+        public static bool Enabled = true;
 
         public delegate void SetLightsHandler(object sender, EventArgs e);
         public event SetLightsHandler SetLights;
-        public bool Enabled { get; private set; }
 
         public List<ShadowInfo> _lights = new List<ShadowInfo>();
 
@@ -548,24 +548,22 @@ namespace Two_and_a_Half_Dimensions
         public override void Render()
         {
             ShadowInfo info = GetShadowInfo();
-            if (this.Enabled)
-            {
-                GL.UseProgram(this.Program);
-                Matrix4 mat = info.matrix;
-                GL.UniformMatrix4(lightWVPLocation, false, ref mat);
-                GL.Uniform1(shadowTextureLocation, info.texture);
-            }
+
+            GL.UseProgram(this.Program);
+            Matrix4 mat = info.matrix;
+            GL.UniformMatrix4(lightWVPLocation, false, ref mat);
+            GL.Uniform1(shadowTextureLocation, info.texture);
+
         }
 
         public ShadowInfo GetShadowInfo()
         {
             if (_lights.Count > 0)
             {
-                this.Enabled = true;
                 return _lights[0];
             }
 
-            this.Enabled = false;
+            Enabled = false;
             return ShadowInfo.Default;
         }
 

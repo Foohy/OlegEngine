@@ -153,10 +153,9 @@ vec4 CalcLightInternal( BaseLight Light, vec3 LightDirection, vec3 Normal, float
         vec3 VertexToEye = normalize(gEyeWorldPos - WorldPos0);                             
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));                     
         float SpecularFactor = dot(VertexToEye, LightReflect);                              
-        SpecularFactor = pow(SpecularFactor, gSpecularPower) * texture( sampler_spec, ex_UV.st);                            
+        SpecularFactor = pow(SpecularFactor, gSpecularPower * texture( sampler_spec, ex_UV.st).x);                            
         if (SpecularFactor > 0) {                                                           
-            SpecularColor = vec4(Light.Color, 1.0f) *                                       
-                            gMatSpecularIntensity * SpecularFactor;                         
+            SpecularColor = vec4(Light.Color, 1.0f) * gMatSpecularIntensity * SpecularFactor;                         
         }                                                                                   
     }                                                                                       
                                                                                             
@@ -229,6 +228,7 @@ vec4 CalcShadowSpotLight(ShadowCaster l, vec3 Normal, vec4 LightSpacePos)
     if (UVCoords.x < 1 && UVCoords.y < 1 && UVCoords.x > 0 && UVCoords.y > 0) 
 	{
 		vec4 Color = vec4( 1, 0, 0, 0 );
+		/*
 		if (l.Cheap > 0)
 		{
 			Color = CalcPointLight(l.Base, Normal, LightSpacePos);
@@ -237,6 +237,8 @@ vec4 CalcShadowSpotLight(ShadowCaster l, vec3 Normal, vec4 LightSpacePos)
 		{
 			Color = CalcShadowPointLight(l.Base, Normal, LightSpacePos);
 		}
+		*/
+		Color = CalcShadowPointLight(l.Base, Normal, LightSpacePos);
 
 		Color *= texture2D(sampler_shadow_tex, -UVCoords );
 

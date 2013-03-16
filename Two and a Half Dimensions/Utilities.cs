@@ -178,7 +178,17 @@ namespace Two_and_a_Half_Dimensions
             int id = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, id);
 
-            Bitmap bmp = new Bitmap(filename);
+            Bitmap bmp;
+            if (Path.GetExtension(filename) == ".tga")
+            {
+                bmp = Paloma.TargaImage.LoadTargaImage(filename);
+            }
+            else
+            {
+                bmp = new Bitmap(filename);
+            }
+            
+            
             System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
@@ -339,31 +349,7 @@ namespace Two_and_a_Half_Dimensions
 
             if (normals.Count > 0) lsNormals = normals.ToArray();
             if (uv.Count > 0) lsUV = uv.ToArray();
-            //lsNormals = normals.ToArray();
-            //lsUV = uv.ToArray();
 
-
-            //lmao remove this
-            /*
-            Vector3[] Tverts = new Vector3[]
-            {
-                new Vector3( -5, 0, -5 ), new Vector3( 5, 0, -5 ),
-                new Vector3( 5, 0, 5), new Vector3( -5, 0, 5 ),
-            };
-            Vector2[] Tuv = new Vector2[]
-            {
-                new Vector2( 0, 0 ), new Vector2( 5, 0 ),
-                new Vector2( 5, 5 ), new Vector2( 0, 5 ),
-            };
-            int[] Telements = new int[]
-            {
-                0, 1, 2,
-                2, 3, 0
-            };
-            lsVerts = Tverts;
-            lsElements = Telements;
-            //lsUV = Tuv;
-            */
             //Go through all the vertices and calculate their tangents/bitangents
             if (uv.Count >= verts.Count)
             {
@@ -423,6 +409,219 @@ namespace Two_and_a_Half_Dimensions
 
             lsTangents = tangents.ToArray();
         }
+
+        public static Mesh MeshFromData(Vector3[] lsVerts, int[] lsElements, Vector3[] lsTangents, Vector3[] lsNormals, Vector2[] lsUV, Mesh.BoundingBox boundingBox, string Material)
+        {
+            //Try to load the material
+            Material mat = Resource.GetMaterial(Material);
+
+            //Create the model
+            Mesh m = new Mesh(lsVerts, lsElements, lsTangents, lsNormals, lsUV);
+            m.mat = mat;
+
+            return m;
+        }
+
+        public static Mesh MeshFromRawData(List<Vector3> verts, List<int> elements, List<Vector3> normals, List<Vector2> uv, string Material )
+        {
+            Vector3[] lsVerts = null;
+            int[] lsElements = null;
+            Vector3[] lsTangents = null;
+            Vector3[] lsNormals = null;
+            Vector2[] lsUV = null;
+
+            lsElements = elements.ToArray();
+            lsVerts = verts.ToArray();
+
+            if (normals.Count > 0) lsNormals = normals.ToArray();
+            if (uv.Count > 0) lsUV = uv.ToArray();
+
+            //Calculate bitangents and tangents of model
+            if (uv.Count >= verts.Count)
+            {
+                lsTangents = CalculateTangents(lsVerts, lsUV);
+            }
+            else
+            {
+                lsTangents = new Vector3[lsVerts.Length];
+            }
+
+            //Try to load the material
+            Material mat = Resource.GetMaterial(Material);
+
+            //Create the model
+            Mesh m = new Mesh(lsVerts, lsElements, lsTangents, lsNormals, lsUV);
+            m.mat = mat;
+
+            return m;
+        }
+
+        public static MeshGroup LoadOBJMulti( string filename )
+        {
+            List<Mesh> meshList = new List<Mesh>();
+
+            filename = Resource.ModelDir + filename;
+
+            string material = "";
+            string[] file = null;
+            Vector3[] lsVerts = null;
+            int[] lsElements = null;
+            Vector3[] lsTangents = null;
+            Vector3[] lsNormals = null;
+            Vector2[] lsUV = null;
+            Mesh.BoundingBox boundingBox = new Mesh.BoundingBox();
+
+            try
+            {
+                file = System.IO.File.ReadAllLines(filename);
+            }
+            catch (System.IO.FileNotFoundException ex)
+            {
+                Console.WriteLine("Failed to load level file: " + ex.Message);
+            }
+            if (file == null || file.Length == 0)
+            {
+                Console.WriteLine("Failed to load level file: An unknown error occurred!");
+                return null;
+            }
+
+            //scan the file and look for the number of stuffs
+            List<Vector3> verts = new List<Vector3>();
+            List<Vector3> verts_UNSORTED = new List<Vector3>();
+            List<Vector3> normals = new List<Vector3>();
+            List<Vector3> normals_UNSORTED = new List<Vector3>();
+            List<Vector3> tangents = new List<Vector3>();
+            List<Vector2> uv = new List<Vector2>();
+            List<Vector2> uv_UNSORTED = new List<Vector2>();
+            List<int> elements = new List<int>();
+            for (int i = 0; i < file.Length; i++)
+            {
+                string curline = file[i];
+                string seg1 = curline.Split(' ')[0];
+                switch (seg1)
+                {
+                    case "v":
+                        string[] vert = curline.Split(' ');
+                        if (vert[1].Length == 0 && vert.Length > 4)
+                        {
+                            verts_UNSORTED.Add(new Vector3(float.Parse(vert[2]), float.Parse(vert[3]), float.Parse(vert[4])));
+                        }
+                        else
+                        {
+                            verts_UNSORTED.Add(new Vector3(float.Parse(vert[1]), float.Parse(vert[2]), float.Parse(vert[3])));
+                        }
+                        break;
+
+                    case "vn":
+                        string[] norms = curline.Split(' ');
+                        if (norms[1].Length == 0 && norms.Length > 4)
+                        {
+                            normals_UNSORTED.Add(new Vector3(float.Parse(norms[2]), float.Parse(norms[3]), float.Parse(norms[4])));
+                        }
+                        else
+                        {
+                            normals_UNSORTED.Add(new Vector3(float.Parse(norms[1]), float.Parse(norms[2]), float.Parse(norms[3])));
+                        }
+                        break;
+
+                    case "vt":
+                        string[] coords = curline.Split(' ');
+                        if (coords[1].Length == 0 && coords.Length > 3)
+                        {
+                            uv_UNSORTED.Add(new Vector2(float.Parse(coords[2]), -float.Parse(coords[3])));
+                        }
+                        else
+                        {
+                            uv_UNSORTED.Add(new Vector2(float.Parse(coords[1]), -float.Parse(coords[2])));
+                        }
+                        break;
+
+                    case "f":
+                        string[] element = curline.Split(' ');
+
+                        for (int n = 1; n < 4; n++)
+                        {
+                            string[] group = element[n].Split('/');
+                            //elements.Add(int.Parse(group[0]) - 1);
+                            if (group.Length > 0 && group[0].Length > 0)
+                            {
+                                int vertNum = int.Parse(group[0]);
+                                if (vertNum < verts_UNSORTED.Count + 1)
+                                {
+                                    verts.Add(verts_UNSORTED[vertNum - 1]);
+                                    elements.Add(elements.Count);
+
+                                    //Update the size of the bounding box
+                                    boundingBox.BottomLeft = SmallestVec(boundingBox.BottomLeft, verts[verts.Count - 1]);
+                                    boundingBox.TopRight = BiggestVec(boundingBox.TopRight, verts[verts.Count - 1]);
+                                }
+                            }
+                            if (group.Length > 1 && group[1].Length > 0)
+                            {
+                                int uvNum = int.Parse(group[1]);
+                                if (uvNum < uv_UNSORTED.Count + 1)
+                                {
+                                    uv.Add(uv_UNSORTED[uvNum - 1]);
+                                }
+                            }
+                            if (group.Length > 2 && group[2].Length > 0)
+                            {
+                                int normNum = int.Parse(group[2]);
+                                if (normNum < normals_UNSORTED.Count)
+                                {
+                                    normals.Add(normals_UNSORTED[normNum - 1]);
+                                }
+                            }
+                        }
+                        break;
+
+                    //Specify what material this object should use
+                    case "usemtl":
+                        string[] mtlline = curline.Split(' ');
+                        if (mtlline.Length > 0)
+                        {
+                            material = mtlline[1];
+                        }
+
+                        break;
+                    case "o":
+                        //If there is info, compile it into a model
+                        if (verts.Count > 0)
+                        {
+                            meshList.Add(MeshFromRawData(verts, elements, normals, uv, material));
+                        }
+
+                        // Reset everything for this new mesh
+                        verts = new List<Vector3>();
+                        normals = new List<Vector3>();
+                        tangents = new List<Vector3>();
+                        uv = new List<Vector2>();
+                        elements = new List<int>();
+
+                        break;
+                    case "#":
+                        //Console.WriteLine("Comment: {0}", curline );
+                        break;
+                    default:
+                        if (!string.IsNullOrEmpty(curline))
+                        {
+#if DEBUG
+                            //Console.WriteLine("Unknown line definition ({0}): {1}", i, curline);
+#endif
+                        }
+                        break;
+                }
+            }
+
+            //If there is info, compile it into a model
+            if (verts.Count > 0)
+            {
+                meshList.Add(MeshFromRawData(verts, elements, normals, uv, material));
+            }
+
+            return new MeshGroup(meshList);
+        }
+
 
         private static Vector3 SmallestVec(Vector3 currentSmallest, Vector3 contender)
         {
