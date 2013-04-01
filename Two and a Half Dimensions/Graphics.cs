@@ -10,47 +10,64 @@ namespace Two_and_a_Half_Dimensions
 {
     class Graphics
     {
-        public static bool DrawBoundingBoxes = false;
+        public static bool ShouldDrawBoundingBoxes = false;
+        public static bool ShouldDrawNormals = false;
 
         private static Mesh box;
+        private static Material dbgWhite;
+
+        public static void Init()
+        {
+            dbgWhite = new Material("engine/white.png", "default");
+            box = Resource.GetMesh("debug/box.obj");
+            box.mat = dbgWhite;
+            box.ShouldDrawDebugInfo = false;
+        }
+
+        public static void DrawLine(Vector3 Position1, Vector3 Position2, bool SetMaterial = true )
+        {
+            if (SetMaterial)
+            {
+                dbgWhite.BindMaterial();
+                GL.UniformMatrix4(dbgWhite.locVMatrix, false, ref Matrix4.Identity);
+                GL.LineWidth(1.5f);
+            }
+
+            GL.Begin(BeginMode.Lines);
+            GL.Vertex3(Position1);
+            GL.Vertex3(Position2);
+            GL.End();
+            
+        }
 
         public static void DrawBox(Vector3 Position, Vector3 BottomLeft, Vector3 TopRight)
         {
             if (Utilities.CurrentPass == 1) return;
-
-            if (box == null)
-            {
-                box = Resource.GetMesh("debug/box.obj");
-                box.mat = new Material("engine/white.png", "default");
-            }
             
             Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
             modelview *= Matrix4.Scale((TopRight - BottomLeft ) / 2 );
             modelview *= Matrix4.CreateTranslation(Position);
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-            DrawBoundingBoxes = false;
             box.DrawSimple(modelview);
-            DrawBoundingBoxes = true;
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
         }
 
-        public static void DrawLine(Matrix4 matrix, Vector3 Point1, Vector3 Point2)
+        public static void DrawNormals(Mesh m )
         {
-            GL.UseProgram(0);
-            //Teehee deprecated functions
-            GL.LineWidth(1.0f);
-            GL.Color3(0.0f, 0.0f, 1.0f);
-            GL.PushMatrix();
-                GL.MultMatrix(ref matrix);
-                GL.Color3(0.0f, 1.0f, 1.0f);
-                GL.Begin(BeginMode.Lines);
-                GL.LineWidth(9.0f);
-                
-                GL.Vertex3(Point1);
-                GL.Vertex3(Point2);
-                GL.End();
-            GL.PopMatrix();
+            if (m.DBG_Vertices == null || m.DBG_Normals == null || m.DBG_Elements == null) return;
+
+            dbgWhite.BindMaterial();
+            GL.UniformMatrix4(dbgWhite.locVMatrix, false, ref Matrix4.Identity);
+            GL.LineWidth(1.5f);
+
+            for (int i = 0; i < m.DBG_Elements.Length; i++)
+            {
+                int element = m.DBG_Elements[i];
+                if (element > m.DBG_Normals.Length || element > m.DBG_Vertices.Length) continue;
+
+                DrawLine(m.Position + m.DBG_Vertices[element], m.Position + m.DBG_Vertices[element] + m.DBG_Normals[element], false);
+            }
         }
     }
 
@@ -285,6 +302,7 @@ namespace Two_and_a_Half_Dimensions
         public BufferUsageHint UsageHint = BufferUsageHint.StaticDraw;
         public Vector3 Color = Vector3.One;
         public BoundingBox BBox = new BoundingBox();
+        public bool ShouldDrawDebugInfo = true;
 
         public Vector3 Position { get; set; }
         public Vector3 Scale { get; set; }
@@ -302,6 +320,11 @@ namespace Two_and_a_Half_Dimensions
 
         int[] BaseIndex;
         int NumIndices = -1;
+
+        //Debug properties
+        public Vector3[] DBG_Vertices;
+        public Vector3[] DBG_Normals;
+        public int[] DBG_Elements;
 
         public class BoundingBox
         {
@@ -405,6 +428,10 @@ namespace Two_and_a_Half_Dimensions
 
 
             GL.BindVertexArray(0);
+
+            DBG_Elements = elements;
+            DBG_Normals = normals;
+            DBG_Vertices = verts;
         }
 
         public bool PointWithinBox(Vector3 point)
@@ -505,6 +532,10 @@ namespace Two_and_a_Half_Dimensions
 
 
             GL.BindVertexArray(0);
+
+            DBG_Elements = elements;
+            DBG_Normals = normals;
+            DBG_Vertices = verts;
         }
 
         public void DrawSimple(Matrix4 vmatrix)
@@ -552,10 +583,19 @@ namespace Two_and_a_Half_Dimensions
 
             GL.BindVertexArray(0);
 
-            //Draw the bounding box
-            if (Graphics.DrawBoundingBoxes)
+            //Draw optional debug stuff
+            if (this.ShouldDrawDebugInfo)
             {
-                Graphics.DrawBox(this.Position , this.BBox.BottomLeft, this.BBox.TopRight);
+                //Draw the bounding box
+                if (Graphics.ShouldDrawBoundingBoxes)
+                {
+                    Graphics.DrawBox(this.Position, this.BBox.BottomLeft, this.BBox.TopRight);
+                }
+
+                if (Graphics.ShouldDrawNormals)
+                {
+                    Graphics.DrawNormals(this);
+                }
             }
         }
 

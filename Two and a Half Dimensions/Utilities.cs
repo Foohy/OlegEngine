@@ -323,7 +323,7 @@ namespace Two_and_a_Half_Dimensions
                             if (group.Length > 2 && group[2].Length > 0)
                             {
                                 int normNum = int.Parse(group[2]);
-                                if (normNum < normals_UNSORTED.Count)
+                                if (normNum < normals_UNSORTED.Count + 1)
                                 {
                                     normals.Add(normals_UNSORTED[normNum - 1]);
                                 }
@@ -464,11 +464,7 @@ namespace Two_and_a_Half_Dimensions
 
             string material = "";
             string[] file = null;
-            Vector3[] lsVerts = null;
-            int[] lsElements = null;
-            Vector3[] lsTangents = null;
-            Vector3[] lsNormals = null;
-            Vector2[] lsUV = null;
+
             Mesh.BoundingBox boundingBox = new Mesh.BoundingBox();
 
             try
@@ -567,7 +563,7 @@ namespace Two_and_a_Half_Dimensions
                             if (group.Length > 2 && group[2].Length > 0)
                             {
                                 int normNum = int.Parse(group[2]);
-                                if (normNum < normals_UNSORTED.Count)
+                                if (normNum < normals_UNSORTED.Count + 1)
                                 {
                                     normals.Add(normals_UNSORTED[normNum - 1]);
                                 }

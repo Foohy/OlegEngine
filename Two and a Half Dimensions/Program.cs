@@ -105,6 +105,9 @@ namespace Two_and_a_Half_Dimensions
             counter = new GUI.Font("debug", "frick off");
             counter.SetPos(this.Width - counter.GetTextLength("frick off"), 30 );
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
+
+            //Create some debug stuff
+            Graphics.Init();
         }
 
         double last = 0.0d;
