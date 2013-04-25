@@ -28,8 +28,8 @@ namespace Two_and_a_Half_Dimensions
 
         private Matrix4 defaultViewMatrix = Matrix4.Identity;
         private Matrix4 defaultOrthoMatrix = Matrix4.Identity;
-        private GUI.Font counter;
-        private GUI.Font meshcount;
+        private GUI.Text counter;
+        private GUI.Text meshcount;
         public Program()
             : base(1350,680, new GraphicsMode(32, 24, 0, 4), "BY NO MEANS.", GameWindowFlags.Default) //GraphicsMode(32, 24, 0, 4)
         {
@@ -104,10 +104,10 @@ namespace Two_and_a_Half_Dimensions
             camMat = Matrix4.LookAt(new Vector3(88.94199f, 22.27345f, 5.085441f) + new Vector3(0, 1, 0), new Vector3(88.94199f, 22.27345f, 5.085441f) + point + new Vector3(0, 1, 0), Vector3.UnitY);
 
             //Create our little FPS counter
-            counter = new GUI.Font("debug", "frick off");
+            counter = new GUI.Text("debug", "frick off");
             counter.SetPos(this.Width - counter.GetTextLength("frick off"), 30 );
 
-            meshcount = new GUI.Font("debug", "Mesh Count");
+            meshcount = new GUI.Text("debug", "Mesh Count");
             meshcount.SetPos(this.Width - meshcount.GetTextLength("Mesh Count"), 30 + meshcount.GetTextHeight());
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
 

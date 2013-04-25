@@ -26,13 +26,13 @@ namespace Two_and_a_Half_Dimensions.GUI
         public bool Autosize { get; set; }
         public TextAlign Alignment { get; private set; }
 
-        private Font DrawText;
+        private Text DrawText;
         private Vector2 PosOffset;
 
         public Label()
         {
             this.Text = "";
-            DrawText = new Font("title", this.Text);
+            DrawText = new Text("title", this.Text);
             this.ShouldPassInput = true;
             this.Autosize = true;
         }

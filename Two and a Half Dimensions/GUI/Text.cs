@@ -10,7 +10,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Two_and_a_Half_Dimensions.GUI
 {
-    class Font
+    class Text
     {
         public struct CharDescriptor
         {
@@ -228,7 +228,7 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         private Matrix4 view;
         private Mesh textMesh;
-        public Font( string font, string text )
+        public Text( string font, string text )
         {
             this.charset = ParseFont(FontPath + font + ".fnt");
 

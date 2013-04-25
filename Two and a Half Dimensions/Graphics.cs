@@ -13,10 +13,12 @@ namespace Two_and_a_Half_Dimensions
         public static Frustum ViewFrustum;
 
         public static bool ShouldDrawBoundingBoxes = false;
+        public static bool ShouldDrawBoundingSpheres = false;
         public static bool ShouldDrawNormals = false;
         public static bool ShouldDrawFrustum = false;
 
         private static Mesh box;
+        private static Mesh sphere;
         private static Material dbgWhite;
 
         public static void Init()
@@ -25,6 +27,10 @@ namespace Two_and_a_Half_Dimensions
             box = Resource.GetMesh("debug/box.obj");
             box.mat = dbgWhite;
             box.ShouldDrawDebugInfo = false;
+
+            sphere = Resource.GetMesh("ball.obj");
+            sphere.mat = dbgWhite;
+            sphere.ShouldDrawDebugInfo = false;
 
             ViewFrustum = new Frustum();
         }
@@ -67,6 +73,19 @@ namespace Two_and_a_Half_Dimensions
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
             box.DrawSimple(modelview);
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+        }
+
+        public static void DrawSphere(Vector3 Position, float Radius)
+        {
+            if (Utilities.CurrentPass == 1) return;
+
+            Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
+            modelview *= Matrix4.Scale(Radius / 2);
+            modelview *= Matrix4.CreateTranslation(Position);
+
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            sphere.DrawSimple(modelview);
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
         }
 
@@ -446,24 +465,14 @@ namespace Two_and_a_Half_Dimensions
                 return new Vector3(Math.Abs(vec.X), Math.Abs(vec.Y), Math.Abs(vec.Z));
             }
 
+            private static float Distance(Vector3 a, Vector3 b)
+            {
+                return (float)Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2) + Math.Pow(a.Z - b.Z, 2));
+            }
+
             public static float RadiusFromBoundingBox(BoundingBox b)
             {
-                //Get the absolute values of both vectors
-                Vector3 absMin = absVec(b.Negative);
-                Vector3 absMax = absVec(b.Positive);
-
-                //Get the largest components
-                if (absMin.X > absMax.X)
-                    absMax.X = absMin.X;
-
-                if (absMin.Y > absMax.Y)
-                    absMax.Y = absMin.Y;
-
-                if (absMin.Z > absMax.Z)
-                    absMax.Z = absMin.Z;
-
-                //Get the distance from 0
-                return absMax.Length;
+                return Math.Abs(Distance(b.Negative, b.Positive));
             }
 
             /// <summary>
@@ -722,7 +731,7 @@ namespace Two_and_a_Half_Dimensions
                 MeshesTotal++;
 
                 //this.Color = Vector3.UnitY;
-                if (Graphics.ViewFrustum.SphereInFrustum(this.Position, BBox.Radius) == Frustum.FrustumState.OUTSIDE) { return;  }
+                if (Graphics.ViewFrustum.SphereInFrustum(this.Position + (this.BBox.Positive + this.BBox.Negative) / 2, BBox.Radius) == Frustum.FrustumState.OUTSIDE) { return; }
                 //if (Graphics.ViewFrustum.BoxInFrustum(this.BBox, this.Position) == Frustum.FrustumState.OUTSIDE) { this.Color = Vector3.UnitX; MeshesDrawn--; }
                 //if (Graphics.ViewFrustum.PointInFrustum((this.BBox.BottomLeft + this.BBox.TopRight) / 2 + this.Position) == Frustum.FrustumState.OUTSIDE) { this.Color = Vector3.UnitX; MeshesDrawn--;  }
 
@@ -761,6 +770,11 @@ namespace Two_and_a_Half_Dimensions
                 if (Graphics.ShouldDrawBoundingBoxes)
                 {
                     Graphics.DrawBox(this.Position, this.BBox.Negative, this.BBox.Positive);
+                }
+
+                if (Graphics.ShouldDrawBoundingSpheres)
+                {
+                    Graphics.DrawSphere(this.Position + (this.BBox.Positive + this.BBox.Negative ) / 2, this.BBox.Radius);
                 }
 
                 if (Graphics.ShouldDrawNormals)

@@ -27,7 +27,7 @@ namespace Two_and_a_Half_Dimensions
         public static BaseEntity SelectedEnt;
         public static ent_cursor Cursor;
 
-        private static GUI.Font CurrentModeText;
+        private static GUI.Text CurrentModeText;
         private static float goalZoom = 5.0f;
         private static Vector3 Pos = new Vector3();
         private static float multiplier = 8;
@@ -51,7 +51,7 @@ namespace Two_and_a_Half_Dimensions
 
 
             //Slap some text on the screen
-            CurrentModeText = new GUI.Font("debug", "Mode: " + CurrentMode.ToString());
+            CurrentModeText = new GUI.Text("debug", "Mode: " + CurrentMode.ToString());
             CurrentModeText.SetPos(5, 30 );
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
 

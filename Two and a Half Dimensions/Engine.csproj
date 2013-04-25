@@ -87,7 +87,7 @@
     <Compile Include="GUI\Elements\Toolbar.cs" />
     <Compile Include="GUI\Elements\Window.cs" />
     <Compile Include="GUI\Elements\Panel.cs" />
-    <Compile Include="GUI\font.cs" />
+    <Compile Include="GUI\Text.cs" />
     <Compile Include="GUI\gui.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="Levels\Level1.cs" />
