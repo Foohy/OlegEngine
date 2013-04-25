@@ -19,12 +19,12 @@ namespace Two_and_a_Half_Dimensions
         CUSTOM
     }
 
-    class Player
+    class Player_DEPRECATED
     {
         public delegate void CalcViewHandler(object sender, EventArgs e);
         public event CalcViewHandler CalcView;
 
-        public static Player ply { get; private set; }
+        public static Player_DEPRECATED ply { get; private set; }
         public Vector3 Pos { get; private set; }
         public float Height { get; set; }
         public Matrix4 camMatrix { get; set; }
@@ -38,7 +38,7 @@ namespace Two_and_a_Half_Dimensions
 
         public PlayerMode Mode { get; private set; }
 
-        public Player(Program Win, Vector3 pos, float height = 4.0f)
+        public Player_DEPRECATED(Program Win, Vector3 pos, float height = 4.0f)
         {
             OverrideCamMatrix = false;
             ply = this;
@@ -163,7 +163,7 @@ namespace Two_and_a_Half_Dimensions
 
         public void Draw(FrameEventArgs e)
         {
-            if (this.Mode == PlayerMode.EDIT) { Editor.Draw(e); }
+            //if (this.Mode == PlayerMode.EDIT) { Editor.Draw(e); }
         }
     }
 }

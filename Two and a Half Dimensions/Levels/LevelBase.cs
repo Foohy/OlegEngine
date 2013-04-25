@@ -11,7 +11,14 @@ namespace Two_and_a_Half_Dimensions.Levels
     {
         public virtual void Preload()
         {
+        }
 
+        public virtual void PlayerSpawn(Two_and_a_Half_Dimensions.Entity.ent_player p)
+        {
+            if (p != null)
+            {
+                p.SetPos(Vector3.Zero);
+            }
         }
 
         public virtual void Think(FrameEventArgs e)

@@ -20,6 +20,12 @@ namespace Two_and_a_Half_Dimensions.Entity
             Translucent
         }
 
+        public enum MoveTypes
+        {
+            NONE,
+            PHYSICS
+        }
+
         public string Name { get; set; }
         public string Class { get; set; }
         public Mesh Model { get; set; }
@@ -29,6 +35,8 @@ namespace Two_and_a_Half_Dimensions.Entity
         public OpenTK.Graphics.OpenGL.BeginMode drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
         public bool WorldSpawn = false;
         public Vector3 Color { get; set; }
+        public MoveTypes Movetype { get; set; }
+        public bool ShouldDraw { get; set; }
 
         public Vector3 Position { get; private set; }
         public Vector3 Angle { get; private set; }
@@ -45,6 +53,8 @@ namespace Two_and_a_Half_Dimensions.Entity
             this.Scale = Vector3.One;
             this.DisableLighting = false;
             this.RenderMode = RenderModes.Opaque;
+            this.Movetype = MoveTypes.PHYSICS;
+            this.ShouldDraw = true;
             this.Init();
 
             if (this.Mat == null) this.Mat = Utilities.ErrorMat;
@@ -66,7 +76,7 @@ namespace Two_and_a_Half_Dimensions.Entity
         }
         public virtual void Draw()
         {
-            if (Model != null)
+            if (Model != null && this.ShouldDraw)
             {
                 if (this.DisableLighting) GL.Disable(EnableCap.Lighting);
 

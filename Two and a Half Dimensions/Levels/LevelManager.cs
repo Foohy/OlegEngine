@@ -22,6 +22,10 @@ namespace Two_and_a_Half_Dimensions.Levels
         public static LevelBase CurrentLevel { get; private set; }
         public static World physWorld { get; private set; }
 
+        #region Events
+        public static event Action<Entity.ent_player> PlayerSpawn;
+        #endregion
+
         public static void InitalizeLevel(LevelBase level)
         {
             if (physWorld != null)
@@ -34,6 +38,16 @@ namespace Two_and_a_Half_Dimensions.Levels
             CurrentLevel.Preload();
             IsLoading = false;
             PausePhysics = false;
+            
+            //Create the player
+            Entity.ent_player ply = Entity.EntManager.Create<Entity.ent_player>();
+            ply.Spawn();
+            CurrentLevel.PlayerSpawn(ply);
+
+            if (PlayerSpawn != null)
+            {
+                PlayerSpawn(ply);
+            }
         }
 
         public static void Think(FrameEventArgs e)

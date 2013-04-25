@@ -52,7 +52,7 @@ namespace Two_and_a_Half_Dimensions.Entity
                     i--;
                 }
 
-                if (ent.Physics != null)
+                if (ent.Physics != null && ent.Movetype == BaseEntity.MoveTypes.PHYSICS)
                 {
                     Vector3 pos = new Vector3( ent.Physics.Body.Position.X, ent.Physics.Body.Position.Y, ent.Position.Z );
                     ent.SetPos(pos, false);

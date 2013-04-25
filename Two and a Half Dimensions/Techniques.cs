@@ -131,7 +131,7 @@ namespace Two_and_a_Half_Dimensions
         public override void Render()
         {
             GL.UseProgram(this.Program);
-            this.SetEyeWorldPos(Player.ply.Pos);
+            this.SetEyeWorldPos(View.Position);
 
             //Clear the lights for this frame
             Pointlights.Clear(); 
@@ -450,7 +450,7 @@ namespace Two_and_a_Half_Dimensions
 
             Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
             modelview *= Matrix4.Scale(1.5f);
-            modelview *= Matrix4.CreateTranslation(Player.ply.Pos);
+            modelview *= Matrix4.CreateTranslation(View.Position);
 
             skymodel.DrawSimple(modelview);
 
@@ -462,11 +462,11 @@ namespace Two_and_a_Half_Dimensions
         {
             GL.UseProgram(this.Program);
 
-            GL.Uniform3(v3CameraPosLocation, Player.ply.Pos);
+            GL.Uniform3(v3CameraPosLocation, View.Player.Position);
             GL.Uniform3(v3LightPosLocation, v3LightDirection);
             GL.Uniform3(v3InvWavelengthLocation, 1 / fWavelength4[0], 1 / fWavelength4[1], 1 / fWavelength4[2]);
-            GL.Uniform1(fCameraHeightLocation, Player.ply.Pos.Length);
-            GL.Uniform1(fCameraHeight2Location, Player.ply.Pos.LengthSquared);
+            GL.Uniform1(fCameraHeightLocation, View.Player.Position.Length);
+            GL.Uniform1(fCameraHeight2Location, View.Player.Position.LengthSquared);
             GL.Uniform1(fInnerRadiusLocation, fInnerRadius);
             GL.Uniform1(fInnerRadius2Location, fInnerRadius * fInnerRadius);
             GL.Uniform1(fOuterRadiusLocation, fOuterRadius);

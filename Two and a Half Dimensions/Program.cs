@@ -20,7 +20,6 @@ namespace Two_and_a_Half_Dimensions
 
     class Program : GameWindow 
     {
-        public Player ply;
         public FBO shadowFBO = new FBO();
         public Matrix4 camMat = Matrix4.Identity;
         public LightingTechnique effect = new LightingTechnique();
@@ -92,10 +91,12 @@ namespace Two_and_a_Half_Dimensions
             //Initialize skybox
             skybox.Init();
 
+            //View system
+            View.Init();
+
             //Initalize our gui system
             GUI.GUIManager.Init();
 
-            ply = new Player(this, new Vector3(88.94199f, 23.27345f, 5.085441f));
             Levels.LevelManager.InitalizeLevel(new Levels.Level1());
 
             //Create a camera matrix
@@ -190,7 +191,8 @@ namespace Two_and_a_Half_Dimensions
                 Exit();
             Input.Think(this, e);
             Audio.Think(e);
-            ply.Think(e);
+            View.Think(e);
+            //ply.Think(e);
             Levels.LevelManager.Think(e);
             Entity.EntManager.Think(e);
 
@@ -200,7 +202,6 @@ namespace Two_and_a_Half_Dimensions
         /// Called when it is time to render the next frame. Add your rendering code here.
         /// </summary>
         /// <param name="e">Contains timing information.</param>
-        Matrix4 plyView = Matrix4.Identity;
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
@@ -218,7 +219,6 @@ namespace Two_and_a_Half_Dimensions
             shadows.SetLightInfo(info);
             if (ShadowTechnique.Enabled)
             {
-                plyView = info.matrix;
                 Utilities.ProjectionMatrix = info.matrix;
 
                 //Pass 1, render in the view of the light
@@ -233,15 +233,15 @@ namespace Two_and_a_Half_Dimensions
 
 
             //Set the view to the normal camera
-            plyView = ply.camMatrix;
-            Utilities.ProjectionMatrix = ply.camMatrix;
+            //Utilities.ProjectionMatrix = ply.camMatrix;
+            Utilities.ProjectionMatrix = View.CameraMatrix;
 
             //Second pass, render normally
             Utilities.CurrentPass = 2;
             
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             shadowFBO.BindForReading();
-            Player.ply.Draw(e);
+            //Player.ply.Draw(e);
             effect.Render();
             RenderScene(e);
 
@@ -262,7 +262,7 @@ namespace Two_and_a_Half_Dimensions
             //Draw opaque geometry
             Levels.LevelManager.Draw(e);
             Entity.EntManager.DrawOpaque(e);
-            ply.Draw(e);
+            //ply.Draw(e);
 
             //Now draw geometry that is potentially transcluent
             GL.Enable(EnableCap.Blend);

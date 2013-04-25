@@ -42,7 +42,7 @@ namespace Two_and_a_Half_Dimensions
         
         public static void Init()
         {
-            Pos = new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, Player.ply.Pos.Z);
+            Pos = new Vector3(View.Player.Position);
 
             Cursor = EntManager.Create<ent_cursor>();
             Cursor.Spawn();
@@ -58,6 +58,7 @@ namespace Two_and_a_Half_Dimensions
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
             Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            View.CalcView += new Action(View_CalcView);
 
             //Create our GUI stuff, if neccessary
             if (TopControl == null)
@@ -402,21 +403,22 @@ namespace Two_and_a_Half_Dimensions
             return pos_out / pos2.W;
         }
 
-        public static void Draw(FrameEventArgs e)
+        static void View_CalcView()
         {
             //Set the camera matrix itself
-            Player.ply.CamAngle = new Vector2d(halfPI, 0.0f); //Clamp it because I can't math correctly
+            View.SetAngles(new Vector3(halfPI, 0, 0));
+            //Player.ply.CamAngle = new Vector2d(halfPI, 0.0f); //Clamp it because I can't math correctly
 
             //find the point where we'll be facing
             Vector3 point = new Vector3(0.0f, 0.0f, -1.0f);
 
-            Player.ply.ViewNormal = point;
-            Player.ply.ViewNormal.Normalize();
-            Player.ply.camMatrix = Matrix4.LookAt(Pos, (Pos + point), Vector3.UnitY);
+            //Player.ply.ViewNormal = point;
+            //Player.ply.ViewNormal.Normalize();
+            //Player.ply.camMatrix = Matrix4.LookAt(Pos, (Pos + point), Vector3.UnitY);
 
-            Utilities.ProjectionMatrix = Player.ply.camMatrix;
+            //Utilities.ProjectionMatrix = Player.ply.camMatrix;
 
-            Player.ply.SetPos(Pos);
+            View.SetPos(Pos);
 
             if (Cursor != null)
             {
@@ -435,6 +437,9 @@ namespace Two_and_a_Half_Dimensions
             Utilities.window.Mouse.ButtonUp -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
 
             GUI.GUIManager.PostDrawHUD -= new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
+            Utilities.window.Keyboard.KeyDown -= new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            View.CalcView -= new Action(View_CalcView);
+
 
             TopControl.ShouldDraw = false;
         }

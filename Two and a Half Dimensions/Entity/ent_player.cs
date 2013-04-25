@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using OpenTK;
+using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
 
 using FarseerPhysics.Common;
@@ -14,18 +15,26 @@ namespace Two_and_a_Half_Dimensions.Entity
 {
     class ent_player : BaseEntity
     {
+        public enum PlayerMode
+        {
+            NOCLIP,
+            EDIT,
+            NONE
+        }
+
+
         public float radius = 2.0f;
 
         public Matrix4 camMatrix;
         public Vector2d CamAngle = new Vector2d(-1.5f, 0.0f);
         public float Zoom { get; set; }
+        public PlayerMode Mode { get; private set; }
 
         private float crZoom = 0.0f;
 
         private static Vector2 Normal = new OpenTK.Vector2();
         private static float Fraction = 0;
         private static Audio phys_hit;
-        private static bool NoClip = false;
         private static VBO circle;
 
         RayCastCallback callback = new RayCastCallback(CastCallbackFunc);
@@ -47,7 +56,6 @@ namespace Two_and_a_Half_Dimensions.Entity
 
             Body bod = new Body(Levels.LevelManager.physWorld);
             bod.BodyType = BodyType.Dynamic;
-            if (NoClip) bod.BodyType = BodyType.Static;
 
             FarseerPhysics.Collision.Shapes.CircleShape circleshape = new FarseerPhysics.Collision.Shapes.CircleShape(radius, 0.5f);
             this.Physics = bod.CreateFixture(circleshape);
@@ -57,9 +65,6 @@ namespace Two_and_a_Half_Dimensions.Entity
             this.Physics.Body.Friction = 23.0f;
             this.Physics.UserData = (object)this.GetType().Name;
 
-
-            Two_and_a_Half_Dimensions.Player.ply.OverrideCamMatrix = !NoClip;
-
             Zoom = 10.0f;
             Normal = new Vector2(0, 1);
 
@@ -68,13 +73,53 @@ namespace Two_and_a_Half_Dimensions.Entity
             
             //Create the sound effect for the physics of our ball
             phys_hit = Audio.LoadSong("Resources/Audio/Physics/rock_hit_hard.wav", false);
-            GL.PointSize(5.0f);
+
+            Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            this.SetMode(PlayerMode.NOCLIP);
+        }
+
+        void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
+        {
+            if (e.Key == Key.F11)
+            {
+                this.SetMode(PlayerMode.EDIT);
+            }
+
+            if (e.Key == Key.F10)
+            {
+                this.SetMode(PlayerMode.NOCLIP);
+            }
+
+            if (e.Key == Key.F9)
+            {
+                this.SetMode(PlayerMode.NONE);
+            }
+        }
+
+        public void SetMode(PlayerMode newMode)
+        {
+            if (newMode != PlayerMode.NONE)
+            {
+                this.Movetype = MoveTypes.NONE;
+                this.ShouldDraw = false;
+            }
+
+            if (this.Mode == PlayerMode.EDIT) Editor.Stop();
+            if (newMode == PlayerMode.EDIT) Editor.Init();
+
+            this.Mode = newMode;
         }
 
         public override void Think()
         {
-            if (NoClip) return;
+            if (this.Mode != PlayerMode.NONE)
+            {
+                return;
+            }
+
+            this.Movetype = MoveTypes.PHYSICS;
             this.SetAngle(Physics.Body.Rotation);
+            this.ShouldDraw = true;
             //this.SetAngle(new Vector3((float)Utilities.Time + Physics.Body.LinearVelocity.Length() / 10, (float) Utilities.Time + Physics.Body.LinearVelocity.Length() / 10, Physics.Body.Rotation));
 
             Zoom += Input.deltaZ * 0.7f;
@@ -123,10 +168,72 @@ namespace Two_and_a_Half_Dimensions.Entity
 
             Vector3 point = new Vector3((float)Math.Cos(CamAngle.X), (float)Math.Sin(CamAngle.Y) - 0.21f, (float)Math.Sin(CamAngle.X));
             camMatrix = Matrix4.LookAt(Position + new Vector3(0, crZoom / 90, crZoom), Position + point + new Vector3(0, crZoom / 90, 0), Vector3.UnitY);
-            Two_and_a_Half_Dimensions.Player.ply.camMatrix = camMatrix;
 
-            Two_and_a_Half_Dimensions.Player.ply.SetPos(Position + new Vector3(0, crZoom / 900, 1.0f + crZoom / 10));
+            //Two_and_a_Half_Dimensions.Player.ply.SetPos(Position + new Vector3(0, crZoom / 900, 1.0f + crZoom / 10));
 
+        }
+
+        public void CalcView()
+        {
+            GameWindow window = Utilities.window;
+
+            float multiplier = 8;
+            if (window.Keyboard[Key.LShift])
+                multiplier = 20;
+
+            Vector3 NewPos = this.Position;
+
+            if (window.Keyboard[Key.W])
+            {
+                NewPos.X += (float)Math.Cos(CamAngle.X) * (float)Utilities.Frametime * multiplier;
+                NewPos.Y += (float)Math.Sin(CamAngle.Y) * (float)Utilities.Frametime * multiplier;
+                NewPos.Z += (float)Math.Sin(CamAngle.X) * (float)Utilities.Frametime * multiplier;
+            }
+                //SetPos(new Vector3(this.Position.X + (float)Math.Cos(CamAngle.X) * (float)Utilities.Frametime * multiplier, this.Position.Y + (float)Math.Sin(CamAngle.Y) * (float)Utilities.Frametime * multiplier, this.Position.Z + (float)Math.Sin(CamAngle.X) * (float)Utilities.Frametime * multiplier));
+            if (window.Keyboard[Key.S])
+            {
+                NewPos.X -= (float)Math.Cos(CamAngle.X) * (float)Utilities.Frametime * multiplier;
+                NewPos.Y -= (float)Math.Sin(CamAngle.Y) * (float)Utilities.Frametime * multiplier;
+                NewPos.Z -= (float)Math.Sin(CamAngle.X) * (float)Utilities.Frametime * multiplier;
+            }
+             //   SetPos(new Vector3(this.Position.X - (float)Math.Cos(CamAngle.X) * (float)Utilities.Frametime * multiplier, this.Position.Y - (float)Math.Sin(CamAngle.Y) * (float)Utilities.Frametime * multiplier, this.Position.Z - (float)Math.Sin(CamAngle.X) * (float)Utilities.Frametime * multiplier));
+            if (window.Keyboard[Key.D])
+            {
+                NewPos.X += (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier;
+                NewPos.Z += (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier;
+            }
+                //SetPos(new Vector3(this.Position.X + (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier, this.Position.Y, this.Position.Z + (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier));
+            if (window.Keyboard[Key.A])
+            {
+                NewPos.X -= (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier;
+                NewPos.Z -= (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier;
+            }
+            //SetPos(new Vector3(this.Position.X - (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier, this.Position.Y, this.Position.Z - (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier));
+
+            if (window.Keyboard[Key.Space])
+            {
+                if (window.Keyboard[Key.ControlLeft])
+                {
+                    NewPos.Y-= (float)Utilities.Frametime * multiplier;
+                    //SetPos(new Vector3(this.Position.X, this.Position.Y - (float)Utilities.Frametime * multiplier, this.Position.Z));
+                }
+                else
+                {
+                    NewPos.Y += (float)Utilities.Frametime * multiplier;
+                    //SetPos(new Vector3(this.Position.X, this.Position.Y + (float)Utilities.Frametime * multiplier, this.Position.Z));
+                }
+            }
+
+            CamAngle += new Vector2d(Input.deltaX / 350f, Input.deltaY / -350f);
+            CamAngle = new Vector2d((float)CamAngle.X, Utilities.Clamp((float)CamAngle.Y, 1.0f, -1.0f)); //Clamp it because I can't math correctly
+
+
+            this.SetPos(NewPos, false);
+            this.SetAngle(new Vector3((float)CamAngle.X, (float)CamAngle.Y, 0));
+
+
+            View.SetPos(this.Position);
+            View.SetAngles(this.Angle);
         }
 
         private static float CastCallbackFunc(Fixture fixture, Microsoft.Xna.Framework.Vector2 point, Microsoft.Xna.Framework.Vector2 normal, float fraction)
@@ -200,6 +307,7 @@ namespace Two_and_a_Half_Dimensions.Entity
             return 0;
         }
 
+        /*
         public override void Draw()
         {
             GL.Disable(EnableCap.Lighting);
@@ -234,5 +342,6 @@ namespace Two_and_a_Half_Dimensions.Entity
             }
             GL.Enable(EnableCap.Lighting);
         }
+         * */
     }
 }

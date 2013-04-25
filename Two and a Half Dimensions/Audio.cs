@@ -126,9 +126,9 @@ namespace Two_and_a_Half_Dimensions
 
         public static void Think( FrameEventArgs e )
         {
-            if (Player.ply != null)
+            if (View.Player != null)
             {
-                BASS_3DVECTOR pos = new BASS_3DVECTOR(Player.ply.Pos.X, Player.ply.Pos.Y, Player.ply.Pos.Z);
+                BASS_3DVECTOR pos = new BASS_3DVECTOR(View.Player.Position.X, View.Player.Position.Y, View.Player.Position.Z);
                 Bass.BASS_Set3DPosition(pos, null, null, null );
                 Bass.BASS_Apply3D();
             }

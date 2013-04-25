@@ -236,7 +236,7 @@ namespace Two_and_a_Half_Dimensions.Levels
                 Entity.ent_testball ball = (Entity.ent_testball)Entity.EntManager.Create<Entity.ent_testball>();
                 //ball.radius = rand.Next(0, 3000) / (float)1000;
                 ball.Spawn();
-                ball.SetPos(new Vector2(Player.ply.Pos.X, Player.ply.Pos.Y + 3.0f));
+                ball.SetPos(new Vector2(View.Player.Position.X, View.Player.Position.Y + 3.0f));
             }
 
             if (e.KeyChar == 'e')
@@ -244,7 +244,7 @@ namespace Two_and_a_Half_Dimensions.Levels
                 Entity.ent_testnerd nerd = (Entity.ent_testnerd)Entity.EntManager.Create<Entity.ent_testnerd>();
                 //ball.radius = rand.Next(0, 3000) / (float)1000;
                 nerd.Spawn();
-                nerd.SetPos(new Vector2(Player.ply.Pos.X, Player.ply.Pos.Y + 3.0f));
+                nerd.SetPos(new Vector2(View.Player.Position.X, View.Player.Position.Y + 3.0f));
             }
 
             if (e.KeyChar == 'r')

@@ -12,9 +12,9 @@ namespace Two_and_a_Half_Dimensions
     {
         public static Frustum ViewFrustum;
 
-        public static bool ShouldDrawBoundingBoxes = true;
+        public static bool ShouldDrawBoundingBoxes = false;
         public static bool ShouldDrawNormals = false;
-        public static bool ShouldDrawFrustum = true;
+        public static bool ShouldDrawFrustum = false;
 
         private static Mesh box;
         private static Material dbgWhite;

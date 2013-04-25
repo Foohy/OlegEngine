@@ -86,7 +86,6 @@ namespace Two_and_a_Half_Dimensions.Levels
             light.Direction = new Vector3(0.0f, -1.0f, 0.0f);
             Utilities.window.effect.SetEnvironmentLight(light);
 
-            Utilities.window.ply.SetPos(new Vector3(0, 0, 0));
             Utilities.window.shadows.Enable();
             Utilities.window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
@@ -107,28 +106,25 @@ namespace Two_and_a_Half_Dimensions.Levels
                 Entity.ent_testball ball = (Entity.ent_testball)Entity.EntManager.Create<Entity.ent_testball>();
                 //ball.radius = rand.Next(0, 3000) / (float)1000;
                 ball.Spawn();
-                ball.SetPos(new Vector2(Player.ply.Pos.X, Player.ply.Pos.Y + 3.00f));
+                ball.SetPos(new Vector2(View.Player.Position.X, View.Player.Position.Y + 3.00f));
                 ball.RenderMode = BaseEntity.RenderModes.Translucent;
             }
             if (e.Key == OpenTK.Input.Key.F12) //Debug print
             {
                 Console.WriteLine("==========================");
-                Console.WriteLine("Position: {0}", Player.ply.Pos );
-                Console.WriteLine("Orientation: {0}", Player.ply.CamAngle);
-                Console.WriteLine("ViewNormal: {0}", Player.ply.ViewNormal);
-                Console.WriteLine("Matrix: {0}", Player.ply.camMatrix);
-                if (Player.ply.OverrideCamMatrix)
-                {
-                    Console.WriteLine("VIEW IS BEING OVERWRITTEN!");
-                }
+                Console.WriteLine("Position: {0}", View.Player.Position);
+                Console.WriteLine("Orientation: {0}", View.Angles);
+                Console.WriteLine("ViewNormal: {0}", View.ViewNormal);
+                Console.WriteLine("Matrix: {0}", View.CameraMatrix);
                 Console.WriteLine("==========================");
             }
+            /*
             if (e.Key == OpenTK.Input.Key.F10)
             {
                 if (playerCar == null)
                 {
                     playerCar = EntManager.Create<ent_car>();
-                    playerCar.SetPos(new Vector3(Player.ply.Pos.X, Player.ply.Pos.Y, 3.0f));
+                    playerCar.SetPos(new Vector3(View.Player.Position.X, View.Player.Position.Y, 3.0f));
                     playerCar.Spawn();
                 }
                 else
@@ -137,6 +133,7 @@ namespace Two_and_a_Half_Dimensions.Levels
                     playerCar = null;
                 }
             }
+             * */
         }
 
         public override void Think(FrameEventArgs e)
@@ -147,8 +144,8 @@ namespace Two_and_a_Half_Dimensions.Levels
 
             if (SetShadow && spotlight != null)
             {
-                spotlight.SetAngle( Player.ply.ViewNormal);
-                spotlight.SetPos( Player.ply.Pos );
+                spotlight.SetAngle( View.ViewNormal);
+                spotlight.SetPos( View.Player.Position );
             }
 
             //Create a camera matrix
