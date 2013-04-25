@@ -236,6 +236,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             //Create a blank vertex buffer which we'll update later with our text info
             textMesh = new Mesh(new Vector3[0], new int[0], new Vector3[0], null, new Vector2[0]);
             textMesh.DrawMode = BeginMode.Quads;
+            textMesh.ShouldDrawDebugInfo = false;
 
             this.SetText(text);
             this.textMesh.mat = new Material(Resource.GetTexture(FontmapPath + font + ".png"), Resource.GetProgram("hud"));

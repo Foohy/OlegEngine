@@ -21,7 +21,7 @@ namespace Two_and_a_Half_Dimensions.Levels
 
         public override void Preload()
         {
-            levelmodel = Utilities.LoadOBJMulti("Levels/multi_test.obj"); //Levels/sponza.obj
+            levelmodel = Utilities.LoadOBJMulti("Levels/sponza.obj"); //Levels/multi_test.obj Levels/sponza.obj
             //levelmodel = Resource.GetMesh("Levels/level1.obj");
             //levelmodel.mat = Resource.GetMaterial("levels/level1");
 
