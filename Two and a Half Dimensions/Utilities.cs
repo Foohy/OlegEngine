@@ -215,6 +215,26 @@ namespace Two_and_a_Half_Dimensions
             return id;
         }
 
+        static Vector3 Multiply(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
+        }
+
+        public static Mesh.BoundingBox CalculateBoundingBox(Vector3[] vertices, Vector3 scale)
+        {
+            Mesh.BoundingBox bbox = new Mesh.BoundingBox();
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                Vector3 vertex = Multiply(vertices[i], scale);
+
+                //Update the size of the bounding box
+                bbox.Negative = bbox.NegativeSet ? SmallestVec(bbox.Negative, vertex) : vertex;
+                bbox.Positive = bbox.PositiveSet ? BiggestVec(bbox.Positive, vertex) : vertex;
+            }
+
+            return bbox;
+        }
+
         public static void LoadOBJ(string filename, out Vector3[] lsVerts, out int[] lsElements, out Vector3[] lsTangents, out Vector3[] lsNormals, out Vector2[] lsUV, out Mesh.BoundingBox boundingBox)
         {
             filename = Resource.ModelDir + filename;
@@ -306,10 +326,6 @@ namespace Two_and_a_Half_Dimensions
                                 {
                                     verts.Add(verts_UNSORTED[vertNum - 1]);
                                     elements.Add(elements.Count);
-
-                                    //Update the size of the bounding box
-                                    boundingBox.BottomLeft = SmallestVec(boundingBox.BottomLeft, verts[verts.Count-1]);
-                                    boundingBox.TopRight = BiggestVec(boundingBox.TopRight, verts[verts.Count-1]);
                                 }
                             }
                             if (group.Length > 1 && group[1].Length > 0)
@@ -391,6 +407,9 @@ namespace Two_and_a_Half_Dimensions
                 }
             }
 
+            //Calculate the bounding box
+            boundingBox = CalculateBoundingBox(lsVerts, Vector3.One);
+
             if (tangents.Count == 0)
             {
                 for (int i = 0; i < verts.Count; i++)
@@ -422,7 +441,7 @@ namespace Two_and_a_Half_Dimensions
             return m;
         }
 
-        public static Mesh MeshFromRawData(List<Vector3> verts, List<int> elements, List<Vector3> normals, List<Vector2> uv, string Material )
+        public static Mesh MeshFromRawData(List<Vector3> verts, List<int> elements, List<Vector3> normals, List<Vector2> uv, string Material)
         {
             Vector3[] lsVerts = null;
             int[] lsElements = null;
@@ -452,6 +471,7 @@ namespace Two_and_a_Half_Dimensions
             //Create the model
             Mesh m = new Mesh(lsVerts, lsElements, lsTangents, lsNormals, lsUV);
             m.mat = mat;
+            m.BBox = CalculateBoundingBox(verts.ToArray(), Vector3.One);
 
             return m;
         }
@@ -464,8 +484,6 @@ namespace Two_and_a_Half_Dimensions
 
             string material = "";
             string[] file = null;
-
-            Mesh.BoundingBox boundingBox = new Mesh.BoundingBox();
 
             try
             {
@@ -546,10 +564,6 @@ namespace Two_and_a_Half_Dimensions
                                 {
                                     verts.Add(verts_UNSORTED[vertNum - 1]);
                                     elements.Add(elements.Count);
-
-                                    //Update the size of the bounding box
-                                    boundingBox.BottomLeft = SmallestVec(boundingBox.BottomLeft, verts[verts.Count - 1]);
-                                    boundingBox.TopRight = BiggestVec(boundingBox.TopRight, verts[verts.Count - 1]);
                                 }
                             }
                             if (group.Length > 1 && group[1].Length > 0)

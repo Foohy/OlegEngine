@@ -147,6 +147,12 @@ namespace Two_and_a_Half_Dimensions
             this.ViewNormal = point;
             this.ViewNormal.Normalize();
             this.camMatrix = Matrix4.LookAt(Pos, (Pos + point), Vector3.UnitY);
+
+            //TODO
+            // Make setting the camera like this an engine function 
+            // like really
+            Graphics.ViewFrustum.SetCameraDef(Pos, (Pos + point), Vector3.UnitY);
+
         }
 
         private void EditorThink(FrameEventArgs e)

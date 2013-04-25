@@ -430,6 +430,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             Mat = new Material(Resource.GetTexture("gui/window.png"), Resource.GetProgram("hud"));
             panelMesh.mat = Mat;
+            panelMesh.ShouldDrawDebugInfo = false;
 
             Width = 200;
             Height = 200;

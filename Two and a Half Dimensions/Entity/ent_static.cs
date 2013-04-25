@@ -14,6 +14,11 @@ namespace Two_and_a_Half_Dimensions.Entity
 {
     class ent_static : BaseEntity 
     {
+        public override void Draw()
+        {
+            base.Draw();
 
+            //Console.WriteLine( Graphics.ViewFrustum.BoxInFrustum( this.Model.BBox ));
+        }
     }
 }

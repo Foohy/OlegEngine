@@ -79,6 +79,7 @@
     <Compile Include="Entity\ent_player.cs" />
     <Compile Include="Entity\ent_speaker.cs" />
     <Compile Include="Entity\ent_testball.cs" />
+    <Compile Include="Frustum.cs" />
     <Compile Include="Graphics.cs" />
     <Compile Include="GUI\Elements\Button.cs" />
     <Compile Include="GUI\Elements\ButtonDropDown.cs" />

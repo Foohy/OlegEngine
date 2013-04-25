@@ -411,6 +411,7 @@ namespace Two_and_a_Half_Dimensions
 
             skymodel = Resource.GetMesh("skybox.obj");
             skymodel.mat = new Material("starm.png", "skybox2");
+            skymodel.ShouldDrawDebugInfo = false;
 
             int prog = Resource.GetProgram("skybox2");
             GL.UseProgram(prog);

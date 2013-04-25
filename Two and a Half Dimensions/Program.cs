@@ -30,6 +30,7 @@ namespace Two_and_a_Half_Dimensions
         private Matrix4 defaultViewMatrix = Matrix4.Identity;
         private Matrix4 defaultOrthoMatrix = Matrix4.Identity;
         private GUI.Font counter;
+        private GUI.Font meshcount;
         public Program()
             : base(1350,680, new GraphicsMode(32, 24, 0, 4), "BY NO MEANS.", GameWindowFlags.Default) //GraphicsMode(32, 24, 0, 4)
         {
@@ -104,6 +105,9 @@ namespace Two_and_a_Half_Dimensions
             //Create our little FPS counter
             counter = new GUI.Font("debug", "frick off");
             counter.SetPos(this.Width - counter.GetTextLength("frick off"), 30 );
+
+            meshcount = new GUI.Font("debug", "Mesh Count");
+            meshcount.SetPos(this.Width - meshcount.GetTextLength("Mesh Count"), 30 + meshcount.GetTextHeight());
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
 
             //Create some debug stuff
@@ -112,7 +116,7 @@ namespace Two_and_a_Half_Dimensions
 
         double last = 0.0d;
         string fps = "frasd";
-        
+        string sMeshCount = "asldsldka";
         void GUIManager_PostDrawHUD(EventArgs e)
         {        
             if (last < Utilities.Time)
@@ -133,9 +137,14 @@ namespace Two_and_a_Half_Dimensions
                 {
                     counter.SetColor(1, 0, 0);
                 }
+
+                //Update the meshes drawn per frame
+                sMeshCount = Mesh.MeshesDrawn + " / " + Mesh.MeshesTotal;
+                meshcount.SetText(sMeshCount);
+                meshcount.SetPos( this.Width - meshcount.GetTextLength(sMeshCount) - 20, 30 + meshcount.GetTextHeight() );
             }
             
-
+            meshcount.Draw();
             counter.Draw();
         }
 
@@ -148,14 +157,23 @@ namespace Two_and_a_Half_Dimensions
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+            // TODO
+            // Move all this code to some place within the engine that is called
+            
+            float FOV = (float)Math.PI / 4;
+            float Ratio = Width / (float)Height;
+            float NearClip = 1.0f;
+            float FarClip = 256.0f;
 
             GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
-            defaultViewMatrix = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, Width / (float)Height, 1.0f, 256.0f);
+            defaultViewMatrix = Matrix4.CreatePerspectiveFieldOfView(FOV, Ratio, NearClip, FarClip);
             //defaultOrthoMatrix = Matrix4.CreateOrthographic(Width, Height, 1.0f, 256.0f);
-            defaultOrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, 1.0f, 256f);
+            defaultOrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, NearClip, FarClip);
             Utilities.ViewMatrix = defaultViewMatrix;
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref defaultViewMatrix);
+
+            Graphics.ViewFrustum.SetCamInternals(FOV, Ratio, NearClip, FarClip);
         }
 
         /// <summary>
@@ -251,6 +269,8 @@ namespace Two_and_a_Half_Dimensions
             Entity.EntManager.DrawTranslucent(e);
             GL.Disable(EnableCap.Blend);
 
+            //Draw debug stuff
+            Graphics.DrawDebug();
         }
 
         /// <summary>

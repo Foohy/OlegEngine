@@ -10,8 +10,11 @@ namespace Two_and_a_Half_Dimensions
 {
     class Graphics
     {
-        public static bool ShouldDrawBoundingBoxes = false;
+        public static Frustum ViewFrustum;
+
+        public static bool ShouldDrawBoundingBoxes = true;
         public static bool ShouldDrawNormals = false;
+        public static bool ShouldDrawFrustum = true;
 
         private static Mesh box;
         private static Material dbgWhite;
@@ -22,6 +25,21 @@ namespace Two_and_a_Half_Dimensions
             box = Resource.GetMesh("debug/box.obj");
             box.mat = dbgWhite;
             box.ShouldDrawDebugInfo = false;
+
+            ViewFrustum = new Frustum();
+        }
+
+        public static void DrawDebug()
+        {
+            if (ViewFrustum != null && ShouldDrawFrustum)
+            {
+                dbgWhite.BindMaterial();
+                GL.UniformMatrix4(dbgWhite.locVMatrix, false, ref Matrix4.Identity);
+                GL.LineWidth(1.5f);
+
+                ViewFrustum.DrawLines();
+                //ViewFrustum.DrawPlanes();
+            }
         }
 
         public static void DrawLine(Vector3 Position1, Vector3 Position2, bool SetMaterial = true )
@@ -37,7 +55,6 @@ namespace Two_and_a_Half_Dimensions
             GL.Vertex3(Position1);
             GL.Vertex3(Position2);
             GL.End();
-            
         }
 
         public static void DrawBox(Vector3 Position, Vector3 BottomLeft, Vector3 TopRight)
@@ -46,7 +63,7 @@ namespace Two_and_a_Half_Dimensions
             
             Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
             modelview *= Matrix4.Scale((TopRight - BottomLeft ) / 2 );
-            modelview *= Matrix4.CreateTranslation(Position);
+            modelview *= Matrix4.CreateTranslation(Position + (BottomLeft + TopRight) / 2);
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
             box.DrawSimple(modelview);
@@ -326,10 +343,138 @@ namespace Two_and_a_Half_Dimensions
         public Vector3[] DBG_Normals;
         public int[] DBG_Elements;
 
+        public static int MeshesDrawn = 0;
+        public static int MeshesTotal = 0;
+        private static double LastDrawTime = 0;
+
         public class BoundingBox
         {
-            public Vector3 BottomLeft = -Vector3.One * 0.1f;
-            public Vector3 TopRight = Vector3.One * 0.1f;
+            private Vector3 vecNegative = -Vector3.One * 0.1f;
+            private Vector3 vecPositive = Vector3.One * 0.1f;
+            private float fRadius = 1.0f;
+
+            public Vector3 Negative {
+                get
+                {
+                    return vecNegative;
+                }
+                set
+                {
+                    if (!NegativeSet)
+                    {
+                        NegativeSet = true;
+                    }
+                    vecNegative = value;
+                    fRadius = RadiusFromBoundingBox(this);
+                }
+            }
+            public Vector3 Positive { 
+                get
+                {
+                    return vecPositive;   
+                }
+                set
+                {
+                    if (!PositiveSet)
+                    {
+                        PositiveSet = true;
+                    }
+                    vecPositive = value;
+                    fRadius = RadiusFromBoundingBox(this);
+                }
+            }
+
+            public float Radius
+            {
+                get
+                {
+                    return fRadius;
+                }
+                set
+                {
+                    fRadius = value;
+                }
+            }
+
+            public bool NegativeSet { get; private set; }
+            public bool PositiveSet { get; private set; }
+
+            public BoundingBox()
+            {
+                NegativeSet = false;
+                PositiveSet = false;
+            }
+
+            public BoundingBox(Vector3 Negative, Vector3 Positive)
+            {
+                this.Negative = Negative;
+                this.Positive = Positive;
+            }
+
+            public Vector3 GetVertexP(Vector3 Normal)
+            {
+                Vector3 res = this.Negative;
+                if (Normal.X > 0)
+                    res.X += this.Positive.X;
+
+                if (Normal.Y > 0)
+                    res.Y += this.Positive.Y;
+
+                if (Normal.Z > 0)
+                    res.Z += this.Positive.Z;
+
+                return res;
+            }
+
+            public Vector3 GetVertexN(Vector3 Normal)
+            {
+                Vector3 res = this.Negative;
+                if (Normal.X < 0)
+                    res.X += this.Positive.X;
+
+                if (Normal.Y < 0)
+                    res.Y += this.Positive.Y;
+
+                if (Normal.Z < 0)
+                    res.Z += this.Positive.Z;
+
+                return res;
+            }
+
+            private static Vector3 absVec(Vector3 vec)
+            {
+                return new Vector3(Math.Abs(vec.X), Math.Abs(vec.Y), Math.Abs(vec.Z));
+            }
+
+            public static float RadiusFromBoundingBox(BoundingBox b)
+            {
+                //Get the absolute values of both vectors
+                Vector3 absMin = absVec(b.Negative);
+                Vector3 absMax = absVec(b.Positive);
+
+                //Get the largest components
+                if (absMin.X > absMax.X)
+                    absMax.X = absMin.X;
+
+                if (absMin.Y > absMax.Y)
+                    absMax.Y = absMin.Y;
+
+                if (absMin.Z > absMax.Z)
+                    absMax.Z = absMin.Z;
+
+                //Get the distance from 0
+                return absMax.Length;
+            }
+
+            /// <summary>
+            /// Create a bounding box from a known radius
+            /// </summary>
+            /// <param name="radius">The radius of the bounding sphere</param>
+            /// <returns>A newly created bounding box from the maxiumum size of the sphere. Note this is not a perfect reconstruction for a proper box.</returns>
+            public static BoundingBox BoundingBoxFromRadius(float radius)
+            {
+                return new BoundingBox(new Vector3(radius), new Vector3(-radius));
+            }
         }
 
         public Mesh()
@@ -434,10 +579,12 @@ namespace Two_and_a_Half_Dimensions
             DBG_Vertices = verts;
         }
 
+        #region Point Testing
+
         public bool PointWithinBox(Vector3 point)
         {
-            Vector3 boxPosL = BBox.BottomLeft + this.Position;
-            Vector3 boxPosR = BBox.TopRight + this.Position;
+            Vector3 boxPosL = BBox.Negative + this.Position;
+            Vector3 boxPosR = BBox.Positive + this.Position;
 
             return (point.X > boxPosL.X && point.X < boxPosR.X &&
                     point.Y > boxPosL.Y && point.Y < boxPosR.Y &&
@@ -446,8 +593,8 @@ namespace Two_and_a_Half_Dimensions
 
         public bool LineIntersectsBox(Vector3 L1, Vector3 L2, ref Vector3 Hit)
         {
-            Vector3 B1 = this.BBox.BottomLeft + this.Position; ;
-            Vector3 B2 = this.BBox.TopRight + this.Position; ;
+            Vector3 B1 = this.BBox.Negative + this.Position; ;
+            Vector3 B2 = this.BBox.Positive + this.Position; ;
             if (L2.X < B1.X && L1.X < B1.X) return false;
             if (L2.X > B2.X && L1.X > B2.X) return false;
             if (L2.Y < B1.Y && L1.Y < B1.Y) return false;
@@ -487,6 +634,10 @@ namespace Two_and_a_Half_Dimensions
             if (Axis == 3 && Hit.X > B1.X && Hit.X < B2.X && Hit.Y > B1.Y && Hit.Y < B2.Y) return true;
             return false;
         }
+
+
+
+        #endregion
 
         private void loadMesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] lsUV = null )
         {
@@ -558,6 +709,26 @@ namespace Two_and_a_Half_Dimensions
 
         private void render(Matrix4 mmatrix, Matrix4 vmatrix, Matrix4 pmatrix)
         {
+            if (LastDrawTime != Utilities.Time)
+            {
+                LastDrawTime = Utilities.Time;
+                MeshesTotal = 0;
+                MeshesDrawn = 0;
+            }
+
+
+            if (Utilities.CurrentPass > 1 && (ShouldDrawDebugInfo))
+            {
+                MeshesTotal++;
+
+                //this.Color = Vector3.UnitY;
+                if (Graphics.ViewFrustum.SphereInFrustum(this.Position, BBox.Radius) == Frustum.FrustumState.OUTSIDE) { return;  }
+                //if (Graphics.ViewFrustum.BoxInFrustum(this.BBox, this.Position) == Frustum.FrustumState.OUTSIDE) { this.Color = Vector3.UnitX; MeshesDrawn--; }
+                //if (Graphics.ViewFrustum.PointInFrustum((this.BBox.BottomLeft + this.BBox.TopRight) / 2 + this.Position) == Frustum.FrustumState.OUTSIDE) { this.Color = Vector3.UnitX; MeshesDrawn--;  }
+
+                MeshesDrawn++;
+            }
+
             GL.BindVertexArray(this.VAO);
             if (mat != null)
             {
@@ -589,7 +760,7 @@ namespace Two_and_a_Half_Dimensions
                 //Draw the bounding box
                 if (Graphics.ShouldDrawBoundingBoxes)
                 {
-                    Graphics.DrawBox(this.Position, this.BBox.BottomLeft, this.BBox.TopRight);
+                    Graphics.DrawBox(this.Position, this.BBox.Negative, this.BBox.Positive);
                 }
 
                 if (Graphics.ShouldDrawNormals)
