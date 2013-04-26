@@ -43,23 +43,26 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             this.Position = new Vector2(200, 480);
             this.WindowTitle = "Untitled";
-            this.Width = 150;
+            this.Width = 200;
             this.Height = 150;
             this.SetMaterial(Resource.GetTexture("gui/window.png"));
+            this.SetColor(20, 24, 33);
 
             Title = GUIManager.Create<Panel>();
             Title.SetMaterial(Resource.GetTexture("gui/title.png"));
-            Title.SetHeight(20);
+            Title.SetHeight(25);
             Title.SetWidth(this.Width);
             Title.SetPos(this.Position - new Vector2(0, Title.Height));
-            Title.OnMouseDown += new OnMouseDownDel(Title_OnMouseDown);
-            Title.OnMouseMove += new OnMouseMoveDel(Title_OnMouseMove);
-            Title.OnMouseUp += new OnMouseUpDel(Title_OnMouseUp);
+            Title.OnMouseDown += new Action<Panel,OpenTK.Input.MouseButtonEventArgs>(Title_OnMouseDown);
+            Title.OnMouseMove += new Action<Panel,OpenTK.Input.MouseMoveEventArgs>(Title_OnMouseMove);
+            Title.OnMouseUp += new Action<Panel,OpenTK.Input.MouseButtonEventArgs>(Title_OnMouseUp);
+            Title.SetColor(135, 36, 31);
 
             TitleText = GUIManager.Create<Label>();
+            TitleText.SetFont("windowtitle");
             TitleText.SetParent(Title);
             TitleText.SetPos(0, 0);
-            TitleText.SetColor(1, 1, 1);
+            TitleText.SetColor(255, 255, 255);
             TitleText.SetText(this.WindowTitle);
             TitleText.Dock(DockStyle.LEFT);
             TitleText.SetAlignment(Label.TextAlign.MiddleLeft);
@@ -67,16 +70,21 @@ namespace Two_and_a_Half_Dimensions.GUI
 
             //Create the close button
             closeButton = GUIManager.Create<Button>();
-            closeButton.TexIdle = Resource.GetTexture("gui/x_idle.png");
-            closeButton.TexPressed = Resource.GetTexture("gui/x_pressed.png");
-            closeButton.TexHovered = Resource.GetTexture("gui/x_hover.png");
-            closeButton.SetWidth(20);
-            closeButton.SetHeight(20);
+            closeButton.SetImage(Resource.GetTexture("gui/close.png"));
+            closeButton.SetWidth(25);
+            closeButton.SetHeight(25);
+            closeButton.SetColor(26, 30, 38);
             closeButton.Dock(DockStyle.RIGHT);
             closeButton.SetParent(Title);
             closeButton.AlignRight();
             closeButton.OnButtonPress += new Button.OnButtonPressDel(closeButton_OnButtonPress);
-            //TODO: align left
+            closeButton.PreDraw += new Action<Panel, Vector2>(closeButton_PreDraw);
+        }
+
+        void closeButton_PreDraw(Panel btn, Vector2 ScreenPos)
+        {
+            Surface.SetDrawColor(48, 55, 71);
+            Surface.DrawRect(ScreenPos.X + 2, ScreenPos.Y + 2, btn.Width - 4, btn.Height - 4);
         }
 
         void closeButton_OnButtonPress(Panel sender)

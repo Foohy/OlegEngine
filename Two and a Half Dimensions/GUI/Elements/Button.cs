@@ -32,8 +32,11 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public Button()
         {
+            this.SetColor(33, 36, 45);
+            this.SetImage(Resource.GetTexture("engine/white.png"));
+
             TextLabel = GUIManager.Create<Label>();
-            TextLabel.SetColor(0, 0, 0);
+            TextLabel.SetColor(255, 255, 255);
             TextLabel.SetParent(this);
             TextLabel.Autosize = false;
             TextLabel.Dock(DockStyle.FILL);
@@ -106,6 +109,20 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.Width = this.TextLabel.GetTextLength() + offset;
         }
 
+        public void SetImage(int image)
+        {
+            this.TexIdle = image;
+            this.TexHovered = image;
+            this.TexPressed = image;
+        }
+
+        public void SetImage(int idle, int hover, int pressed)
+        {
+            this.TexIdle = idle;
+            this.TexHovered = hover;
+            this.TexPressed = pressed;
+        }
+
         public override void Resize()
         {
             base.Resize();
@@ -134,10 +151,7 @@ namespace Two_and_a_Half_Dimensions.GUI
                 }
             }
 
-
             base.Draw();
-
-            //TextLabel.Draw();
         }
     }
 }

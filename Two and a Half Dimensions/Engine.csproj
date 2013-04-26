@@ -95,7 +95,6 @@
     <Compile Include="Levels\LevelManager.cs" />
     <Compile Include="Levels\TargaImage.cs" />
     <Compile Include="Levels\TestLevel.cs" />
-    <Compile Include="Player_DEPRECATED.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resource.cs" />

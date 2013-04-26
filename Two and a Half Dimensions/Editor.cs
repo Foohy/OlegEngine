@@ -96,18 +96,14 @@ namespace Two_and_a_Half_Dimensions
             exitMessageBox.SetHeight(65);
             
             Label label = GUIManager.Create<Label>();
+            label.Autosize = true;
             label.SetParent(exitMessageBox);
             label.SetText("Are you sure you'd like to leave?");
-            label.SetColor(0, 0, 0);
             label.SetPos(15, 10);
 
             Button button = GUIManager.Create<Button>();
             button.SetText("Yes");
-            button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
-            button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-            button.TexIdle = Resource.GetTexture("gui/toolbar.png");
-            button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
             button.SetParent(exitMessageBox);
             button.DockPadding(20, 20, 20, 20);
             button.SetHeight(20);
@@ -116,11 +112,7 @@ namespace Two_and_a_Half_Dimensions
 
             button = GUIManager.Create<Button>();
             button.SetText("Cancel");
-            button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
-            button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-            button.TexIdle = Resource.GetTexture("gui/toolbar.png");
-            button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
             button.SetParent(exitMessageBox);
             button.DockPadding(20, 20, 20, 20);
             button.SetHeight(20);
@@ -146,11 +138,10 @@ namespace Two_and_a_Half_Dimensions
 
             Button button = GUIManager.Create<Button>();
             button.SetText("Clip test!");
-            button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
-            button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-            button.TexIdle = Resource.GetTexture("gui/toolbar.png");
-            button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+            //button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
+            //button.TexIdle = Resource.GetTexture("gui/toolbar.png");
+            //button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
             button.SetParent(w);
             button.SetPos(new Vector2((w.Width / 2) - (button.Width / 2), w.Height - 50));
             button.DockPadding(20, 20, 20, 20);

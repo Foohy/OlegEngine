@@ -33,6 +33,8 @@ namespace Two_and_a_Half_Dimensions.GUI
 
         public static void Init()
         {
+            Surface.Init();
+
             Utilities.window.Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
             Utilities.window.Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
@@ -176,6 +178,73 @@ namespace Two_and_a_Half_Dimensions.GUI
             GL.Enable(EnableCap.CullFace);
             GL.DepthFunc(DepthFunction.Less);
             GL.Disable(EnableCap.Blend);
+        }
+    }
+
+    class Surface
+    {
+        static Mesh Square;
+        static Matrix4 TranslateMatrix = Matrix4.Identity;
+
+        public static void Init()
+        {
+            Square = new Mesh("debug/quad.obj");
+            Square.mat = Utilities.LoadMaterial("engine/white");
+            Square.mat.SetShader(Resource.GetProgram("default"));
+            Square.ShouldDrawDebugInfo = false;
+        }
+
+        /// <summary>
+        /// Set the color
+        /// </summary>
+        /// <param name="x">Red component, 0-1</param>
+        /// <param name="y">Green component, 0-1</param>
+        /// <param name="z">Blue component, 0-1</param>
+        public static void SetDrawColorVector(float x, float y, float z)
+        {
+            Square.Color = new Vector3(x, y, z);
+        }
+        /// <summary>
+        /// Set the color
+        /// </summary>
+        /// <param name="r">Red component 0-255</param>
+        /// <param name="g">Green component 0-255</param>
+        /// <param name="b">Blue component 0-255</param>
+        public static void SetDrawColor(float r, float g, float b)
+        {
+            Square.Color = new Vector3(r / 255, g / 255, b / 255);
+        }
+        /// <summary>
+        /// Set the color
+        /// </summary>
+        /// <param name="color">Color</param>
+        public static void SetDrawColor(System.Drawing.Color color)
+        {
+            Square.Color = new Vector3(color.R / 255, color.G / 255, color.B / 255);
+        }
+
+        public static void DrawRect(float x, float y, float width, float height)
+        {
+            drawRect(x, y, width, height);
+        }
+
+        public static void DrawRect(Vector2 position, float width, float height)
+        {
+            drawRect(position.X, position.Y, width, height);
+        }
+
+        public static void DrawRect(Vector2 position, Vector2 dimensions)
+        {
+            drawRect(position.X, position.Y, dimensions.X, dimensions.Y);
+        }
+
+        private static void drawRect(float x, float y, float width, float height)
+        {
+            TranslateMatrix = Matrix4.CreateTranslation(Vector3.Zero);
+            TranslateMatrix *= Matrix4.Scale(width, height, 1.0f);
+            TranslateMatrix *= Matrix4.CreateTranslation(x, y, 3.0f);
+
+            Square.DrawSimple(TranslateMatrix);
         }
     }
 }

@@ -44,17 +44,12 @@ namespace Two_and_a_Half_Dimensions.GUI
         public bool _ToRemove = false;
 
         //Events
-        public delegate void OnMouseDownDel(Panel sender, MouseButtonEventArgs e);
-        public event OnMouseDownDel OnMouseDown;
-
-        public delegate void OnMouseUpDel(Panel sender, MouseButtonEventArgs e);
-        public event OnMouseUpDel OnMouseUp;
-
-        public delegate void OnMouseMoveDel(Panel sender, MouseMoveEventArgs e);
-        public event OnMouseMoveDel OnMouseMove;
-
-        public delegate void OnResizeDel(Panel sender);
-        public event OnResizeDel OnResize;
+        public event Action<Panel, MouseButtonEventArgs> OnMouseDown;
+        public event Action<Panel, MouseButtonEventArgs> OnMouseUp;
+        public event Action<Panel, MouseMoveEventArgs> OnMouseMove;
+        public event Action<Panel> OnResize;
+        public event Action<Panel, Vector2> PreDraw;
+        public event Action<Panel, Vector2> PostDraw;
 
         Material Mat;
         Mesh panelMesh = Resource.GetMesh("debug/quad.obj");
@@ -358,9 +353,33 @@ namespace Two_and_a_Half_Dimensions.GUI
             return Pos;
         }
 
-        public void SetColor(float x, float y, float z)
+        /// <summary>
+        /// Set the color of the panel
+        /// </summary>
+        /// <param name="x">Red component, 0-1</param>
+        /// <param name="y">Green component, 0-1</param>
+        /// <param name="z">Blue component, 0-1</param>
+        public void SetColorVector(float x, float y, float z)
         {
             this.Color = new Vector3(x, y, z);
+        }
+        /// <summary>
+        /// Set the color of the panel
+        /// </summary>
+        /// <param name="r">Red component 0-255</param>
+        /// <param name="g">Green component 0-255</param>
+        /// <param name="b">Blue component 0-255</param>
+        public void SetColor(float r, float g, float b)
+        {
+            this.Color = new Vector3(r / 255, g / 255, b / 255);
+        }
+        /// <summary>
+        /// Set the color of a panel
+        /// </summary>
+        /// <param name="color">Color</param>
+        public void SetColor(System.Drawing.Color color)
+        {
+            this.Color = new Vector3(color.R / 255, color.G / 255, color.B / 255);
         }
 
         /// <summary>
@@ -446,7 +465,8 @@ namespace Two_and_a_Half_Dimensions.GUI
             if (!ShouldDraw) { return; }
 
             Vector2 posOffset = this.GetScreenPos();
-  
+
+            if (this.PreDraw != null) { this.PreDraw(this, posOffset); }
             if (!AlphaBlendmode) { GL.Disable(EnableCap.Blend); }
             bool clipping = (this.ClipChildren && ((this.Parent != null && !this.Parent.ClipChildren ) || this.Parent == null)); //Clip if clipping is enabled, our parent isn't clipping, or our parent is null
             if (clipping)
@@ -460,8 +480,12 @@ namespace Two_and_a_Half_Dimensions.GUI
             modelview *= Matrix4.Scale(Width, Height, 1.0f);
             modelview *= Matrix4.CreateTranslation(posOffset.X, posOffset.Y, 3.0f);
 
-            this.panelMesh.mat.Properties.Color = this.Color;
+
+            this.panelMesh.Color = this.Color;
             panelMesh.DrawSimple(modelview);
+            if (this.PostDraw != null) { this.PostDraw(this, posOffset); }
+
+
             if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
 
             //Draw our children

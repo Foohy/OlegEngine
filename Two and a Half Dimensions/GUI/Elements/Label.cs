@@ -34,7 +34,8 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.Text = "";
             DrawText = new Text("title", this.Text);
             this.ShouldPassInput = true;
-            this.Autosize = true;
+            this.Autosize = false;
+            this.SetColor(255, 255, 255);
         }
 
         public void SetText(string str)
@@ -104,6 +105,16 @@ namespace Two_and_a_Half_Dimensions.GUI
             {
                 PosOffset += new Vector2(0, this.Height - this.GetTextHeight());
             }
+        }
+
+        public void SetTextSize(float Width, float Height)
+        {
+            this.DrawText.SetScale(Width, Height);
+        }
+
+        public void SetFont(string font)
+        {
+            this.DrawText = new Text(font, this.Text);
         }
 
         protected override void Reposition()

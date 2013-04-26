@@ -12,7 +12,7 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.Width = Utilities.window.Width;
             this.Height = 20;
             this.SetMaterial(Resource.GetTexture("gui/toolbar.png"));
-
+            this.SetColor(40, 40, 40);
         }
 
         public void AddToolPanel(Panel p)
@@ -30,12 +30,11 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             Button button = GUIManager.Create<Button>();
             button.SetText(text);
-            button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
             button.SetHeight(this.Height);
-            button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-            button.TexIdle = Resource.GetTexture("gui/toolbar.png");
-            button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+            //button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
+            //button.TexIdle = Resource.GetTexture("gui/toolbar.png");
+            //button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
             this.AddToolPanel(button);
 
             return button;
@@ -45,12 +44,11 @@ namespace Two_and_a_Half_Dimensions.GUI
         {
             ButtonDropDown button = GUIManager.Create<ButtonDropDown>();
             button.SetText(text);
-            button.TextLabel.SetColor(0, 0, 0);
             button.SizeToText(15);
             button.SetHeight(this.Height);
-            button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-            button.TexIdle = Resource.GetTexture("gui/toolbar.png");
-            button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+            //button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
+            //button.TexIdle = Resource.GetTexture("gui/toolbar.png");
+            //button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
             this.AddToolPanel(button);
 
             return button;
