@@ -26,10 +26,10 @@ namespace Two_and_a_Half_Dimensions
         public static Vector3 MousePos = new Vector3();
         public static BaseEntity SelectedEnt;
         public static ent_cursor Cursor;
+        public static Vector3 ViewPosition = new Vector3();
 
         private static GUI.Text CurrentModeText;
         private static float goalZoom = 5.0f;
-        private static Vector3 Pos = new Vector3();
         private static float multiplier = 8;
         private static float halfPI = -1.570796326794896f;
         private static float Multiplier = 0.000924f;
@@ -42,11 +42,13 @@ namespace Two_and_a_Half_Dimensions
         
         public static void Init()
         {
-            Pos = new Vector3(View.Player.Position);
+            ViewPosition = new Vector3(View.Player.Position);
 
             Cursor = EntManager.Create<ent_cursor>();
             Cursor.Spawn();
             Cursor.SetPos(new Vector3(0, 0, 0));
+
+            Input.LockMouse = false;
             //Cursor.Scale = Vector3.One * 0.25f;
 
 
@@ -253,7 +255,7 @@ namespace Two_and_a_Half_Dimensions
             }
         }
 
-        public static void Think(FrameEventArgs e)
+        public static void Think()
         {
             Input.LockMouse = false;
             //curve dat zoom mmm girl u fine
@@ -263,7 +265,7 @@ namespace Two_and_a_Half_Dimensions
 
             goalZoom += Input.deltaZ;
             Zoom += (goalZoom - Zoom) / 4;
-            Pos = new Vector3(Pos.X, Pos.Y, Zoom);
+            ViewPosition = new Vector3(ViewPosition.X, ViewPosition.Y, Zoom);
 
             //How fast should we move
             multiplier = 7;
@@ -280,19 +282,19 @@ namespace Two_and_a_Half_Dimensions
             //I SAID MOVE
             if (Utilities.window.Keyboard[Key.W])
             {
-                Pos += new Vector3(0.0f, (float)e.Time, 0.0f) * multiplier;
+                ViewPosition += new Vector3(0.0f, (float)Utilities.Frametime, 0.0f) * multiplier;
             }
             if (Utilities.window.Keyboard[Key.A])
             {
-                Pos += new Vector3(-(float)e.Time, 0.0f, 0.0f) * multiplier;
+                ViewPosition += new Vector3(-(float)Utilities.Frametime, 0.0f, 0.0f) * multiplier;
             }
             if (Utilities.window.Keyboard[Key.S])
             {
-                Pos += new Vector3(0.0f, -(float)e.Time, 0.0f) * multiplier;
+                ViewPosition += new Vector3(0.0f, -(float)Utilities.Frametime, 0.0f) * multiplier;
             }
             if (Utilities.window.Keyboard[Key.D])
             {
-                Pos += new Vector3((float)e.Time, 0.0f, 0.0f) * multiplier;
+                ViewPosition += new Vector3((float)Utilities.Frametime, 0.0f, 0.0f) * multiplier;
             }
 
             if (Cursor != null)
@@ -307,7 +309,7 @@ namespace Two_and_a_Half_Dimensions
                 Vector3 mousePos = new Vector3((Utilities.window.Mouse.X - (Utilities.window.Width / 2)), -(Utilities.window.Mouse.Y - (Utilities.window.Height / 2)), 0);
                 //MousePos = Get2Dto3D(Utilities.window.Mouse.X, Utilities.window.Mouse.Y, -5.0f );
                 //MousePos += new Vector3(MousePos.X, MousePos.Y, 0);
-                MousePos = new Vector3(Pos.X, Pos.Y, 0);
+                MousePos = new Vector3(ViewPosition.X, ViewPosition.Y, 0);
                 //MousePos += LPCameraScreenToVector(0, 0, Utilities.window.Mouse.X, Utilities.window.Mouse.Y, (float)Math.PI / 4.0f);
                 MousePos += mousePos * Zoom * Multiplier; //lmao fuck
                 Cursor.SetPos(MousePos);
@@ -317,15 +319,15 @@ namespace Two_and_a_Half_Dimensions
             switch (CurrentMode)
             {
                 case EditMode.CreateEnt:
-                    CreateEnt.Think(e);
+                    CreateEnt.Think();
                     break;
 
                 case EditMode.CreatePhys:
-                    CreatePhys.Think(e);
+                    CreatePhys.Think();
                     break;
 
                 case EditMode.Transform:
-                    Transform.Think(e);
+                    Transform.Think();
                     break;
             }
         }
@@ -380,8 +382,8 @@ namespace Two_and_a_Half_Dimensions
             Vector3 yoff = Vector3.UnitY * y;
             Vector3 zoff = _lookAt * 1.0f;
 
-            Vector3 worldpos = Pos + xoff + yoff + zoff;
-            Vector3 norm = (Pos - worldpos);
+            Vector3 worldpos = ViewPosition + xoff + yoff + zoff;
+            Vector3 norm = (ViewPosition - worldpos);
             norm.Normalize();
             return norm;
         }
@@ -418,7 +420,7 @@ namespace Two_and_a_Half_Dimensions
 
             //Utilities.ProjectionMatrix = Player.ply.camMatrix;
 
-            View.SetPos(Pos);
+            View.SetPos(ViewPosition);
 
             if (Cursor != null)
             {
@@ -483,7 +485,7 @@ namespace Two_and_a_Half_Dimensions
             {
             }
 
-            public static void Think(FrameEventArgs e)
+            public static void Think()
             {
 
             }
@@ -540,7 +542,7 @@ namespace Two_and_a_Half_Dimensions
             {
             }
 
-            public static void Think(FrameEventArgs e)
+            public static void Think()
             {
                 if (dragging && Editor.SelectedEnt != null)
                 {
@@ -574,7 +576,7 @@ namespace Two_and_a_Half_Dimensions
             {
             }
 
-            public static void Think(FrameEventArgs e)
+            public static void Think()
             {
             }
         }

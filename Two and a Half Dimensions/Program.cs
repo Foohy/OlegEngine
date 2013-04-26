@@ -45,7 +45,7 @@ namespace Two_and_a_Half_Dimensions
             //Print useful information about the card
             Console.WriteLine("==================================");
             Console.WriteLine("Vendor: {0}", GL.GetString(StringName.Vendor));
-            Console.WriteLine(", Renderer: {0}", GL.GetString(StringName.Renderer));
+            Console.WriteLine("Renderer: {0}", GL.GetString(StringName.Renderer));
             Console.WriteLine(GL.GetString(StringName.ShadingLanguageVersion));
             string versionOpenGL = GL.GetString(StringName.Version);
             GLVersion.Major = versionOpenGL[0];

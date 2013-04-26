@@ -31,6 +31,7 @@ namespace Two_and_a_Half_Dimensions.Entity
             previewMesh.mat = Resource.GetMaterial("engine/white_simple");
             previewMesh.UsageHint = BufferUsageHint.StreamDraw;
             previewMesh.Color = new Vector3(1.0f,0, 0);
+            previewMesh.ShouldDrawDebugInfo = false;
         }
 
         public void AddPoint(Vector3 point)

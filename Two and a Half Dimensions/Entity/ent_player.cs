@@ -102,10 +102,19 @@ namespace Two_and_a_Half_Dimensions.Entity
             {
                 this.Movetype = MoveTypes.NONE;
                 this.ShouldDraw = false;
+                if (this.Physics != null) this.Physics.CollisionCategories = Category.None;
+            }
+            else
+            {
+                if (this.Physics != null) this.Physics.CollisionCategories = Category.Cat1;
             }
 
             if (this.Mode == PlayerMode.EDIT) Editor.Stop();
             if (newMode == PlayerMode.EDIT) Editor.Init();
+            else
+            {
+                Input.LockMouse = true;
+            }
 
             this.Mode = newMode;
         }
@@ -114,6 +123,11 @@ namespace Two_and_a_Half_Dimensions.Entity
         {
             if (this.Mode != PlayerMode.NONE)
             {
+                if (this.Mode == PlayerMode.EDIT)
+                {
+                    Editor.Think();
+                    this.SetPos(Editor.ViewPosition);
+                }
                 return;
             }
 

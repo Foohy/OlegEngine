@@ -30,8 +30,6 @@ namespace Two_and_a_Half_Dimensions
 
         public static void Think(FrameEventArgs e)
         {
-            Input.LockMouse = true;
-
             if (Player != null)
             {
                 //Run calcview on the player that will control the normal camera
