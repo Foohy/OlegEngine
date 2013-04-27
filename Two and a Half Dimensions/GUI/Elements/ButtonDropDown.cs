@@ -190,9 +190,9 @@ namespace Two_and_a_Half_Dimensions.GUI
             contextPanel.SetPos(this.Position.X, this.Position.Y + this.Height);
         }
 
-        public override void Resize()
+        public override void Resize(float oldWidth, float oldHeight, float newWidth, float newHeight)
         {
-            base.Resize();
+            base.Resize(oldWidth, oldHeight, newWidth, newHeight);
 
             contextPanel.SetPos(this.Position.X, this.Position.Y + this.Height);
         }

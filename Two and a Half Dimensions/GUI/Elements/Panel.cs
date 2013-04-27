@@ -21,6 +21,16 @@ namespace Two_and_a_Half_Dimensions.GUI
             FILL
         }
 
+        [Flags]
+        public enum Anchors
+        {
+            None    = 0x0,
+            Bottom  = 0x1,
+            Left    = 0x2,
+            Right   = 0x4,
+            Top     = 0x8
+        }
+
         public float Width { get; protected set; }
         public float Height { get; protected set; }
         public bool ShouldDraw { get; set; }
@@ -29,7 +39,9 @@ namespace Two_and_a_Half_Dimensions.GUI
         public bool ShouldPassInput { get; set; } //Clicks should pass 'through' this panel to underlying panels
         public bool ClipChildren { get; set; } //Should the panel clip child panels when they go off the edge?
         public bool Enabled { get; set; }
+        public bool ShouldAnchor { get; set; } //Control which style should be used: Docking, or anchor style
         public DockStyle DockingStyle { get; protected set; }
+        public Anchors AnchorStyle { get; protected set; }
         public Vector3 Color { get; set; }
         public Vector2 Position { get; protected set; }
 
@@ -47,7 +59,8 @@ namespace Two_and_a_Half_Dimensions.GUI
         public event Action<Panel, MouseButtonEventArgs> OnMouseDown;
         public event Action<Panel, MouseButtonEventArgs> OnMouseUp;
         public event Action<Panel, MouseMoveEventArgs> OnMouseMove;
-        public event Action<Panel> OnResize;
+        public event Action<Panel, ResizeEventArgs> OnResize;
+        public class ResizeEventArgs : EventArgs { float OldWidth; float OldHeight; float NewWidth; float NewHeight; public ResizeEventArgs(float oldWidth, float oldHeight, float newWidth, float newHeight) { OldWidth = oldWidth; oldHeight = OldHeight; newWidth = NewWidth; newHeight = NewHeight; } }
         public event Action<Panel, Vector2> PreDraw;
         public event Action<Panel, Vector2> PostDraw;
 
@@ -234,20 +247,23 @@ namespace Two_and_a_Half_Dimensions.GUI
         #region Sizing Functions
         public void SetWidth(float width)
         {
+            float oldW = this.Width;
             this.Width = width;
-            this.Resize();
+            this.Resize(oldW, this.Height, this.Width, this.Height);
         }
 
         public void SetHeight(float height)
         {
+            float oldH = this.Height;
             this.Height = height;
-            this.Resize();
+            this.Resize(this.Width, oldH, this.Width, this.Height);
         }
 
         public void Dock(DockStyle style)
         {
             this.DockingStyle = style;
-            this.ParentResized();
+            this.ParentResized(this.Width, this.Height, this.Width, this.Height);
+            this.ShouldAnchor = false;
         }
 
         public void DockPadding(float left, float right, float top, float bottom)
@@ -257,24 +273,28 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.PaddingTop = top;
             this.PaddingBottom = bottom;
 
-            this.ParentResized();
+            this.ParentResized(this.Width, this.Height, this.Width, this.Height);
         }
 
-        protected virtual void ParentResized()
+        public void SetAnchorStyle(Anchors anchors)
         {
-            if (this.Parent == null) return;
+            this.AnchorStyle = anchors;
+            this.ShouldAnchor = true;
+        }
 
+        private void HandleDocking()
+        {
             //Handle docking
-            if (this.DockingStyle == DockStyle.NODOCK ) return;
-            if (this.DockingStyle == DockStyle.FILL )
+            if (this.DockingStyle == DockStyle.NODOCK) return;
+            if (this.DockingStyle == DockStyle.FILL)
             {
                 this.Width = this.Parent.Width - (PaddingLeft + PaddingRight);
-                this.Height = this.Parent.Height - (PaddingTop + PaddingBottom );
+                this.Height = this.Parent.Height - (PaddingTop + PaddingBottom);
                 this.Position = new Vector2(PaddingLeft, PaddingTop);
             }
 
 
-            if (this.DockingStyle == DockStyle.TOP )
+            if (this.DockingStyle == DockStyle.TOP)
             {
                 this.Position = new Vector2(PaddingLeft, PaddingTop);
                 this.Width = this.Parent.Width - (PaddingLeft + PaddingRight);
@@ -294,22 +314,64 @@ namespace Two_and_a_Half_Dimensions.GUI
                 this.Position = new Vector2(this.Parent.Width - (this.Width + PaddingRight), PaddingTop);
                 this.Height = this.Parent.Height - (PaddingTop + PaddingBottom);
             }
-
-            //Alert that we've just resized ourselves
-            this.Resize();
-
         }
 
-        public virtual void Resize()
+        private void HandleAnchors( float DeltaW, float DeltaH )
+        {
+            /////////////////////////////////////
+            if (this.AnchorStyle == Anchors.None ) return;
+
+            if ((Anchors.Bottom & this.AnchorStyle) != 0)
+            {
+                if ((Anchors.Top & this.AnchorStyle ) != 0)
+                {
+                    //Set the height
+                    this.Height += DeltaH; 
+                }
+                else
+                {
+                    //Move the entire panel
+                    this.Position = new Vector2(this.Position.X, this.Position.Y + DeltaH);
+                }
+            }
+
+            if ((Anchors.Right & this.AnchorStyle) != 0)
+            {
+                if ((Anchors.Left & this.AnchorStyle ) != 0)
+                {
+                    //Set the width
+                    this.Width += DeltaW;
+                }
+                else
+                {
+                    //Move the entire panel
+                    this.Position = new Vector2(this.Position.X + DeltaW, this.Position.Y);
+                }
+            }
+            ///////////////////////////////////
+        }
+
+        protected virtual void ParentResized( float OldWidth, float OldHeight, float NewWidth, float NewHeight )
+        {
+            if (this.Parent == null) return;
+
+            if (this.ShouldAnchor) HandleAnchors(NewWidth - OldWidth, NewHeight - OldHeight);
+            else HandleDocking();
+
+            //Alert that we've just resized ourselves
+            this.Resize(OldWidth, OldHeight, NewWidth, NewHeight);
+        }
+
+        public virtual void Resize(float OldWidth, float OldHeight, float NewWidth, float NewHeight)
         {
             foreach (Panel child in Children)
             {
-                child.ParentResized();
+                child.ParentResized(OldWidth, OldHeight,NewWidth, NewHeight);
             }
 
             if (OnResize != null)
             {
-                OnResize(this);
+                OnResize(this, new ResizeEventArgs(OldWidth, OldHeight, NewWidth, NewHeight));
             }
         }
         #endregion

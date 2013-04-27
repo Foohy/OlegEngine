@@ -200,13 +200,13 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.Title.SetPos(this.Position - new Vector2(0, this.Title.Height));
         }
 
-        public override void Resize()
+        public override void Resize(float oldWidth, float oldHeight, float newWidth, float newHeight)
         {
             //Make sure our size is within our minimum and maximum
             this.Width = Utilities.Clamp(this.Width, (this.MaximumSize.X <= 0) ? float.PositiveInfinity : this.MaximumSize.X, (this.MinimumSize.X < this.closeButton.Width) ? this.closeButton.Width : this.MinimumSize.X);
             this.Height = Utilities.Clamp(this.Height, (this.MaximumSize.Y <= 0) ? float.PositiveInfinity : this.MaximumSize.Y, this.MinimumSize.Y);
 
-            base.Resize();
+            base.Resize(oldWidth, oldHeight, this.Width, this.Height);
             Title.SetWidth(this.Width);
         }
 

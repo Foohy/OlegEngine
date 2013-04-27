@@ -123,9 +123,9 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.TexPressed = pressed;
         }
 
-        public override void Resize()
+        public override void Resize(float oldWidth, float oldHeight, float newWidth, float newHeight)
         {
-            base.Resize();
+            base.Resize(oldWidth, oldHeight, newWidth, newHeight);
 
             //center text
             //this.TextLabel.SetPos((this.Width / 2) - (this.TextLabel.Width / 2), (this.Height / 2) - (this.TextLabel.Height / 2));

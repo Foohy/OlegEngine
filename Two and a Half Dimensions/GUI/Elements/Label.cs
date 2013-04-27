@@ -53,9 +53,9 @@ namespace Two_and_a_Half_Dimensions.GUI
             this.PositionText();
         }
 
-        protected override void ParentResized()
+        protected override void ParentResized( float oldWidth, float oldHeight, float newWidth, float newHeight)
         {
-            base.ParentResized();
+            base.ParentResized(oldWidth, oldHeight, newWidth, newHeight);
             if (this.Autosize) { SizeToText(); }
             PositionText();
         }

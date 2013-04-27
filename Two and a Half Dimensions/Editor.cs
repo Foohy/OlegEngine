@@ -92,8 +92,8 @@ namespace Two_and_a_Half_Dimensions
             exitMessageBox.ClipChildren = true;
             exitMessageBox.SetPos((Utilities.window.Width / 2) - (exitMessageBox.Width / 2), (Utilities.window.Height / 2) - (exitMessageBox.Height / 2));
 
-            exitMessageBox.SetWidth(195);
-            exitMessageBox.SetHeight(65);
+            exitMessageBox.SetWidth(205);
+            exitMessageBox.SetHeight(75);
             
             Label label = GUIManager.Create<Label>();
             label.Autosize = true;
@@ -107,7 +107,7 @@ namespace Two_and_a_Half_Dimensions
             button.SetParent(exitMessageBox);
             button.DockPadding(20, 20, 20, 20);
             button.SetHeight(20);
-            button.SetPos(20, 30);
+            button.SetPos(20, 40);
             button.OnButtonPress += new Button.OnButtonPressDel(button_OnYesButtonPress);
 
             button = GUIManager.Create<Button>();
@@ -116,7 +116,8 @@ namespace Two_and_a_Half_Dimensions
             button.SetParent(exitMessageBox);
             button.DockPadding(20, 20, 20, 20);
             button.SetHeight(20);
-            button.SetPos(exitMessageBox.Width - button.Width - 20, 30);
+            button.SetPos(exitMessageBox.Width - button.Width - 20, 40);
+            button.SetAnchorStyle(Panel.Anchors.Right );
             button.OnButtonPress += new Button.OnButtonPressDel(button_OnNoButtonPress);
         }
 
