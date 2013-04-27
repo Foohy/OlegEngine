@@ -1186,6 +1186,8 @@ namespace Two_and_a_Half_Dimensions
             //GL.ActiveTexture(TextureUnit.Texture2);
             //GL.Disable(EnableCap.Texture2D);
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, fbo);
+            GL.ActiveTexture(TextureUnit.Texture2);
+            GL.BindTexture(TextureTarget.Texture2D, _disabledTex);
         }
 
         public void BindForReading()
