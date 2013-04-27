@@ -31,6 +31,18 @@ namespace Two_and_a_Half_Dimensions.GUI
             return panel;
         }
 
+        public static T Create<T>( Panel p) where T : Panel, new()
+        {
+            T panel = new T();
+            panel.ShouldDraw = true;
+            panel.ShouldDrawChildren = true;
+            panel.SetParent(p);
+            panel.Init();
+
+            elements.Add(panel);
+            return panel;
+        }
+
         public static void Init()
         {
             Surface.Init();
@@ -221,6 +233,16 @@ namespace Two_and_a_Half_Dimensions.GUI
         public static void SetDrawColor(System.Drawing.Color color)
         {
             Square.Color = new Vector3(color.R / 255, color.G / 255, color.B / 255);
+        }
+
+        public static void SetTexture(int texID)
+        {
+            Square.mat.Properties.BaseTexture = texID;
+        }
+
+        public static void SetNoTexture()
+        {
+            Square.mat.Properties.BaseTexture = Utilities.AlphaTex;
         }
 
         public static void DrawRect(float x, float y, float width, float height)

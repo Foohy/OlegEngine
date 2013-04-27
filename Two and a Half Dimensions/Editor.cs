@@ -54,7 +54,7 @@ namespace Two_and_a_Half_Dimensions
 
             //Slap some text on the screen
             CurrentModeText = new GUI.Text("debug", "Mode: " + CurrentMode.ToString());
-            CurrentModeText.SetPos(5, 30 );
+            CurrentModeText.SetPos(Utilities.window.Width - 200, Utilities.window.Height - CurrentModeText.GetTextHeight() );
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
 
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
