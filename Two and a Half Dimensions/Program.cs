@@ -163,18 +163,16 @@ namespace Two_and_a_Half_Dimensions
             
             float FOV = (float)Math.PI / 4;
             float Ratio = Width / (float)Height;
-            float NearClip = 1.0f;
-            float FarClip = 256.0f;
 
             GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
-            defaultViewMatrix = Matrix4.CreatePerspectiveFieldOfView(FOV, Ratio, NearClip, FarClip);
+            defaultViewMatrix = Matrix4.CreatePerspectiveFieldOfView(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
             //defaultOrthoMatrix = Matrix4.CreateOrthographic(Width, Height, 1.0f, 256.0f);
-            defaultOrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, NearClip, FarClip);
+            defaultOrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, Utilities.NearClip, Utilities.FarClip);
             Utilities.ViewMatrix = defaultViewMatrix;
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref defaultViewMatrix);
 
-            Graphics.ViewFrustum.SetCamInternals(FOV, Ratio, NearClip, FarClip);
+            Graphics.ViewFrustum.SetCamInternals(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
         }
 
         /// <summary>

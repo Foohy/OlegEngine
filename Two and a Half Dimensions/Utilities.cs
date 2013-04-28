@@ -28,6 +28,9 @@ namespace Two_and_a_Half_Dimensions
         public static Matrix4 ViewMatrix { get; set; }
         public static int CurrentPass = 1; //What stage of rendering we're at
 
+        public const float NearClip = 1.0f;
+        public const float FarClip = 256f;
+
         #region timing stuff
         public static void Think(FrameEventArgs e)
         {
@@ -632,6 +635,54 @@ namespace Two_and_a_Half_Dimensions
             return new MeshGroup(meshList);
         }
 
+        public static Vector3 Get2Dto3D(int x, int y)
+        {
+            int[] viewport = new int[4];
+            Matrix4 modelviewMatrix, projectionMatrix;
+            GL.GetFloat(GetPName.ModelviewMatrix, out modelviewMatrix);
+            GL.GetFloat(GetPName.ProjectionMatrix, out projectionMatrix);
+            GL.GetInteger(GetPName.Viewport, viewport);
+
+            // get depth of clicked pixel
+            float[] t = new float[1];
+            GL.ReadPixels(x, Utilities.window.Height - y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, PixelType.Float, t);
+
+            return UnProject(new Vector3(x, viewport[3] - y, t[0]), modelviewMatrix, projectionMatrix, viewport);
+        }
+
+        public static Vector3 Get2Dto3D(int x, int y, float z)
+        {
+            int[] viewport = new int[4];
+            Matrix4 modelviewMatrix, projectionMatrix;
+            GL.GetFloat(GetPName.ModelviewMatrix, out modelviewMatrix);
+            GL.GetFloat(GetPName.ProjectionMatrix, out projectionMatrix);
+            GL.GetInteger(GetPName.Viewport, viewport);
+
+            // convert z to be in terms of 0 - 1 of the clip planes
+            float A = -(Utilities.FarClip + Utilities.NearClip) / (Utilities.FarClip - Utilities.NearClip);
+            float B = -2 * Utilities.FarClip * Utilities.NearClip / (Utilities.FarClip - Utilities.NearClip);
+            z = -(A * z + B) / z;
+            z = 0.5f * z + 0.5f; // convert it to be from 0 to 1
+
+
+            return UnProject(new Vector3(x, viewport[3] - y, z), modelviewMatrix, projectionMatrix, viewport);
+        }
+
+        public static Vector3 UnProject(Vector3 screen, Matrix4 view, Matrix4 projection, int[] view_port)
+        {
+            Vector4 pos = new Vector4();
+
+            // Map x and y from window coordinates, map to range -1 to 1 
+            pos.X = (screen.X - (float)view_port[0]) / (float)view_port[2] * 2.0f - 1.0f;
+            pos.Y = (screen.Y - (float)view_port[1]) / (float)view_port[3] * 2.0f - 1.0f;
+            pos.Z = screen.Z * 2.0f - 1.0f;
+            pos.W = 1.0f;
+
+            Vector4 pos2 = Vector4.Transform(pos, Matrix4.Invert(Matrix4.Mult(view, projection)));
+            Vector3 pos_out = new Vector3(pos2.X, pos2.Y, pos2.Z);
+
+            return pos_out / pos2.W;
+        }
 
         private static Vector3 SmallestVec(Vector3 currentSmallest, Vector3 contender)
         {

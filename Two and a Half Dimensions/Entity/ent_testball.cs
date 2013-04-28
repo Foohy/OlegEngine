@@ -25,7 +25,7 @@ namespace Two_and_a_Half_Dimensions.Entity
             this.Mat.Properties.SpecularIntensity = 5.0f;
             //this.Mat.SetShader("default");
            // this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
-            this.SetPos(new Vector3(0, 3.0f, -3.0f));
+            this.SetPos(new Vector3(0, 3.0f, 0.0f));
 
 
             Body bod = new Body(Levels.LevelManager.physWorld);
