@@ -11,9 +11,9 @@ using OpenTK.Graphics.OpenGL;
 
 using Newtonsoft.Json;
 
-namespace Two_and_a_Half_Dimensions
+namespace OlegEngine
 {
-    class Utilities
+    public class Utilities
     {
         public static double Time = 0.0d;
         public static double Frametime = 0.0d;
@@ -23,10 +23,12 @@ namespace Two_and_a_Half_Dimensions
         public static int SpecTex { get; set; }
         public static Material ErrorMat { get; set; }
         public static Material NormalUp { get; private set; }
-        public static Program window { get; private set; }
+        public static GameWindow window { get; private set; }
         public static Matrix4 ProjectionMatrix { get; set; }
         public static Matrix4 ViewMatrix { get; set; }
         public static int CurrentPass = 1; //What stage of rendering we're at
+
+        public static FarseerPhysics.Dynamics.World PhysicsWorld { get; set; }
 
         public const float NearClip = 1.0f;
         public const float FarClip = 256f;
@@ -39,7 +41,7 @@ namespace Two_and_a_Half_Dimensions
         }
         #endregion
 
-        public static void Init(Program win)
+        public static void Init(GameWindow win)
         {
             window = win;
 

@@ -6,12 +6,11 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Two_and_a_Half_Dimensions
+namespace OlegEngine
 {
-    class Technique
+    public class Technique
     {
-        public int Program = 0;
-
+        public static int Program = 0;
         public Technique()
         {
         }
@@ -19,55 +18,40 @@ namespace Two_and_a_Half_Dimensions
         {
         }
 
-        public virtual bool Init()
+        public static void Enable()
         {
-            return true;
-        }
-
-        public virtual void Render()
-        {
-
-        }
-
-        public void Enable()
-        {
-            GL.UseProgram(this.Program);
+            GL.UseProgram(Program);
         }
 
 
     }
-    class LightingTechnique : Technique
+    public class LightingTechnique : Technique
     {
-        public delegate void SetLightsHandler(object sender, EventArgs e);
-        public event SetLightsHandler SetLights;
+        public static event Action SetLights;
+        new public static int Program = 0; //Override
 
         const int MAX_SPOTLIGHTS = 2;
         const int MAX_POINTLIGHTS = 2;
 
-        int samplerLocation;
-        int eyeWorldPosLocation;
+        static int samplerLocation;
+        static int eyeWorldPosLocation;
 
-        int matSpecularIntensityLocation;
-        int matSpecularPowerLocation;
+        static int matSpecularIntensityLocation;
+        static int matSpecularPowerLocation;
 
-        int numPointLightsLocation;
-        int numSpotLightsLocation;
+        static int numPointLightsLocation;
+        static int numSpotLightsLocation;
 
-        LightLocations lightLocations;
-        SpotLightLocations[] spotlightLocations = new SpotLightLocations[MAX_SPOTLIGHTS];
-        PointLightLocations[] pointlightLocations = new PointLightLocations[MAX_POINTLIGHTS];
+        static LightLocations lightLocations;
+        static SpotLightLocations[] spotlightLocations = new SpotLightLocations[MAX_SPOTLIGHTS];
+        static PointLightLocations[] pointlightLocations = new PointLightLocations[MAX_POINTLIGHTS];
 
 
-        DirectionalLight EnvironmentLight = new DirectionalLight();
-        List<SpotLight> Spotlights = new List<SpotLight>();
-        List<PointLight> Pointlights = new List<PointLight>();
+        static DirectionalLight EnvironmentLight = new DirectionalLight();
+        static List<SpotLight> Spotlights = new List<SpotLight>();
+        static List<PointLight> Pointlights = new List<PointLight>();
 
-        public LightingTechnique()
-        {
-            this.Program = 0;
-        }
-
-        public override bool Init()
+        public static bool Init()
         {
             lightLocations = new LightLocations();
 
@@ -119,128 +103,50 @@ namespace Two_and_a_Half_Dimensions
                 spotlightLocations[i].Texture = GL.GetUniformLocation(prog, beginning + ".SpotlightTexture");
             }
 
-            this.Program = prog;
+            Program = prog;
 
             return true;
         }
 
-        //lmao
-        Entity.ent_car car;
-        Entity.BaseEntity fire;
-        private EventArgs ev =  new EventArgs();
-        public override void Render()
+        public static void Render()
         {
-            GL.UseProgram(this.Program);
-            this.SetEyeWorldPos(View.Position);
+            GL.UseProgram(Program);
+            SetEyeWorldPos(View.Position);
 
             //Clear the lights for this frame
             Pointlights.Clear(); 
             Spotlights.Clear();
 
             if (SetLights == null) return; //don't bother setting the lights if no one is out there
-            SetLights(this, ev);
+            SetLights();
 
             //Now that we have a list of all the lights to render this frame, friggin set em
             SetPointLights(Pointlights.ToArray());
             SetSpotlights(Spotlights.ToArray());
             SetDirectionalLight(EnvironmentLight);
-            /*
-            //TEMPORARY!!
-            if (car == null)
-            {
-                Entity.BaseEntity[] ents = Entity.EntManager.GetByType<Entity.Car>();
-                if (ents.Length > 0)
-                {
-                    car = (Entity.Car)ents[0];
-                }
-            }
-
-            if (fire == null)
-            {
-                Entity.BaseEntity[] ents = Entity.EntManager.GetByName("Fire");
-                if (ents.Length > 0)
-                {
-                    fire = ents[0];
-                }
-            }
-
-            if (true) { return; }
-            DayNightThink();
-
-            DirectionalLight light = new DirectionalLight();
-            light.Color = current;// new Vector3(0.133f, 0.149f, 0.176f);
-            light.AmbientIntensity = 0.4f;
-            light.DiffuseIntensity = 1.00f;
-            light.Direction = angle; // new Vector3(0.661814f, -0.6181439f, -0.4251322f);
-            this.SetDirectionalLight(light);
-
-            if (fire != null)
-            {
-                PointLight[] pl = new PointLight[1];
-                pl[0].AmbientIntensity = 0.4f;
-                pl[0].DiffuseIntensity = 0.85f;
-                pl[0].Color = new Vector3(1.0f, 0.5f, 0.0f);
-                pl[0].Position = fire.Position;
-                pl[0].Linear = 0.1f;
-                this.SetPointLights(pl);
-            }
-            
-            pl[1].AmbientIntensity = 0.4f;
-            pl[1].DiffuseIntensity = 0.95f;
-            pl[1].Color = new Vector3(0.0f, 0.5f, 1.0f);
-            pl[1].Position = new Vector3(190, 300, 0);
-            pl[1].Constant = 4.0f;
-            
-
-            if (car != null)
-            {
-                float x = (float)Math.Cos(car.Angle.Z);
-                float y = (float)Math.Sin(car.Angle.Z);
-
-                SpotLight[] sl = new SpotLight[2];
-                sl[0].AmbientIntensity = 0.4f;
-                sl[0].DiffuseIntensity = 0.9f;
-                sl[0].Color = new Vector3(1.0f, 1.0f, 0.6f);
-                sl[0].Position = car.Position + new Vector3(x * 3.0f, y * 3.0f, -1.5f);
-                sl[0].Direction = new Vector3(x, y - 0.5f, 0);
-                sl[0].Linear = 0.1f;
-                sl[0].Cutoff = 40.0f;
-
-                sl[1].AmbientIntensity = 0.4f;
-                sl[1].DiffuseIntensity = 0.9f;
-                sl[1].Color = new Vector3(1.0f, 1.0f, 1.0f);
-                sl[1].Position = new Vector3(88.94199f, 23.27345f, 5.085441f);
-                sl[1].Direction = new Vector3(0.661814f, -0.6181439f, -0.4251322f);
-                sl[1].Linear = 0.1f;
-                sl[1].Cutoff = 40.0f;
-
-
-                this.SetSpotlights(sl);
-            }
-             * */
         }
 
-        public void AddPointLight(PointLight pl)
+        public static void AddPointLight(PointLight pl)
         {
             Pointlights.Add(pl);
         }
 
-        public void AddSpotLight(SpotLight sl)
+        public static void AddSpotLight(SpotLight sl)
         {
             Spotlights.Add(sl);
         }
 
-        public void SetEnvironmentLight( DirectionalLight light )
+        public static void SetEnvironmentLight(DirectionalLight light)
         {
             EnvironmentLight = light;
         }
 
-        Vector3 day = new Vector3(1.0f, 1.0f, 0.862f);
-        Vector3 dusk = new Vector3(1.0f, 0.2353f, 0.2353f);
-        Vector3 night = new Vector3(0.133f, 0.149f, 0.176f) * 4;
-        Vector3 current = new Vector3();
-        public Vector3 angle = new Vector3();
-        private void DayNightThink()
+        static Vector3 day = new Vector3(1.0f, 1.0f, 0.862f);
+        static Vector3 dusk = new Vector3(1.0f, 0.2353f, 0.2353f);
+        static Vector3 night = new Vector3(0.133f, 0.149f, 0.176f) * 4;
+        static Vector3 current = new Vector3();
+        public static Vector3 angle = new Vector3();
+        private static void DayNightThink()
         {
             float time = (float)Math.Sin(Utilities.Time / 10);
             if (time > 0)
@@ -256,24 +162,24 @@ namespace Two_and_a_Half_Dimensions
             
         }
 
-        private Vector3 ApproachVector(Vector3 vec1, Vector3 vec2, float percent)
+        private static Vector3 ApproachVector(Vector3 vec1, Vector3 vec2, float percent)
         {
             return new Vector3(Approach(vec1.X, vec2.X, percent),
                 Approach(vec1.Y, vec2.Y, percent),
                 Approach(vec1.Z, vec2.Z, percent));
         }
 
-        private float Approach(float start, float end, float percent)
+        private static float Approach(float start, float end, float percent)
         {
             return start + ((end - start) * percent);
         }
 
-        public void SetEyeWorldPos(Vector3 pos)
+        public static void SetEyeWorldPos(Vector3 pos)
         {
-            GL.Uniform3(this.eyeWorldPosLocation, pos.X, pos.Y, pos.Z);
+            GL.Uniform3(eyeWorldPosLocation, pos.X, pos.Y, pos.Z);
         }
 
-        public void SetShadowTexture(int tex)
+        public static void SetShadowTexture(int tex)
         {
             //GL.ActiveTexture(TextureUnit.Texture2);
             //GL.BindTexture(TextureTarget.Texture2D, tex);
@@ -281,11 +187,11 @@ namespace Two_and_a_Half_Dimensions
             //GL.ActiveTexture(TextureUnit.Texture0);
         }
 
-        public void SetTextureUnit(int unit )
+        public static void SetTextureUnit(int unit)
         {
         }
 
-        private void SetDirectionalLight(DirectionalLight Light)
+        private static void SetDirectionalLight(DirectionalLight Light)
         {
             GL.Uniform3(lightLocations.Color, Light.Color.X, Light.Color.Y, Light.Color.Z);
             GL.Uniform1(lightLocations.AmbientIntensity, Light.AmbientIntensity);
@@ -296,7 +202,7 @@ namespace Two_and_a_Half_Dimensions
         }
 
 
-        private void SetPointLights(PointLight[] pLights)
+        private static void SetPointLights(PointLight[] pLights)
         {
             GL.Uniform1(numPointLightsLocation, pLights.Length);
 
@@ -312,7 +218,7 @@ namespace Two_and_a_Half_Dimensions
             }
         }
 
-        private void SetSpotlights(SpotLight[] pLights)
+        private static void SetSpotlights(SpotLight[] pLights)
         {
             GL.Uniform1(numSpotLightsLocation, pLights.Length);
 
@@ -335,67 +241,69 @@ namespace Two_and_a_Half_Dimensions
             }
         }
 
-        public void SetMatSpecularIntensity(float Intensity)
+        public static void SetMatSpecularIntensity(float Intensity)
         {
             GL.Uniform1(matSpecularIntensityLocation, Intensity);
         }
 
-        public void SetMatSpecularPower(float Power)
+        public static void SetMatSpecularPower(float Power)
         {
             GL.Uniform1(matSpecularPowerLocation, Power);
         }
 
-        private double ToRadian(double deg)
+        private static double ToRadian(double deg)
         {
             return (Math.PI / 180) * deg;
         }
     }
-    class SkyboxTechnique : Technique
+    public class SkyboxTechnique : Technique
     {
-        Mesh skymodel;
+        new public static int Program = 0; //Override
 
-        int v3CameraPosLocation;
-        int v3LightPosLocation;
-        int v3InvWavelengthLocation;
-        int fCameraHeightLocation;
-        int fCameraHeight2Location;
-        int fOuterRadiusLocation;
-        int fOuterRadius2Location;
-        int fInnerRadiusLocation;
-        int fInnerRadius2Location;
-        int fKrESunLocation;
-        int fKmESunLocation;
-        int fKr4PILocation;
-        int fKm4PILocation;
-        int fScaleLocation;
-        int fScaleDepthLocation;
-        int fScaleOverScaleDepthLocation;
+        static Mesh skymodel;
 
-        int gLocation;
-        int g2Location;
+        static int v3CameraPosLocation;
+        static int v3LightPosLocation;
+        static int v3InvWavelengthLocation;
+        static int fCameraHeightLocation;
+        static int fCameraHeight2Location;
+        static int fOuterRadiusLocation;
+        static int fOuterRadius2Location;
+        static int fInnerRadiusLocation;
+        static int fInnerRadius2Location;
+        static int fKrESunLocation;
+        static int fKmESunLocation;
+        static int fKr4PILocation;
+        static int fKm4PILocation;
+        static int fScaleLocation;
+        static int fScaleDepthLocation;
+        static int fScaleOverScaleDepthLocation;
+
+        static int gLocation;
+        static int g2Location;
 
 
 
 
-        float[] fWavelength = new float[3];
-        float[] fWavelength4 = new float[3];
+        static float[] fWavelength = new float[3];
+        static float[] fWavelength4 = new float[3];
 
-        int nSamples = 3;		// Number of sample rays to use in integral equation
-	    float Kr = 0.0025f;		// Rayleigh scattering constant
-        float Kr4PI;
-	    float Km = 0.0010f;		// Mie scattering constant
-        float Km4PI;
-	    float ESun = 20.0f;		// Sun brightness constant
-	    float g = -0.990f;		// The Mie phase asymmetry factor
-        float fInnerRadius = 10.0f;
-        float fOuterRadius = 10.25f;
-        float fScale;
-        float fRayleighScaleDepth = 0.25f;
-	    float fMieScaleDepth = 0.1f;
-        Vector3 vLight = new Vector3( 200, 100, -5);
-        Vector3 v3LightDirection;
+        static int nSamples = 3;		// Number of sample rays to use in integral equation
+        static float Kr = 0.0025f;		// Rayleigh scattering constant
+        static float Kr4PI;
+        static float Km = 0.0010f;		// Mie scattering constant
+        static float Km4PI;
+        static float ESun = 20.0f;		// Sun brightness constant
+        static float g = -0.990f;		// The Mie phase asymmetry factor
+        static float fInnerRadius = 10.0f;
+        static float fOuterRadius = 10.25f;
+        static float fScale;
+        static float fRayleighScaleDepth = 0.25f;
+        static float fMieScaleDepth = 0.1f;
+        static Vector3 vLight = new Vector3(200, 100, -5);
+        static Vector3 v3LightDirection;
 
-        public override bool Init()
+        public static bool Init()
         {
             fWavelength[0] = 0.650f;		// 650 nm for red
             fWavelength[1] = 0.570f;		// 570 nm for green
@@ -436,12 +344,12 @@ namespace Two_and_a_Half_Dimensions
             gLocation = GL.GetUniformLocation(prog, "g");
             g2Location = GL.GetUniformLocation(prog, "g2");
 
-            this.Program = prog;
+            Program = prog;
 
             return true;
         }
 
-        public override void Render()
+        public static void Render()
         {
             setUniforms();
 
@@ -457,10 +365,10 @@ namespace Two_and_a_Half_Dimensions
             GL.CullFace(CullFaceMode.Back);
             GL.DepthFunc(DepthFunction.Less);
         }
-        
-        private void setUniforms()
+
+        private static void setUniforms()
         {
-            GL.UseProgram(this.Program);
+            GL.UseProgram(Program);
 
             GL.Uniform3(v3CameraPosLocation, View.Player.Position);
             GL.Uniform3(v3LightPosLocation, v3LightDirection);
@@ -485,26 +393,26 @@ namespace Two_and_a_Half_Dimensions
 
         }
     }
-    class ShadowTechnique : Technique
+    public class ShadowTechnique : Technique
     {
         const int MAX_SHADOWCASTERS = 2;
         public static bool Enabled = true;
+        new public static int Program = 0; //Override
 
-        public delegate void SetLightsHandler(object sender, EventArgs e);
-        public event SetLightsHandler SetLights;
+        public static event Action SetLights;
 
-        public List<ShadowInfo> _lights = new List<ShadowInfo>();
+        public static List<ShadowInfo> _lights = new List<ShadowInfo>();
 
-        int shadowSamplerLocation;
-        int shadowMapLocation;
-        int shadowTextureLocation;
-        int numShadowCastersLocation;
+        static int shadowSamplerLocation;
+        static int shadowMapLocation;
+        static int shadowTextureLocation;
+        static int numShadowCastersLocation;
 
-        ShadowCasterLocations[] shadowcasterLocations = new ShadowCasterLocations[MAX_SHADOWCASTERS];
+        static ShadowCasterLocations[] shadowcasterLocations = new ShadowCasterLocations[MAX_SHADOWCASTERS];
 
-        public int lightWVPLocation;
+        public static int lightWVPLocation;
 
-        public override bool Init()
+        public static bool Init()
         {
             int prog = Resource.GetProgram("default_lighting");
             shadowSamplerLocation = GL.GetUniformLocation(prog, "sampler_shadow");
@@ -539,25 +447,24 @@ namespace Two_and_a_Half_Dimensions
                 return false;
             }
 
-            this.Program = prog;
+            Program = prog;
 
             return true;
 
         }
 
-        EventArgs ev = new EventArgs();
-        public override void Render()
+        public static void Render()
         {
             ShadowInfo info = GetShadowInfo();
 
-            GL.UseProgram(this.Program);
+            GL.UseProgram(Program);
             Matrix4 mat = info.matrix;
             GL.UniformMatrix4(lightWVPLocation, false, ref mat);
             GL.Uniform1(shadowTextureLocation, info.texture);
 
         }
 
-        public ShadowInfo GetShadowInfo()
+        public static ShadowInfo GetShadowInfo()
         {
             if (_lights.Count > 0)
             {
@@ -571,30 +478,30 @@ namespace Two_and_a_Half_Dimensions
         /// <summary>
         /// Send out an event to set the positions of all the places we'll render lights from
         /// </summary>
-        public void UpdateLightPositions()
+        public static void UpdateLightPositions()
         {
             _lights.Clear();
 
             if (SetLights == null) return; //don't bother setting the lights if no one is out there
-            SetLights(this, ev);
+            SetLights();
 
             //set the information to the shader
             SetShadowedSpotlights(_lights.ToArray());
         }
 
-        public void AddLightsource(ShadowInfo info)
+        public static void AddLightsource(ShadowInfo info)
         {
             _lights.Add(info);
         }
 
-        public void AddLightPositionDirection(Vector3 Position, Vector3 Direction)
+        public static void AddLightPositionDirection(Vector3 Position, Vector3 Direction)
         {
 
         }
 
-        public void SetLightInfo( ShadowInfo info )
+        public static void SetLightInfo(ShadowInfo info)
         {
-            GL.UseProgram(this.Program);
+            GL.UseProgram(Program);
             Matrix4 mat = info.matrix;
             GL.UniformMatrix4(lightWVPLocation, false, ref mat);
 
@@ -602,9 +509,9 @@ namespace Two_and_a_Half_Dimensions
             GL.BindTexture(TextureTarget.Texture2D, info.texture);
         }
 
-        private void SetShadowedSpotlights(ShadowInfo[] pLights)
+        private static void SetShadowedSpotlights(ShadowInfo[] pLights)
         {
-            GL.UseProgram(this.Program);
+            GL.UseProgram(Program);
             GL.Uniform1(numShadowCastersLocation, pLights.Length);
 
             for (int i = 0; i < pLights.Length && i < MAX_SHADOWCASTERS; i++)
@@ -625,7 +532,7 @@ namespace Two_and_a_Half_Dimensions
             }
         }
 
-        private double ToRadian(double deg)
+        private static double ToRadian(double deg)
         {
             return (Math.PI / 180) * deg;
         }
@@ -633,7 +540,7 @@ namespace Two_and_a_Half_Dimensions
 
     #region technique structures
 
-    struct DirectionalLight
+    public struct DirectionalLight
     {
         public Vector3 Color;
         public float AmbientIntensity;
@@ -642,7 +549,7 @@ namespace Two_and_a_Half_Dimensions
         public Vector3 Direction;
     }
 
-    struct PointLight
+    public struct PointLight
     {
         public Vector3 Color;
         public float AmbientIntensity;
@@ -655,7 +562,7 @@ namespace Two_and_a_Half_Dimensions
         public float Exp;
     }
 
-    struct SpotLight
+    public struct SpotLight
     {
         public Vector3 Color;
         public float AmbientIntensity;
@@ -673,7 +580,7 @@ namespace Two_and_a_Half_Dimensions
         public int Texture;
     }
 
-    struct ShadowInfo
+    public struct ShadowInfo
     {
         public Vector3 Color;
         public float AmbientIntensity;
@@ -758,14 +665,14 @@ namespace Two_and_a_Half_Dimensions
         }
     }
 
-    struct LightLocations
+    public struct LightLocations
     {
         public int Color;
         public int AmbientIntensity;
         public int DiffuseIntensity;
         public int Direction;
     }
-    struct PointLightLocations
+    public struct PointLightLocations
     {
         public int Color;
         public int AmbientIntensity;
@@ -776,7 +683,7 @@ namespace Two_and_a_Half_Dimensions
         public int Linear;
         public int Exp;
     }
-    struct SpotLightLocations
+    public struct SpotLightLocations
     {
         public int Color;
         public int AmbientIntensity;
@@ -794,7 +701,7 @@ namespace Two_and_a_Half_Dimensions
         public int Texture;
     }
 
-    struct ShadowCasterLocations
+    public struct ShadowCasterLocations
     {
         public int Color;
         public int AmbientIntensity;

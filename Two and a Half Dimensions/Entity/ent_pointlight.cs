@@ -10,9 +10,9 @@ using FarseerPhysics.Common;
 using FarseerPhysics.Collision;
 using FarseerPhysics.Dynamics;
 
-namespace Two_and_a_Half_Dimensions.Entity
+namespace OlegEngine.Entity
 {
-    class ent_pointlight : BaseEntity 
+    public class ent_pointlight : BaseEntity 
     {
         public bool Enabled { get; set; }
         public float Cutoff { get; set; }
@@ -24,20 +24,15 @@ namespace Two_and_a_Half_Dimensions.Entity
         private PointLight light = new PointLight();
         public override void Init()
         {
-            Utilities.window.effect.SetLights += new LightingTechnique.SetLightsHandler(effect_SetLights);
+            LightingTechnique.SetLights += new Action(LightingTechnique_SetLights);
+
             AmbientIntensity = 0.2f;
             DiffuseIntensity = 0.7f;
 
             this.Enabled = true;
         }
 
-        public override void Remove()
-        {
-            base.Remove();
-            Utilities.window.effect.SetLights -= effect_SetLights;
-        }
-
-        void effect_SetLights(object sender, EventArgs e)
+        void LightingTechnique_SetLights()
         {
             if (this.Enabled)
             {
@@ -48,8 +43,14 @@ namespace Two_and_a_Half_Dimensions.Entity
                 light.Constant = Constant;
                 light.Position = Position;
 
-                Utilities.window.effect.AddPointLight(light);
+                LightingTechnique.AddPointLight(light);
             }
+        }
+
+        public override void Remove()
+        {
+            base.Remove();
+            LightingTechnique.SetLights -= LightingTechnique_SetLights;
         }
     }
 }

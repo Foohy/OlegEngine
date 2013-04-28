@@ -10,9 +10,9 @@ using FarseerPhysics.Common;
 using FarseerPhysics.Collision;
 using FarseerPhysics.Dynamics;
 
-namespace Two_and_a_Half_Dimensions.Entity
+namespace OlegEngine.Entity
 {
-    class ent_spotlight : BaseEntity 
+    public class ent_spotlight : BaseEntity 
     {
         public bool Enabled { get; set; }
         public bool ExpensiveShadows { get; set; }
@@ -31,7 +31,8 @@ namespace Two_and_a_Half_Dimensions.Entity
             cheapLight = new SpotLight();
             cheapLight.Linear = 0.01f;
 
-            Utilities.window.shadows.SetLights += new ShadowTechnique.SetLightsHandler(shadows_SetLights);
+            ShadowTechnique.SetLights += new Action(ShadowTechnique_SetLights);
+
             AmbientIntensity = 0.0f;
             DiffuseIntensity = 1.0f;
 
@@ -39,15 +40,9 @@ namespace Two_and_a_Half_Dimensions.Entity
             this.ExpensiveShadows = true;
         }
 
-        public override void Remove()
+        void ShadowTechnique_SetLights()
         {
-            base.Remove();
-            Utilities.window.effect.SetLights -= shadows_SetLights;
-        }
-
-        void shadows_SetLights(object sender, EventArgs e)
-        {
-            if (this.Enabled )
+            if (this.Enabled)
             {
                 shadowInfo.AmbientIntensity = 0.0f;
                 shadowInfo.DiffuseIntensity = 1.0f;
@@ -58,8 +53,14 @@ namespace Two_and_a_Half_Dimensions.Entity
                 shadowInfo.Position = Position;
                 shadowInfo.Cheap = !this.ExpensiveShadows;
 
-                Utilities.window.shadows.AddLightsource(shadowInfo);
+                ShadowTechnique.AddLightsource(shadowInfo);
             }
+        }
+
+        public override void Remove()
+        {
+            base.Remove();
+            ShadowTechnique.SetLights -= ShadowTechnique_SetLights;
         }
     }
 }

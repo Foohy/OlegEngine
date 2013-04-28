@@ -10,9 +10,9 @@ using FarseerPhysics.Common;
 using FarseerPhysics.Collision;
 using FarseerPhysics.Dynamics;
 
-namespace Two_and_a_Half_Dimensions.Entity
+namespace OlegEngine.Entity
 {
-    class ent_static : BaseEntity 
+    public class ent_static : BaseEntity 
     {
         public override void Draw()
         {

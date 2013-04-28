@@ -6,9 +6,9 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Two_and_a_Half_Dimensions.GUI
+namespace OlegEngine.GUI
 {
-    class Window : Panel
+    public class Window : Panel
     {
         private enum ResizeMode
         {

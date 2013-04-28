@@ -10,9 +10,9 @@ using FarseerPhysics.Common;
 using FarseerPhysics.Collision;
 using FarseerPhysics.Dynamics;
 
-namespace Two_and_a_Half_Dimensions.Entity
+namespace OlegEngine.Entity
 {
-    class BaseEntity
+    public class BaseEntity
     {
         public enum RenderModes
         {

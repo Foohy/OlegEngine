@@ -5,9 +5,9 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Two_and_a_Half_Dimensions
+namespace OlegEngine
 {
-    class Frustum
+    public class Frustum
     {
         public float Angle { get; private set; }
         public float Ratio { get; private set; }
@@ -30,7 +30,7 @@ namespace Two_and_a_Half_Dimensions
         public Vector3 fbl { get; private set; }
         public Vector3 fbr { get; private set; }
 
-        public Plane[] pl = new Plane[6];
+        Plane[] pl = new Plane[6];
 
         public enum FrustumState
         {

@@ -11,9 +11,9 @@ using FarseerPhysics.Collision;
 using FarseerPhysics.Controllers;
 using FarseerPhysics.Dynamics;
 
-namespace Two_and_a_Half_Dimensions.Entity
+namespace OlegEngine.Entity
 {
-    class EntManager
+    public class EntManager
     {
         public static bool Paused { get; private set; }
 
@@ -26,10 +26,6 @@ namespace Two_and_a_Half_Dimensions.Entity
 
             //Create a new instance
             T ent = new T();
-            
-            //If it was spawned during level loading, set it as world spawn
-            if (Levels.LevelManager.IsLoading)
-                ent.WorldSpawn = true;
 
             //Create a unique name
             ent.Name = ent.GetType().Name + "[" + _nmEnts.ToString() + "]";
@@ -87,7 +83,7 @@ namespace Two_and_a_Half_Dimensions.Entity
         {
             if (ent.Physics == null ) return;
 
-            Levels.LevelManager.physWorld.RemoveBody(ent.Physics.Body);
+            Utilities.PhysicsWorld.RemoveBody(ent.Physics.Body);
         }
 
         #region utility functions

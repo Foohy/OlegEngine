@@ -4,36 +4,28 @@ using System.Linq;
 using System.Text;
 using OpenTK;
 
-namespace Two_and_a_Half_Dimensions
+namespace OlegEngine
 {
-    class View
+    public class View
     {
         public static Vector3 Position { get; private set; }
         public static Vector3 Angles { get; set; }
         public static Vector3 ViewNormal { get; set; }
         public static Matrix4 CameraMatrix { get; set; }
 
-        public static Entity.ent_player Player { get; private set; }
+        public static Entity.BaseEntity Player { get; private set; }
 
-        public class CalcViewEventArgs : EventArgs { Entity.ent_player ply; Vector3 Pos; Vector3 Ang; }
+        public class CalcViewEventArgs : EventArgs { Entity.BaseEntity ply; Vector3 Pos; Vector3 Ang; }
         public static event Action CalcView;
 
-        public static void Init()
-        {
-            Two_and_a_Half_Dimensions.Levels.LevelManager.PlayerSpawn += new Action<Entity.ent_player>(LevelManager_PlayerSpawn);
-        }
-
-        static void LevelManager_PlayerSpawn(Entity.ent_player ply)
-        {
-            SetLocalPlayer(ply);
-        }
+        private static System.Reflection.MethodInfo PlyCalcView;
 
         public static void Think(FrameEventArgs e)
         {
-            if (Player != null)
+            if (Player != null && PlyCalcView != null )
             {
                 //Run calcview on the player that will control the normal camera
-                Player.CalcView();
+                PlyCalcView.Invoke(Player, null);
             }
 
             //Override the normal camera
@@ -65,14 +57,26 @@ namespace Two_and_a_Half_Dimensions
             Angles = Ang;
         }
 
-        public static Entity.ent_player GetLocalPlayer()
+        public static Entity.BaseEntity GetLocalPlayer()
         {
             return Player;
         }
 
-        public static void SetLocalPlayer( Entity.ent_player ply )
+        public static void SetLocalPlayer( Entity.BaseEntity ply )
         {
-            Player = ply;
+            System.Reflection.MethodInfo inf = GetMethod(ply, "CalcView");
+
+            if (inf != null)
+            {
+                Player = ply;
+                PlyCalcView = inf;
+            }
+        }
+
+        private static System.Reflection.MethodInfo GetMethod(object obj, string methodname)
+        {
+            var type = obj.GetType();
+            return type.GetMethod(methodname);
         }
 
     }

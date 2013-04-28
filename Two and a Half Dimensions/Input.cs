@@ -6,9 +6,9 @@ using System.Text;
 using OpenTK;
 using OpenTK.Input;
 
-namespace Two_and_a_Half_Dimensions
+namespace OlegEngine
 {
-    class Input
+    public class Input
     {
         public static bool LockMouse { get; set; }
         public static int deltaX { get; set; }
@@ -19,7 +19,7 @@ namespace Two_and_a_Half_Dimensions
         /// <summary>
         /// Update input, including getting mouse deltas/etc.
         /// </summary>
-        public static void Think(Program window, FrameEventArgs e)
+        public static void Think(GameWindow window, FrameEventArgs e)
         {
             current = Mouse.GetState();
 

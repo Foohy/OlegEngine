@@ -9,9 +9,9 @@ using System.Windows.Media.Imaging;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Two_and_a_Half_Dimensions.GUI
+namespace OlegEngine.GUI
 {
-    class GUIManager
+    public class GUIManager
     {
         public delegate void OnDrawHUD(EventArgs e);
         public static event OnDrawHUD PostDrawHUD;
@@ -193,7 +193,7 @@ namespace Two_and_a_Half_Dimensions.GUI
         }
     }
 
-    class Surface
+    public class Surface
     {
         static Mesh Square;
         static Matrix4 TranslateMatrix = Matrix4.Identity;

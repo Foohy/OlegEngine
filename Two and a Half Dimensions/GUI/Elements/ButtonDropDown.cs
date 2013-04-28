@@ -7,9 +7,9 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
-namespace Two_and_a_Half_Dimensions.GUI
+namespace OlegEngine.GUI
 {
-    class ButtonDropDown : Panel
+    public class ButtonDropDown : Panel
     {
         public enum State
         {

@@ -7,9 +7,9 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
-namespace Two_and_a_Half_Dimensions.GUI
+namespace OlegEngine.GUI
 {
-    class Panel
+    public class Panel
     {
         public enum DockStyle
         {

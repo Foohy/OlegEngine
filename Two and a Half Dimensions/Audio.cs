@@ -7,9 +7,9 @@ using OpenTK;
 
 using Un4seen.Bass;
 
-namespace Two_and_a_Half_Dimensions
+namespace OlegEngine
 {
-    class Audio
+    public class Audio
     {
         public int Handle { get; private set; }
         public string Filename { get; private set; }
@@ -232,7 +232,7 @@ namespace Two_and_a_Half_Dimensions
         #endregion
     }
 
-    class CachedAudio
+    public class CachedAudio
     {
         public string Name { get; set; }
         public IntPtr bufferPointer { get; set; }

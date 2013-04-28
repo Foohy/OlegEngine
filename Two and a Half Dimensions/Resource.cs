@@ -6,9 +6,9 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Two_and_a_Half_Dimensions
+namespace OlegEngine
 {
-    class Resource
+    public class Resource
     {
         public const string ModelDir = "Resources/Models/";
         public const string TextureDir = "Resources/Materials/";
@@ -61,6 +61,7 @@ namespace Two_and_a_Half_Dimensions
 
             return Textures[filename];
         }
+        /*
         public static VBO GetModel(string filename)
         {
             if (!Models.ContainsKey(filename))
@@ -78,6 +79,7 @@ namespace Two_and_a_Half_Dimensions
 
             return Models[filename];
         }
+         * */
         public static Mesh GetMesh(string filename)
         {
             if (!Meshes.ContainsKey(filename) )

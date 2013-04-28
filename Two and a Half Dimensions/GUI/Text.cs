@@ -8,9 +8,9 @@ using System.IO;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Two_and_a_Half_Dimensions.GUI
+namespace OlegEngine.GUI
 {
-    class Text
+    public class Text
     {
         public struct CharDescriptor
         {

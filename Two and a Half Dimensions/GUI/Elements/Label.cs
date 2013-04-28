@@ -5,9 +5,9 @@ using System.Text;
 
 using OpenTK;
 
-namespace Two_and_a_Half_Dimensions.GUI
+namespace OlegEngine.GUI
 {
-    class Label : Panel
+    public class Label : Panel
     {
         public enum TextAlign
         {

@@ -6,13 +6,13 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Two_and_a_Half_Dimensions
+namespace OlegEngine
 {
-    class Graphics
+    public class Graphics
     {
         public static Frustum ViewFrustum;
 
-        public static bool ShouldDrawBoundingBoxes = false;
+        public static bool ShouldDrawBoundingBoxes = true;
         public static bool ShouldDrawBoundingSpheres = false;
         public static bool ShouldDrawNormals = false;
         public static bool ShouldDrawFrustum = false;
@@ -332,7 +332,7 @@ namespace Two_and_a_Half_Dimensions
         }
     }
 
-    class Mesh
+    public class Mesh
     {
         public BeginMode DrawMode = BeginMode.Triangles;
         public BufferUsageHint UsageHint = BufferUsageHint.StaticDraw;
@@ -790,7 +790,7 @@ namespace Two_and_a_Half_Dimensions
         }
     }
 
-    class MeshGroup : ICollection<Mesh>
+    public class MeshGroup : ICollection<Mesh>
     {
         public Vector3 Scale { get; set; }
         public Vector3 Angle { get; set; }
@@ -887,7 +887,7 @@ namespace Two_and_a_Half_Dimensions
         }
     }
 
-    class Material
+    public class Material
     {
         public MaterialProperties Properties = new MaterialProperties();
         public string Name { get; private set; }
@@ -1099,7 +1099,7 @@ namespace Two_and_a_Half_Dimensions
         }
     }
 
-    class MaterialProperties
+    public class MaterialProperties
     {
         public int ShaderProgram;
         public int BaseTexture;
@@ -1119,7 +1119,7 @@ namespace Two_and_a_Half_Dimensions
         }
     }
 
-    class FBO
+    public class FBO
     {
         private int fbo = 0;
         private int _shadowMap = 0;
