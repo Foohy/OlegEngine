@@ -68,7 +68,7 @@ namespace Gravity_Car.Levels
             */
             ent_pointlight pointlight = (ent_pointlight)EntManager.Create<ent_pointlight>();
             pointlight.Spawn();
-            pointlight.AmbientIntensity = 0.4f;
+            pointlight.AmbientIntensity = 0.40f;
             pointlight.DiffuseIntensity = 0.85f;
             pointlight.Color = new Vector3(1.0f, 0.5f, 0.0f);
             pointlight.SetPos(OlegPos);

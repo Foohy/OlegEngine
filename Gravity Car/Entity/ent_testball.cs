@@ -21,7 +21,7 @@ namespace Gravity_Car.Entity
         public float radius = 1.0f;
         public override void Init()
         {
-            this.Model = Resource.GetMesh("ball.obj");
+            this.Model = Resource.GetMesh("debug/ball.obj");
 
             this.Mat = Resource.GetMaterial("levels/dirt");
             this.Mat.Properties.SpecularPower = 32.0f;

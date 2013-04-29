@@ -62,7 +62,7 @@ namespace OlegEngine.Entity
 
         public virtual void Init()
         {
-            this.Model = Resource.GetMesh("ball.obj");
+            this.Model = Resource.GetMesh("debug/ball.obj");
             this.Mat = Utilities.ErrorMat;
         }
 

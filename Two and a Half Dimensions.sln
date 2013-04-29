@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlegEngine", "Two and a Hal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gravity Car", "Gravity Car\Gravity Car.csproj", "{97CCD20B-5F84-4F9B-98AE-62EC0BA000E3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Balance", "Balance\Balance.csproj", "{0BC4E103-BBBD-4171-A308-9F679468310C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -19,6 +21,10 @@ Global
 		{97CCD20B-5F84-4F9B-98AE-62EC0BA000E3}.Debug|x86.Build.0 = Debug|x86
 		{97CCD20B-5F84-4F9B-98AE-62EC0BA000E3}.Release|x86.ActiveCfg = Release|x86
 		{97CCD20B-5F84-4F9B-98AE-62EC0BA000E3}.Release|x86.Build.0 = Release|x86
+		{0BC4E103-BBBD-4171-A308-9F679468310C}.Debug|x86.ActiveCfg = Debug|x86
+		{0BC4E103-BBBD-4171-A308-9F679468310C}.Debug|x86.Build.0 = Debug|x86
+		{0BC4E103-BBBD-4171-A308-9F679468310C}.Release|x86.ActiveCfg = Release|x86
+		{0BC4E103-BBBD-4171-A308-9F679468310C}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

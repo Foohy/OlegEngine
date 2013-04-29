@@ -12,7 +12,7 @@ namespace OlegEngine
     {
         public static Frustum ViewFrustum;
 
-        public static bool ShouldDrawBoundingBoxes = true;
+        public static bool ShouldDrawBoundingBoxes = false;
         public static bool ShouldDrawBoundingSpheres = false;
         public static bool ShouldDrawNormals = false;
         public static bool ShouldDrawFrustum = false;
@@ -28,7 +28,7 @@ namespace OlegEngine
             box.mat = dbgWhite;
             box.ShouldDrawDebugInfo = false;
 
-            sphere = Resource.GetMesh("ball.obj");
+            sphere = Resource.GetMesh("debug/ball.obj");
             sphere.mat = dbgWhite;
             sphere.ShouldDrawDebugInfo = false;
 
@@ -650,6 +650,15 @@ namespace OlegEngine
 
         private void loadMesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] lsUV = null )
         {
+            if (verts == null || elements == null || tangents == null)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine("ERROR LOADING MESH: Vertices: {0}, Elements: {1}, Tangents: {2}", verts, elements, tangents);
+                Console.ResetColor();
+
+                return;
+            }
+
             GL.GenVertexArrays(1, out VAO);
             GL.BindVertexArray(VAO);
 
