@@ -41,7 +41,7 @@ namespace OlegEngine
                 init = true;
 
                 //Set the distance for 3D sounds
-                Bass.BASS_Set3DFactors(1.0f, 0.6f, -1f);
+                Bass.BASS_Set3DFactors(1.0f, 0.0f, 1.0f);
                 Bass.BASS_Apply3D(); // apply the change
             }
             catch (Exception ex)
@@ -128,8 +128,10 @@ namespace OlegEngine
         {
             if (View.Player != null)
             {
-                BASS_3DVECTOR pos = new BASS_3DVECTOR(View.Player.Position.X, View.Player.Position.Y, View.Player.Position.Z);
-                Bass.BASS_Set3DPosition(pos, null, null, null );
+                BASS_3DVECTOR pos = new BASS_3DVECTOR(View.Position.X, View.Position.Y, View.Position.Z);
+                BASS_3DVECTOR fwd = new BASS_3DVECTOR(-View.ViewNormal.X, -View.ViewNormal.Y, -View.ViewNormal.Z);
+                BASS_3DVECTOR up = new BASS_3DVECTOR(0, 1, 0);
+                Bass.BASS_Set3DPosition(pos, null, fwd, up );
                 Bass.BASS_Apply3D();
             }
 
