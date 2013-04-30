@@ -129,8 +129,8 @@ namespace OlegEngine
             if (View.Player != null)
             {
                 BASS_3DVECTOR pos = new BASS_3DVECTOR(View.Position.X, View.Position.Y, View.Position.Z);
-                BASS_3DVECTOR fwd = new BASS_3DVECTOR(-View.ViewNormal.X, -View.ViewNormal.Y, -View.ViewNormal.Z);
-                BASS_3DVECTOR up = new BASS_3DVECTOR(0, 1, 0);
+                BASS_3DVECTOR fwd = new BASS_3DVECTOR(View.ViewNormal.X, View.ViewNormal.Y, View.ViewNormal.Z);
+                BASS_3DVECTOR up = new BASS_3DVECTOR(0, -1, 0);
                 Bass.BASS_Set3DPosition(pos, null, fwd, up );
                 Bass.BASS_Apply3D();
             }
