@@ -807,6 +807,12 @@ namespace OlegEngine
             if (num < low) return low;
             return num;
         }
+        public static long Clamp(long num, long high, long low)
+        {
+            if (num > high) return high;
+            if (num < low) return low;
+            return num;
+        }
 
         private static int GenerateErrorTex()
         {

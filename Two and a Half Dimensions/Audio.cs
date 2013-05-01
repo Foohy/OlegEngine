@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 using OpenTK;
 
@@ -19,8 +20,13 @@ namespace OlegEngine
         public float Volume { get; private set; }
         public bool Looped { get; private set; }
 
+        public Int32 StartLoopPosition { get; private set; }
+        public Int32 EndLoopPosition { get; private set; }
+
         private static List<Audio> _lsAudio = new List<Audio>();
         private static Dictionary<string, CachedAudio> _lsPrecached = new Dictionary<string, CachedAudio>();
+        private static SYNCPROC _SyncDel;
+
         //private static Dictionary<Audio, int> musics = new Dictionary<Audio, int>();
         public static bool init = false;
         public Audio( int handle, string filename )
@@ -43,6 +49,7 @@ namespace OlegEngine
                 //Set the distance for 3D sounds
                 Bass.BASS_Set3DFactors(1.0f, 0.0f, 1.0f);
                 Bass.BASS_Apply3D(); // apply the change
+                _SyncDel = new SYNCPROC(SyncThink);
             }
             catch (Exception ex)
             {
@@ -68,7 +75,15 @@ namespace OlegEngine
                 audio.attachedEnt = ent;
                 audio.Looped = Loop;
 
+                if (audio.Looped)
+                {
+                    //Try to load the loop positions from wav files
+                    LoadCuePoints(audio, filename);
+                }
+
                 _lsAudio.Add(audio);
+                //Create a callback so we can control playback looping and stuff
+                Bass.BASS_ChannelSetSync(audio.Handle, BASSSync.BASS_SYNC_END, 0, _SyncDel, IntPtr.Zero);
 
                 return audio;
             }
@@ -137,25 +152,70 @@ namespace OlegEngine
 
             for (int i = 0; i < _lsAudio.Count; i++)
             {
-                if (_lsAudio[i].attachedEnt != null)
+                Audio audio = _lsAudio[i]; 
+                if (audio.attachedEnt != null)
                 {
-                    _lsAudio[i].Set3DPosition(_lsAudio[i].attachedEnt.Position);
+                   audio.Set3DPosition(audio.attachedEnt.Position);
                 }
 
-                if (_lsAudio[i].Handle != 0 && !_lsAudio[i].Looped)
-                {
-                    long seconds = Bass.BASS_ChannelGetPosition(_lsAudio[i].Handle);
-                    long length = Bass.BASS_ChannelGetLength(_lsAudio[i].Handle);
+                long seconds = Bass.BASS_ChannelGetPosition(audio.Handle, BASSMode.BASS_POS_BYTES);
+                long length = Bass.BASS_ChannelGetLength(audio.Handle, BASSMode.BASS_POS_BYTES);
 
+                if (audio.Handle != 0 && !audio.Looped)
+                {
                     if (seconds >= length)
                     {
-                        Bass.BASS_ChannelStop( _lsAudio[i].Handle );
+                        Bass.BASS_ChannelStop(audio.Handle);
                         _lsAudio.RemoveAt(i);
                     }
-                    
+                }
+                else if (audio.StartLoopPosition > 0 && audio.EndLoopPosition > 0 )
+                {
+                    if (seconds > audio.EndLoopPosition)
+                    {
+                        Bass.BASS_ChannelSetPosition(audio.Handle, audio.StartLoopPosition, BASSMode.BASS_POS_BYTES);
+                    }
                 }
             }
         }
+
+        private static Audio GetAudioFromHandle(int handle)
+        {
+            for (int i = 0; i < _lsAudio.Count; i++)
+            {
+                if (_lsAudio[i].Handle == handle) return _lsAudio[i];
+            }
+
+            //Nothing found with that handle
+            return null;
+        }
+
+        //Called when a stream reaches its end
+        private static void SyncThink(int handle, int channel, int data, IntPtr user)
+        {
+            Audio audio = GetAudioFromHandle(channel);
+            if (audio == null) return;
+
+            //If the end cue point wasn't caught in the above think function, set it to the start cue here
+            if (audio.Looped && audio.StartLoopPosition > 0 && audio.EndLoopPosition > 0)
+            {
+                long seconds = Bass.BASS_ChannelGetPosition(audio.Handle, BASSMode.BASS_POS_BYTES);
+                Bass.BASS_ChannelSetPosition(audio.Handle, audio.StartLoopPosition, BASSMode.BASS_POS_BYTES);
+            }
+        }
+
+        private static void LoadCuePoints(Audio audio, string filename)
+        {
+            AudioCueLoader.CueStruct[] cues = AudioCueLoader.LoadCues(filename);
+            if (cues != null)
+            {
+                audio.StartLoopPosition = cues[0].SamplePosition * 2;
+                audio.EndLoopPosition = cues[1].SamplePosition * 2;
+                audio.EndLoopPosition = (int)Utilities.Clamp(audio.EndLoopPosition, Bass.BASS_ChannelGetLength(audio.Handle, BASSMode.BASS_POS_BYTES) - 200, 0L);
+            }
+        }
+
+
 
         #region non-static methods
         public void SetVolume(float volume)
@@ -199,7 +259,7 @@ namespace OlegEngine
             if (_lsAudio.Contains(this) && this.Handle != 0)
             {
                 Un4seen.Bass.BASSActive active = Bass.BASS_ChannelIsActive(this.Handle);
-                return active == BASSActive.BASS_ACTIVE_STOPPED || active == BASSActive.BASS_ACTIVE_PAUSED;
+                return active != BASSActive.BASS_ACTIVE_STOPPED && active != BASSActive.BASS_ACTIVE_PAUSED;
             }
             
             return false;
@@ -232,6 +292,168 @@ namespace OlegEngine
         }
 
         #endregion
+    }
+
+    class AudioCueLoader
+    {
+        public static string StartCueText = "start_cue";
+        public static string EndCueText = "end_cue";
+
+        private static long DataOffset = 0;
+        public struct CueStruct
+        {
+            public string Text;
+            public Int32 SamplePosition;
+            public Int32 SampleOffset;
+
+            public CueStruct(string text, Int32 samplePos, Int32 sampleOffset)
+            {
+                Text = text;
+                SamplePosition = samplePos;
+                SampleOffset = sampleOffset;
+            }
+        }
+        static Dictionary<Int32, CueStruct> lsCuePointIDs;
+        public static CueStruct[] LoadCues(string filename)
+        {
+            lsCuePointIDs = new Dictionary<Int32, CueStruct>();
+            DataOffset = 0;
+            FileStream fs;
+
+            try
+            {
+                fs = new FileStream(filename, FileMode.Open);
+            }
+            catch (Exception e) { Console.WriteLine(e.Message); return null; }
+
+            using (BinaryReader br = new BinaryReader(fs))
+            {
+                string Chunk = GetString(br.ReadBytes(4));
+                Int32 ChunkSize = br.ReadInt32();
+                string Type = GetString(br.ReadBytes(4));
+
+                while (br.BaseStream.Position < br.BaseStream.Length)
+                {
+                    ReadSubChunk(br);
+                }
+            }
+
+            CueStruct[] cues = new CueStruct[2];
+            int CueCount = 0;
+            //Given a list of keys, get the sample positions for start_cue and end_cue
+            foreach (CueStruct cue in lsCuePointIDs.Values)
+            {
+
+                if (cue.Text == StartCueText )
+                {
+                    cues[0] = cue;
+                    CueCount++;
+                }
+
+                if (cue.Text == EndCueText)
+                {
+                    cues[1] = cue;
+                    CueCount++;
+                }
+
+                if (CueCount == 2)
+                {
+                    Console.WriteLine("Valid cues in {0}!", filename);
+                    return cues;
+                }
+            }
+
+            return null;
+        }
+
+        public static void ReadSubChunk(BinaryReader br)
+        {
+            byte[] somebytes = br.ReadBytes(4);
+            string Chunk = GetString(somebytes);
+            Int32 ChunkSize = br.ReadInt32();
+
+            switch (Chunk.ToLower())
+            {
+                case "cue":
+                case "cue ":
+                    ReadCueChunk(br);
+                    break;
+
+                case "labl":
+                    ReadTextLabelChunk(br);
+                    break;
+
+                case "list":
+                    ReadDataListChunk(br);
+                    break;
+
+                case "data":
+                    ReadDataChunk(br, ChunkSize);
+                    break;
+
+                default:
+                    br.ReadBytes(ChunkSize);
+                    break;
+            }
+        }
+
+        public static void ReadCueChunk(BinaryReader br)
+        {
+            Int32 NumPoints = br.ReadInt32();
+            Int32 Size = 4 + (NumPoints * 24);
+
+            for (int i = 0; i < NumPoints; i++)
+            {
+                Int32 ID = br.ReadInt32();
+                Int32 SamplePosition = br.ReadInt32();
+                Int32 DataChunkID = br.ReadInt32();
+                Int32 ChunkStart = br.ReadInt32();
+                Int32 BlockStart = br.ReadInt32();
+                Int32 SampleOffset = br.ReadInt32();
+
+                lsCuePointIDs.Add(ID, new CueStruct("", SamplePosition + 100, SampleOffset + 100));
+            }
+        }
+
+        public static void ReadTextLabelChunk(BinaryReader br)
+        {
+            Int32 CueID = br.ReadInt32();
+            string Text = ReadAscii(br);
+
+            if (lsCuePointIDs.ContainsKey(CueID ))
+            {
+                CueStruct cuestruct= lsCuePointIDs[CueID];
+                cuestruct.Text = Text;
+                lsCuePointIDs[CueID] = cuestruct;
+            }
+        }
+
+        public static void ReadDataChunk(BinaryReader br, Int32 ChunkSize )
+        {
+            DataOffset = br.BaseStream.Position;
+            //We don't actually need to read any data, just take note of when it starts
+            br.ReadBytes(ChunkSize);
+        }
+
+        public static void ReadDataListChunk(BinaryReader br)
+        {
+            string TypeID = GetString(br.ReadBytes(4));
+            ReadSubChunk(br);
+        }
+
+        static string GetString(byte[] bytes)
+        {
+            return System.Text.Encoding.ASCII.GetString(bytes);
+        }
+
+        static string ReadAscii(BinaryReader input)
+        {
+            List<byte> strBytes = new List<byte>();
+            int b;
+            while ((b = input.ReadByte()) != 0x00)
+                strBytes.Add((byte)b);
+            return System.Text.Encoding.ASCII.GetString(strBytes.ToArray());
+        }
     }
 
     public class CachedAudio
