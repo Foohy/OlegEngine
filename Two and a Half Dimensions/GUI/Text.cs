@@ -35,6 +35,7 @@ namespace OlegEngine.GUI
 
         public const string FontPath = "Resources/Fonts/";
         public const string FontmapPath = "gui/fontmaps/"; //Relative to the directory for materials
+        public string CurrentText;
 
         public static Charset CreateFrontFromBitmap(string font)
         {
@@ -304,6 +305,15 @@ namespace OlegEngine.GUI
             return strLength;
         }
 
+        /// <summary>
+        /// Get the length, in pixels, of the given text string/charset combo
+        /// </summary>
+        /// <returns>The length in pixels of the string</returns>
+        public float GetTextLength()
+        {
+            return GetTextLength(this.CurrentText);
+        }
+
         public float GetTextHeight()
         {
             return this.charset.LineHeight;
@@ -312,6 +322,7 @@ namespace OlegEngine.GUI
         public void SetText(string text)
         {
             if (string.IsNullOrEmpty(text)) return;
+            this.CurrentText = text;
 
             Vector3[] verts;
             Vector2[] UV;
