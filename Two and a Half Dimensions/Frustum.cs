@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -64,19 +65,6 @@ namespace OlegEngine
             CreatePlanes();
         }
 
-        Vector3 Multiply(Vector3 a, Vector3 b)
-        {
-            return new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
-        }
-
-        Vector3 Cross(Vector3 a, Vector3 b)
-        {
-            return new Vector3(
-                a.Y * b.Z - a.Z * b.Y, 
-                a.Z * b.X - a.X * b.Z, 
-                a.X * b.Y - a.Y * b.X);
-        }
-
         public void CreatePlanes()
         {
             for (int i = 0; i < pl.Length; i++)
@@ -99,12 +87,12 @@ namespace OlegEngine
             // X axis of camera with given "up" vector and Z axis
 
             //X = u * Z;
-            X = Cross(u, Z);
+            X = u.Cross(Z);
             X.Normalize();
 
             // the real "up" vector is the cross product of Z and X
             //Y = Z * X;
-            Y = Cross(Z, X);
+            Y = Z.Cross(X);
 
             // compute the centers of the near and far planes
             nc = p - Z * NearD;
@@ -302,36 +290,22 @@ namespace OlegEngine
         public Vector3 Point;
         public float d;
 
-        Vector3 Cross(Vector3 a, Vector3 b)
-        {
-            return new Vector3(
-                a.Y * b.Z - a.Z * b.Y,
-                a.Z * b.X - a.X * b.Z,
-                a.X * b.Y - a.Y * b.X);
-        }
-
         public void Set3Points(Vector3 v1, Vector3 v2, Vector3 v3)
         {
             Vector3 aux1, aux2;
 
             aux1 = v1 - v2;
             aux2 = v3 - v2;
-            Normal = Cross(aux2, aux1);
+            Normal = aux2.Cross(aux1);
             //Normal = new Vector3(aux1.X * aux2.X, aux1.Y * aux2.Y, aux1.Z * aux2.Z);
             Normal.Normalize();
             Point = v2;
-            d = -(InnerProduct( Normal, Point ));
+            d = -(Normal.InnerProduct(Point));
         }
 
         public float Distance(Vector3 p )
         {
-            return (d + InnerProduct( Normal, p ));
-        }
-
-
-        private float InnerProduct( Vector3 Point1, Vector3 Point2 )
-        {
-            return (Point1.X * Point2.X + Point1.Y * Point2.Y + Point1.Z * Point2.Z);
+            return (d + Normal.InnerProduct(p));
         }
     }
 }

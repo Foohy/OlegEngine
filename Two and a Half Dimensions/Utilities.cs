@@ -220,17 +220,12 @@ namespace OlegEngine
             return id;
         }
 
-        static Vector3 Multiply(Vector3 a, Vector3 b)
-        {
-            return new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
-        }
-
         public static Mesh.BoundingBox CalculateBoundingBox(Vector3[] vertices, Vector3 scale)
         {
             Mesh.BoundingBox bbox = new Mesh.BoundingBox();
             for (int i = 0; i < vertices.Length; i++)
             {
-                Vector3 vertex = Multiply(vertices[i], scale);
+                Vector3 vertex = vertices[i].Multiply( scale);
 
                 //Update the size of the bounding box
                 bbox.Negative = bbox.NegativeSet ? SmallestVec(bbox.Negative, vertex) : vertex;

@@ -73,6 +73,7 @@
     <Compile Include="Entity\ent_spotlight.cs" />
     <Compile Include="Entity\ent_static.cs" />
     <Compile Include="Entity\EntManager.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Frustum.cs" />
     <Compile Include="Graphics.cs" />
     <Compile Include="GUI\Elements\Button.cs" />
