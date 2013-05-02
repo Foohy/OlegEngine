@@ -26,5 +26,11 @@ namespace OlegEngine
         {
             return (a.X * b.X + a.Y * b.Y + a.Z * b.Z);
         }
+
+        //Rand
+        public static double NextDouble(this Random rand, double min, double max)
+        {
+            return rand.NextDouble() * (max - min) + min;
+        }
     }
 }

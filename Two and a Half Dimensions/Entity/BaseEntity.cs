@@ -28,7 +28,7 @@ namespace OlegEngine.Entity
 
         public string Name { get; set; }
         public string Class { get; set; }
-        public Mesh Model { get; set; }
+        public Mesh Model { get; protected set; }
         public Material Mat { get; set; }
         public RenderModes RenderMode { get; set; }
         public bool DisableLighting { get; set; }
