@@ -321,7 +321,7 @@ namespace OlegEngine.GUI
 
         public void SetText(string text)
         {
-            if (string.IsNullOrEmpty(text)) return;
+            if (string.IsNullOrEmpty(text) || text == this.CurrentText) return;
             this.CurrentText = text;
 
             Vector3[] verts;
