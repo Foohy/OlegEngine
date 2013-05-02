@@ -39,14 +39,5 @@ namespace Gravity_Car.Entity
             this.Physics.Body.AngularVelocity = -1f;
         }
 
-        public override void Think()
-        {
-            //SetPos( new OpenTK.Vector3( (float)Math.Sin(Utilities.Time), Position.Y, Position.Z ));
-            //Rotation = (float)Utilities.Time;
-            //Console.WriteLine(Physics.Body.Rotation);
-
-            this.SetAngle(Physics.Body.Rotation);
-        }
-
     }
 }

@@ -42,7 +42,7 @@ namespace Gravity_Car.Levels
             //some fires too
             ent_static oleg = EntManager.Create<ent_static>();
             oleg.Spawn();
-            oleg.Model = Resource.GetMesh("props/oleg.obj");
+            oleg.SetModel(Resource.GetMesh("props/oleg.obj"));
             oleg.Mat = Resource.GetMaterial("models/props/oleg"); //Resource.GetMaterial("models/props/oleg");
             oleg.Name = "Oleg";
             oleg.SetPos(OlegPos);

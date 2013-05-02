@@ -30,6 +30,7 @@ namespace OlegEngine.Entity
             DiffuseIntensity = 0.7f;
 
             this.Enabled = true;
+            this.ShouldDraw = false;
         }
 
         void LightingTechnique_SetLights()

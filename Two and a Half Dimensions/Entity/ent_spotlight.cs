@@ -38,6 +38,7 @@ namespace OlegEngine.Entity
 
             this.Enabled = true;
             this.ExpensiveShadows = true;
+            this.ShouldDraw = false;
         }
 
         void ShadowTechnique_SetLights()
