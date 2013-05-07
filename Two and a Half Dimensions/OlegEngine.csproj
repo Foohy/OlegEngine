@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Audio.cs" />
     <Compile Include="Entity\BaseEntity.cs" />
+    <Compile Include="Entity\ent_physics.cs" />
     <Compile Include="Entity\ent_pointlight.cs" />
     <Compile Include="Entity\ent_spotlight.cs" />
     <Compile Include="Entity\ent_static.cs" />

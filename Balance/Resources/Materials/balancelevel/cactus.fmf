@@ -1,4 +1,4 @@
 {
 	'shader'				: 'default_lighting',
-	'basetexture'			: 'balancelevel/wood_log.png',
+	'basetexture'			: 'engine/white.png',
 }

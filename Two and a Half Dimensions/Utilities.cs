@@ -27,6 +27,7 @@ namespace OlegEngine
         public static Matrix4 ProjectionMatrix { get; set; }
         public static Matrix4 ViewMatrix { get; set; }
         public static int CurrentPass = 1; //What stage of rendering we're at
+        public static Random Rand;
 
         public static FarseerPhysics.Dynamics.World PhysicsWorld { get; set; }
 
@@ -52,6 +53,8 @@ namespace OlegEngine
             NormalTex = GenerateNormalTex();
             SpecTex = GenerateWhite();
             AlphaTex = GenerateWhite();
+
+            Rand = new Random();
         }
 
         public static Material LoadMaterial(string filename)

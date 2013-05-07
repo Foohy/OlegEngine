@@ -54,6 +54,8 @@ namespace Balance
             base.OnUpdateFrame(e);
             engine.OnUpdateFrame(e);
             BalanceLevel.Think();
+
+            if (this.Keyboard[Key.Escape]) this.Exit();
         }
 
         /// <summary>

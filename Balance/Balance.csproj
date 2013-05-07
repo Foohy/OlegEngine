@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bass.Net, Version=2.4.9.0, Culture=neutral, PublicKeyToken=b7566c273e6ef480, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Two and a Half Dimensions\Bass.Net.dll</HintPath>
+    </Reference>
     <Reference Include="FarseerPhysics">
       <HintPath>..\Two and a Half Dimensions\FarseerPhysics.dll</HintPath>
     </Reference>
@@ -49,7 +53,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BalanceLevel.cs" />
+    <Compile Include="Entity\ent_ball.cs" />
     <Compile Include="Entity\ent_camera.cs" />
+    <Compile Include="Entity\ent_radio.cs" />
+    <Compile Include="MusicManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
