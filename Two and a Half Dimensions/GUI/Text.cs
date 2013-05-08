@@ -291,18 +291,18 @@ namespace OlegEngine.GUI
         {
             if (string.IsNullOrEmpty(str)) return 0;
 
-            float OffsetX = 0;
             float CurX = 0;
-            float strLength = 0;
-            float Width = 0;
+            float StartX = 0;
+            float EndX = 0;
             for (int i = 0; i < str.Length; i++)
             {
-                OffsetX = this.charset.Chars[str[i]].XOffset;
-                Width = this.charset.Chars[str[i]].Width;
-                strLength += (float)CurX + OffsetX + Width;
+                if (i == 0) StartX = this.charset.Chars[str[i]].XOffset;
+                if (i == str.Length - 1) EndX = this.charset.Chars[str[i]].Width + CurX + this.charset.Chars[str[i]].XOffset;
+
+                CurX += this.charset.Chars[str[i]].XAdvance;
             }
 
-            return strLength * ScaleW;
+            return (EndX - StartX) *ScaleW;
         }
 
         /// <summary>
