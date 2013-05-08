@@ -302,7 +302,7 @@ namespace OlegEngine.GUI
                 CurX += this.charset.Chars[str[i]].XAdvance;
             }
 
-            return (EndX - StartX) *ScaleW;
+            return (EndX - StartX);
         }
 
         /// <summary>
