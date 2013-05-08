@@ -302,7 +302,7 @@ namespace OlegEngine.GUI
                 strLength += (float)CurX + OffsetX + Width;
             }
 
-            return strLength;
+            return strLength * ScaleW;
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace OlegEngine.GUI
 
         public float GetTextHeight()
         {
-            return this.charset.LineHeight;
+            return this.charset.LineHeight * ScaleH;
         }
 
         public void SetText(string text)
