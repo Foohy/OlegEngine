@@ -812,6 +812,11 @@ namespace OlegEngine
             return num;
         }
 
+        public static float Lerp( float start, float end, float percent)
+        {
+            return start + percent * (end - start);
+        }
+
         private static int GenerateErrorTex()
         {
             Bitmap tex = new Bitmap(32, 32);

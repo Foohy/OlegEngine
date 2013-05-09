@@ -27,8 +27,7 @@ namespace OlegEngine
 
         private Matrix4 defaultViewMatrix = Matrix4.Identity;
         private Matrix4 defaultOrthoMatrix = Matrix4.Identity;
-        private GUI.Text counter;
-        private GUI.Text meshcount;
+
         public Engine(GameWindow window )
         {
             this.WindowContext = window;
@@ -94,51 +93,10 @@ namespace OlegEngine
             Vector3 point = new Vector3((float)Math.Cos(-0.6f), (float)Math.Sin(-0.52) - 0.21f, (float)Math.Sin(-0.6));
             camMat = Matrix4.LookAt(new Vector3(88.94199f, 22.27345f, 5.085441f) + new Vector3(0, 1, 0), new Vector3(88.94199f, 22.27345f, 5.085441f) + point + new Vector3(0, 1, 0), Vector3.UnitY);
 
-            //Create our little FPS counter
-            counter = new GUI.Text("debug", "frick off");
-            counter.SetPos(this.WindowContext.Width - counter.GetTextLength("frick off"), 30);
-
-            meshcount = new GUI.Text("debug", "Mesh Count");
-            meshcount.SetPos(this.WindowContext.Width - meshcount.GetTextLength("Mesh Count"), 30 + meshcount.GetTextHeight());
-            GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
-
             //Create some debug stuff
             Graphics.Init();
         }
 
-        double last = 0.0d;
-        string fps = "frasd";
-        string sMeshCount = "asldsldka";
-        void GUIManager_PostDrawHUD(EventArgs e)
-        {        
-            if (last < Utilities.Time)
-            {
-                last = Utilities.Time + 0.5;
-                int FPS = (int)(1 / this.WindowContext.RenderPeriod);
-
-                fps = (this.WindowContext.RenderPeriod * 1000).ToString() + " ms (" + FPS + " FPS)";
-                counter.SetText(fps);
-                counter.SetPos(this.WindowContext.Width - counter.GetTextLength(fps) - 20, 30);
-
-                counter.SetColor(0, 1, 0);
-                if (FPS < 45)
-                {
-                    counter.SetColor(1, 1, 0);
-                }
-                if (FPS < 30)
-                {
-                    counter.SetColor(1, 0, 0);
-                }
-
-                //Update the meshes drawn per frame
-                sMeshCount = Mesh.MeshesDrawn + " / " + Mesh.MeshesTotal;
-                meshcount.SetText(sMeshCount);
-                meshcount.SetPos(this.WindowContext.Width - meshcount.GetTextLength(sMeshCount) - 20, 30 + meshcount.GetTextHeight());
-            }
-            
-            meshcount.Draw();
-            counter.Draw();
-        }
 
         /// <summary>
         /// Called when your window is resized. Set your viewport here. It is also
@@ -196,7 +154,7 @@ namespace OlegEngine
             ShadowInfo info = ShadowTechnique.GetShadowInfo();
             shadowFBO.Enabled = ShadowTechnique.Enabled;
             ShadowTechnique.SetLightInfo(info);
-            if (ShadowTechnique.Enabled)
+            if (ShadowTechnique.Enabled && ShadowTechnique._lights.Count > 0)
             {
                 Utilities.ProjectionMatrix = info.matrix;
 
@@ -205,9 +163,8 @@ namespace OlegEngine
                 shadowFBO.BindForWriting();
                 GL.Clear(ClearBufferMask.DepthBufferBit);
                 RenderScene(e);
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0); //Reset it to the default framebuffer
             }
-
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0); //Reset it to the default framebuffer
 
 
 

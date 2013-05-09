@@ -471,7 +471,6 @@ namespace OlegEngine
                 return _lights[0];
             }
 
-            Enabled = false;
             return ShadowInfo.Default;
         }
 
@@ -482,8 +481,8 @@ namespace OlegEngine
         {
             _lights.Clear();
 
-            if (SetLights == null) return; //don't bother setting the lights if no one is out there
-            SetLights();
+            if (SetLights != null) //don't bother setting the lights if no one is out there
+                SetLights();
 
             //set the information to the shader
             SetShadowedSpotlights(_lights.ToArray());
