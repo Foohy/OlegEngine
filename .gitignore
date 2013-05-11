@@ -108,5 +108,5 @@ Backup*/
 UpgradeLog*.XML
 
 #But include anything in the resources directory
-!"Two and a Half Dimensions/Resources/"
-!"Two and a Half Dimensions/Resources/*"
+!"*/Resources/"
+!"*/Resources/*"
