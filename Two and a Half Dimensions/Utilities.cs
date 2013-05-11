@@ -164,6 +164,38 @@ namespace OlegEngine
             return new Material(properties, Name);
         }
 
+        public static int LoadTexture(Bitmap bmp)
+        {
+            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, id);
+
+            System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            bmp.UnlockBits(bmp_data);
+
+
+            if (GLVersion.Major <= 2)
+            {
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, 1);
+            }
+            else
+            {
+                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+            }
+
+            //TODO: Settings system that'll only set supported modes
+            float maxAniso;
+            GL.GetFloat((GetPName)ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out maxAniso);
+            GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, maxAniso);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            return id;
+        }
+
         public static int LoadTexture(string filename)
         {
             filename = Resource.TextureDir + filename;
@@ -195,32 +227,8 @@ namespace OlegEngine
             {
                 bmp = new Bitmap(filename);
             }
-            
-            
-            System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-
-            bmp.UnlockBits(bmp_data);
-
-
-            if (GLVersion.Major <= 2)
-            {
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, 1); 
-            }
-            else
-            {
-                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);  
-            }
-
-            //TODO: Settings system that'll only set supported modes
-            float maxAniso;
-            GL.GetFloat((GetPName)ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out maxAniso);
-            GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, maxAniso);
-
-            GL.ActiveTexture(TextureUnit.Texture0);
-            return id;
+            return LoadTexture(bmp);
         }
 
         public static Mesh.BoundingBox CalculateBoundingBox(Vector3[] vertices, Vector3 scale)
