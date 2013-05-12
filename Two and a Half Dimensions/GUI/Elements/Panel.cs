@@ -73,6 +73,11 @@ namespace OlegEngine.GUI
             this.ClipChildren = true;
         }
 
+        public static implicit operator bool(Panel p)
+        {
+            return p != null;
+        }
+
         /// <summary>
         /// Set the material of the panel
         /// </summary>
