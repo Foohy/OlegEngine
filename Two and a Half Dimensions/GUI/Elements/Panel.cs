@@ -301,7 +301,7 @@ namespace OlegEngine.GUI
             }
             if (this.DockingStyle == DockStyle.BOTTOM)
             {
-                this.Position = new Vector2(0, this.Parent.Height - this.Height);
+                this.Position = new Vector2(PaddingLeft, this.Parent.Height - this.Height - PaddingBottom);
                 this.Width = this.Parent.Width - (PaddingLeft + PaddingRight);
             }
             if (this.DockingStyle == DockStyle.LEFT)
