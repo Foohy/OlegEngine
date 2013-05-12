@@ -24,6 +24,7 @@ namespace OlegEngine
         public FBO shadowFBO = new FBO();
         public Matrix4 camMat = Matrix4.Identity;
         public event Action<FrameEventArgs> OnRenderScene;
+        public event Action OnSceneResize;
 
         private Matrix4 defaultViewMatrix = Matrix4.Identity;
         private Matrix4 defaultOrthoMatrix = Matrix4.Identity;
@@ -48,7 +49,7 @@ namespace OlegEngine
             Console.WriteLine("OpenGL version: {0}.{1}", GLVersion.Major, GLVersion.Minor);
             Console.WriteLine("==================================");
 
-            Utilities.Init(this.WindowContext);
+            Utilities.Init(this.WindowContext, this);
             Audio.Init();
 
             float[] fogColor = { 0.18431f, 0.1764f, 0.22745f };//0.18431372549019607843137254901961
@@ -119,6 +120,9 @@ namespace OlegEngine
             GL.LoadMatrix(ref defaultViewMatrix);
 
             Graphics.ViewFrustum.SetCamInternals(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
+
+            if (OnSceneResize != null)
+                OnSceneResize();
         }
 
         /// <summary>

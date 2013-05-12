@@ -28,6 +28,7 @@ namespace OlegEngine
         public static Matrix4 ViewMatrix { get; set; }
         public static int CurrentPass = 1; //What stage of rendering we're at
         public static Random Rand;
+        public static Engine engine;
 
         public static FarseerPhysics.Dynamics.World PhysicsWorld { get; set; }
 
@@ -42,9 +43,10 @@ namespace OlegEngine
         }
         #endregion
 
-        public static void Init(GameWindow win)
+        public static void Init(GameWindow win, Engine eng)
         {
             window = win;
+            engine = eng;
 
             //Make sure default error textures
             ErrorTex = GenerateErrorTex();
