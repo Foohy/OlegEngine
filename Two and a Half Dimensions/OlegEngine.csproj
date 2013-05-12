@@ -79,6 +79,7 @@
     <Compile Include="Graphics.cs" />
     <Compile Include="GUI\Elements\Button.cs" />
     <Compile Include="GUI\Elements\ButtonDropDown.cs" />
+    <Compile Include="GUI\Elements\CheckBox.cs" />
     <Compile Include="GUI\Elements\Label.cs" />
     <Compile Include="GUI\Elements\Toolbar.cs" />
     <Compile Include="GUI\Elements\Window.cs" />
