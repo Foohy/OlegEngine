@@ -61,6 +61,8 @@ namespace OlegEngine.GUI
             for (int i = 0; i < str.Length; i++)
             {
                 char curChar = str[i];
+                if (curChar > ch.Chars.Length) continue;
+
                 CharX = ch.Chars[curChar].x;
                 CharY = ch.Chars[curChar].y;
                 Width = ch.Chars[curChar].Width;
@@ -296,6 +298,8 @@ namespace OlegEngine.GUI
             float EndX = 0;
             for (int i = 0; i < str.Length; i++)
             {
+                if (str[i] > this.charset.Chars.Length) continue;
+
                 if (i == 0) StartX = this.charset.Chars[str[i]].XOffset;
                 if (i == str.Length - 1) EndX = this.charset.Chars[str[i]].Width + CurX + this.charset.Chars[str[i]].XOffset;
 
