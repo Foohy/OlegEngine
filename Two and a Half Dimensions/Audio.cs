@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Runtime.InteropServices;
 
 using OpenTK;
 
@@ -105,6 +106,7 @@ namespace OlegEngine
             try
             {
                 bytes = System.IO.File.ReadAllBytes(filename);
+                
             }
             catch (System.IO.FileNotFoundException ex)
             {
@@ -114,7 +116,8 @@ namespace OlegEngine
             int length = bytes.Length;
             fixed (byte* p = &bytes[0])
             {
-                CachedAudio memAudio = new CachedAudio(filename, new IntPtr(p), length);
+                GCHandle rawDataHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+                CachedAudio memAudio = new CachedAudio(filename, new IntPtr(p), length, rawDataHandle);
                 memAudio.Filename = filename; //may as well store this
 
                 if (!_lsPrecached.ContainsKey(filename))
@@ -132,7 +135,7 @@ namespace OlegEngine
                 Console.WriteLine("Sound not precached: {0}", name);
             }
 
-            int handle = Bass.BASS_StreamCreateFile(_lsPrecached[name].bufferPointer, 0, _lsPrecached[name].bufferLength, BASSFlag.BASS_DEFAULT); //Bass.BASS_StreamCreatePush( 44100, 1, BASSFlag.BASS_DEFAULT, IntPtr.Zero );
+            int handle = Bass.BASS_StreamCreateFile(_lsPrecached[name].bufferPointer, 0, _lsPrecached[name].bufferLength, BASSFlag.BASS_DEFAULT | BASSFlag.BASS_STREAM_AUTOFREE); //Bass.BASS_StreamCreatePush( 44100, 1, BASSFlag.BASS_DEFAULT, IntPtr.Zero );
             if (handle == 0) Console.WriteLine("Failed to play precached sound! " + Bass.BASS_ErrorGetCode());
             Bass.BASS_ChannelSetAttribute(handle, BASSAttribute.BASS_ATTRIB_VOL, volume);
             Bass.BASS_ChannelSetAttribute(handle, BASSAttribute.BASS_ATTRIB_FREQ, frequency);
@@ -165,8 +168,8 @@ namespace OlegEngine
                 {
                     if (seconds >= length)
                     {
-                        Bass.BASS_ChannelStop(audio.Handle);
-                        _lsAudio.RemoveAt(i);
+                        audio.Remove();
+                        i--;
                     }
                 }
                 else if (audio.StartLoopPosition > 0 && audio.EndLoopPosition > 0 )
@@ -194,13 +197,18 @@ namespace OlegEngine
         private static void SyncThink(int handle, int channel, int data, IntPtr user)
         {
             Audio audio = GetAudioFromHandle(channel);
-            if (audio == null) return;
+            if (audio == null) { Bass.BASS_StreamFree(channel); return; }
 
             //If the end cue point wasn't caught in the above think function, set it to the start cue here
             if (audio.Looped && audio.StartLoopPosition > 0 && audio.EndLoopPosition > 0)
             {
                 long seconds = Bass.BASS_ChannelGetPosition(audio.Handle, BASSMode.BASS_POS_BYTES);
                 Bass.BASS_ChannelSetPosition(audio.Handle, audio.StartLoopPosition, BASSMode.BASS_POS_BYTES);
+            }
+            else
+            {
+                //Remove the channel
+                Bass.BASS_StreamFree(channel);
             }
         }
 
@@ -289,6 +297,14 @@ namespace OlegEngine
                 Bass.BASS_ChannelSet3DPosition(this.Handle, vec, null, null);
                 Bass.BASS_Apply3D();
             }
+        }
+
+        public void Remove()
+        {
+            //Remove the channel
+            Bass.BASS_ChannelStop(this.Handle);
+            Bass.BASS_StreamFree(this.Handle);
+            _lsAudio.Remove(this);
         }
 
         #endregion
@@ -462,9 +478,12 @@ namespace OlegEngine
         public IntPtr bufferPointer { get; set; }
         public int bufferLength { get; set; }
         public string Filename { get; set; }
+        public GCHandle DataHandle;
 
-        public CachedAudio(string name, IntPtr ptr, int length)
+        public CachedAudio(string name, IntPtr ptr, int length, GCHandle handle)
         {
+
+            DataHandle = handle;
             Name = name;
             bufferPointer = ptr;
             bufferLength = length;
