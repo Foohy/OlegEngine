@@ -44,6 +44,7 @@ namespace OlegEngine.GUI
         public Anchors AnchorStyle { get; protected set; }
         public Vector3 Color { get; set; }
         public Vector2 Position { get; protected set; }
+        public string Name { get; set; }
 
         public float PaddingLeft { get; protected set; }
         public float PaddingRight { get; protected set; }
