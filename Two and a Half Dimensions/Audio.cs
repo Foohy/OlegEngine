@@ -100,7 +100,7 @@ namespace OlegEngine
             return new Audio(-1, "rude");
         }
 
-        public static unsafe void Precache(string filename )
+        public static void Precache(string filename )
         {
             byte[] bytes = null;
             try
@@ -114,16 +114,13 @@ namespace OlegEngine
                 return;
             }
             int length = bytes.Length;
-            fixed (byte* p = &bytes[0])
-            {
-                GCHandle rawDataHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-                CachedAudio memAudio = new CachedAudio(filename, new IntPtr(p), length, rawDataHandle);
-                memAudio.Filename = filename; //may as well store this
+            GCHandle rawDataHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+            CachedAudio memAudio = new CachedAudio(filename, rawDataHandle.AddrOfPinnedObject(), length, rawDataHandle);
+            memAudio.Filename = filename; //may as well store this
 
-                if (!_lsPrecached.ContainsKey(filename))
-                {
-                    _lsPrecached.Add(filename, memAudio);
-                }
+            if (!_lsPrecached.ContainsKey(filename))
+            {
+                _lsPrecached.Add(filename, memAudio);
             }
         }
 
