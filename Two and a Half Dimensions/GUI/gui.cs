@@ -181,6 +181,7 @@ namespace OlegEngine.GUI
         public static void Draw()
         {
             GL.Disable(EnableCap.CullFace);
+            GL.Disable(EnableCap.Multisample);
             GL.DepthFunc(DepthFunction.Always);
             GL.Enable(EnableCap.Blend);
 
@@ -203,6 +204,7 @@ namespace OlegEngine.GUI
 
             GL.Enable(EnableCap.CullFace);
             GL.DepthFunc(DepthFunction.Less);
+            GL.Enable(EnableCap.Multisample);
             GL.Disable(EnableCap.Blend);
         }
     }
