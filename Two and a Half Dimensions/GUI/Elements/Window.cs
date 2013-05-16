@@ -225,6 +225,12 @@ namespace OlegEngine.GUI
             this.TitleText.SetText(str);
         }
 
+        public void SetEnableCloseButton(bool enabled)
+        {
+            this.closeButton.Enabled = enabled;
+            this.closeButton.ShouldDraw = enabled;
+        }
+
         private static int size = 10; //must be within a box of this many pixels wide
         private bool MouseWithinRightCorner()
         {
