@@ -60,6 +60,7 @@ namespace OlegEngine.GUI
         public event Action<Panel, MouseButtonEventArgs> OnMouseDown;
         public event Action<Panel, MouseButtonEventArgs> OnMouseUp;
         public event Action<Panel, MouseMoveEventArgs> OnMouseMove;
+        public event Action<Panel, KeyPressEventArgs> OnKeyPressed;
         public event Action<Panel, ResizeEventArgs> OnResize;
         public class ResizeEventArgs : EventArgs { float OldWidth; float OldHeight; float NewWidth; float NewHeight; public ResizeEventArgs(float oldWidth, float oldHeight, float newWidth, float newHeight) { OldWidth = oldWidth; oldHeight = OldHeight; newWidth = NewWidth; newHeight = NewHeight; } }
         public event Action<Panel, Vector2> PreDraw;
@@ -72,6 +73,7 @@ namespace OlegEngine.GUI
         public Panel()
         {
             this.ClipChildren = true;
+            this.Enabled = true;
         }
 
         public static implicit operator bool(Panel p)
@@ -450,6 +452,25 @@ namespace OlegEngine.GUI
             this.Color = new Vector3(color.R / 255, color.G / 255, color.B / 255);
         }
 
+        public Panel GetChildByName(string name, bool recursive = false)
+        {
+             //Get the text input with our name
+            foreach (Panel p in this.Children)
+            {
+                if (p.Name == name)
+                {
+                    return p;
+                }
+                else if (recursive)
+                {
+                    return p.GetChildByName(name, recursive);
+                }
+            }
+
+            return null;
+
+        }
+
         /// <summary>
         /// Remove the panel and all of its children
         /// </summary>
@@ -508,6 +529,23 @@ namespace OlegEngine.GUI
             if (OnMouseMove != null)
             {
                 OnMouseMove(this, e);
+            }
+        }
+
+        public virtual void KeyPressed(KeyPressEventArgs e)
+        {
+            foreach (Panel child in this.Children)
+            {
+                if (child.IsMouseOver())
+                {
+                    child.KeyPressed(e);
+                }
+            }
+
+
+            if (OnKeyPressed != null)
+            {
+                OnKeyPressed(this, e);
             }
         }
 

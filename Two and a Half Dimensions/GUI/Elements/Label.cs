@@ -33,6 +33,7 @@ namespace OlegEngine.GUI
         {
             this.Text = "";
             DrawText = new Text("title", this.Text);
+            SizeToText();
             this.ShouldPassInput = true;
             this.Autosize = false;
             this.SetColor(255, 255, 255);
@@ -91,7 +92,7 @@ namespace OlegEngine.GUI
                 Alignment == TextAlign.LowerCenter ||
                 Alignment == TextAlign.LowerRight)
             {
-                PosOffset += new Vector2(0, 0);
+                PosOffset += new Vector2(0, this.Height - this.GetTextHeight());
             }
             if (Alignment == TextAlign.MiddleLeft ||
                 Alignment == TextAlign.MiddleCenter ||
@@ -103,7 +104,7 @@ namespace OlegEngine.GUI
                 Alignment == TextAlign.TopCenter ||
                 Alignment == TextAlign.TopRight)
             {
-                PosOffset += new Vector2(0, this.Height - this.GetTextHeight());
+                PosOffset += new Vector2(0, 0);
             }
         }
 

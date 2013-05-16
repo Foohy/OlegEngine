@@ -50,6 +50,7 @@ namespace OlegEngine.GUI
             Utilities.window.Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
             Utilities.window.Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
+            Utilities.window.KeyPress += new EventHandler<KeyPressEventArgs>(window_KeyPress);
         }
 
         private static void UpdateIsOverElement()
@@ -99,6 +100,19 @@ namespace OlegEngine.GUI
                 }
             }
         }
+
+        static void window_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            for (int i = elements.Count - 1; i >= 0; i--)
+            {
+                Panel p = elements[i];
+                if (p.Enabled && elements[i].Parent == null) //Only call this on top level panels. the panels can control further input
+                {
+                    p.KeyPressed(e);
+                }
+            }
+        }
+
 
         //Queue up sending things to the front
         private static List<Panel> front_queue = new List<Panel>();
