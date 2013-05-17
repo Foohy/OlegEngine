@@ -18,7 +18,6 @@ namespace OlegEngine.GUI
 
         public TextInput()
         {
-
         }
 
         public override void Init()
@@ -35,6 +34,16 @@ namespace OlegEngine.GUI
             TextLabel.Autosize = true;
             TextLabel.Dock(DockStyle.FILL);
             TextLabel.SetAlignment(Label.TextAlign.TopLeft);
+
+            Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+        }
+
+        void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!this.IsMouseOver())
+            {
+                this.SetIsSelected(false);
+            }
         }
 
         public override void MouseMove(MouseMoveEventArgs e)
@@ -56,7 +65,6 @@ namespace OlegEngine.GUI
                 this.SetIsSelected(true);
             }
             else { this.SetIsSelected(false); }
-
         }
 
         public override void KeyPressed(KeyPressEventArgs e)
@@ -107,6 +115,12 @@ namespace OlegEngine.GUI
         public override void Resize(float oldWidth, float oldHeight, float newWidth, float newHeight)
         {
             base.Resize(oldWidth, oldHeight, newWidth, newHeight);
+        }
+
+        public override void Remove()
+        {
+            base.Remove();
+            Utilities.window.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
         }
     }
 }

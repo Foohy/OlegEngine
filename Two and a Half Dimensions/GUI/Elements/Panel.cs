@@ -536,10 +536,7 @@ namespace OlegEngine.GUI
         {
             foreach (Panel child in this.Children)
             {
-                if (child.IsMouseOver())
-                {
-                    child.KeyPressed(e);
-                }
+                child.KeyPressed(e);
             }
 
 
