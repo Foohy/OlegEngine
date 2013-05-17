@@ -1082,7 +1082,7 @@ namespace OlegEngine
             //Bind the base texture
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.Enable(EnableCap.Texture2D);
-            GL.BindTexture(TextureTarget.Texture2D, Properties.BaseTexture);
+            GL.BindTexture(TextureTarget.Texture2D, this.GetCurrentTexture());
 
             //Bind the normal map, if it exists
             GL.ActiveTexture(TextureUnit.Texture1);
@@ -1106,20 +1106,40 @@ namespace OlegEngine
 
             GL.Uniform3(this.locColor, this.Properties.Color);
         }
+
+        public int GetCurrentTexture()
+        {
+            if (this.Properties.IsAnimated && this.Properties.BaseTextures.Length > 0 && Utilities.Time > this.Properties._NextFrameChange)
+            {
+                int index = Properties._CurrentFrame + 1;
+                index = index < this.Properties.BaseTextures.Length ? index : 0;
+                Properties._CurrentFrame = index;
+                this.Properties.BaseTexture = this.Properties.BaseTextures[index];
+                this.Properties._NextFrameChange = Utilities.Time + this.Properties.Framelength;
+            }
+
+
+            return this.Properties.BaseTexture;
+        }
     }
 
     public class MaterialProperties
     {
         public int ShaderProgram;
         public int BaseTexture;
+        public int[] BaseTextures; //For animated textures
         public int NormalMapTexture;
         public int SpecMapTexture;
         public int AlphaMapTexture;
+        public int _CurrentFrame;
         public float SpecularPower;
         public float SpecularIntensity;
+        public double Framelength; //How long each frame is for an animated texture
+        public double _NextFrameChange;
         public Vector3 Color;
         public bool NoCull;
         public bool AlphaTest;
+        public bool IsAnimated;
 
         public MaterialProperties()
         {

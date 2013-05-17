@@ -59,7 +59,141 @@ namespace OlegEngine
             Rand = new Random();
         }
 
+        public enum PrintCode
+        {
+            NONE,
+            WARNING,
+            ERROR,
+            INFO
+        }
+        public static void Print(string str, PrintCode code = PrintCode.NONE, params string[] parameters)
+        {
+            switch (code)
+            {
+                case PrintCode.WARNING:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+
+                case PrintCode.ERROR:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+
+                case PrintCode.INFO:
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+            }
+
+            Console.WriteLine(str, parameters);
+            Console.ResetColor();
+        }
+
+
+        //Strings for each component of a material
+        private const string MAT_SHADER         = "shader";
+        private const string MAT_BASETEXTURE    = "basetexture";
+        private const string MAT_NORMALMAP      = "normalmap";
+        private const string MAT_SPECMAP        = "specmap";
+        private const string MAT_ALPHAMAP       = "alphamap";
+        private const string MAT_NOCULL         = "nocull";
+        private const string MAT_ALPHATEST      = "alphatest";
+        private const string MAT_SPECPOWER      = "specpower";
+        private const string MAT_SPECINTENSITY  = "specintensity";
+        private const string MAT_COLOR          = "color";
+        private const string MAT_ISANIMATED     = "isanimated";
+        private const string MAT_FRAMELENGTH    = "framelength";
+
         public static Material LoadMaterial(string filename)
+        {
+            string Name = filename;
+            filename = Resource.TextureDir + filename + Resource.MaterialExtension;
+            if (String.IsNullOrEmpty(filename))
+            {
+                Utilities.Print("Failed to load material. Filename is empty!", PrintCode.ERROR);
+
+                return null;
+            }
+
+            if (!System.IO.File.Exists(filename))
+            {
+                Utilities.Print("Failed to load material. Couldn't find '{0}'", PrintCode.ERROR, filename);
+                return null;
+            }
+
+            string jsonString = File.ReadAllText(filename);
+            MaterialProperties properties = new MaterialProperties();
+
+            Newtonsoft.Json.Linq.JObject infObj = null;
+            try
+            {
+                infObj = Newtonsoft.Json.Linq.JObject.Parse(jsonString);
+            }
+            catch (Exception e)
+            {
+                Utilities.Print("Failed to load material. {0}", PrintCode.ERROR, e.Message);
+                return ErrorMat;
+            }
+
+            if (infObj[MAT_SHADER] != null)
+                properties.ShaderProgram = Resource.GetProgram(infObj[MAT_SHADER].ToString());
+
+            if (infObj[MAT_BASETEXTURE] != null)
+            {
+                properties.BaseTexture = Resource.GetTexture(infObj[MAT_BASETEXTURE].ToString());
+                if (Path.GetExtension(infObj[MAT_BASETEXTURE].ToString()) == ".gif")
+                {
+                    //Load it with multiple frames in mind
+                    properties.BaseTextures = LoadAnimatedTexture(infObj[MAT_BASETEXTURE].ToString()); //TODO: Add these images to the resource manager
+                }
+
+            }
+
+            if (infObj[MAT_NORMALMAP] != null)
+                properties.NormalMapTexture = Resource.GetTexture(infObj[MAT_NORMALMAP].ToString());
+
+            if (infObj[MAT_SPECMAP] != null)
+                properties.SpecMapTexture = Resource.GetTexture(infObj[MAT_SPECMAP].ToString());
+
+            if (infObj[MAT_ALPHAMAP] != null)
+                properties.AlphaMapTexture = Resource.GetTexture(infObj[MAT_ALPHAMAP].ToString());
+
+            if (infObj[MAT_NOCULL] != null)
+                properties.NoCull = infObj[MAT_NOCULL].ToString().ToLower() == bool.TrueString.ToLower();
+
+            if (infObj[MAT_ALPHATEST] != null)
+                properties.AlphaTest = infObj[MAT_ALPHATEST].ToString().ToLower() == bool.TrueString.ToLower();
+
+            if (infObj[MAT_ISANIMATED] != null)
+                properties.IsAnimated = infObj[MAT_ISANIMATED].ToString().ToLower() == bool.TrueString.ToLower();
+
+            if (infObj[MAT_SPECPOWER] != null)
+                properties.SpecularPower = float.TryParse( infObj[MAT_SPECPOWER].ToString(), out properties.SpecularPower) ? properties.SpecularPower : 0.0f;
+
+            if (infObj[MAT_SPECINTENSITY] != null)
+                properties.SpecularIntensity = float.TryParse(infObj[MAT_SPECINTENSITY].ToString(), out properties.SpecularIntensity) ? properties.SpecularIntensity : 0.0f;
+
+            if (infObj[MAT_FRAMELENGTH] != null)
+                properties.Framelength = double.TryParse(infObj[MAT_FRAMELENGTH].ToString(), out properties.Framelength) ? properties.Framelength : 1.0;
+
+            if (infObj[MAT_COLOR] != null)
+            {
+                string curline = infObj[MAT_COLOR].ToString();
+                string[] components = curline.Split(' ');
+                if (components.Length > 2)
+                {
+                    float r = 1.0f, g = 1.0f, b = 1.0f;
+                    float.TryParse(components[0], out r);
+                    float.TryParse(components[1], out g);
+                    float.TryParse(components[2], out b);
+
+                    properties.Color = new Vector3(r, g, b);
+                }
+            }
+
+
+            return new Material(properties, Name);
+        }
+        /*
+        public static Material LoadMaterial2(string filename)
         {
             filename = Resource.TextureDir + filename + Resource.MaterialExtension;
             if (String.IsNullOrEmpty(filename))
@@ -150,6 +284,10 @@ namespace OlegEngine
                             }
                             break;
 
+                        case "animated":
+                            properties.IsAnimated = true;
+                            break;
+
                         default:
                             break;
                     }
@@ -165,7 +303,7 @@ namespace OlegEngine
 
             return new Material(properties, Name);
         }
-
+        */
         public static int LoadTexture(Bitmap bmp)
         {
             GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
@@ -231,6 +369,36 @@ namespace OlegEngine
             }
 
             return LoadTexture(bmp);
+        }
+
+        public static int[] LoadAnimatedTexture(string filename)
+        {
+            filename = Resource.TextureDir + filename;
+            if (String.IsNullOrEmpty(filename))
+            {
+                Utilities.Print("Failed to load texture. Filename is empty!", PrintCode.ERROR);
+                return new int[0];
+            }
+
+            if (!System.IO.File.Exists(filename))
+            {
+                Utilities.Print("Failed to load texture. Couldn't find '{0}'", PrintCode.ERROR, filename );
+                return new int[0];
+            }
+
+            
+            Bitmap bmp = new Bitmap(filename);
+            var Dimension = new System.Drawing.Imaging.FrameDimension(bmp.FrameDimensionsList[0]);
+            int NumFrames = bmp.GetFrameCount(Dimension);
+
+            int[] Textures = new int[NumFrames];
+            for (int i = 0; i < NumFrames; i++)
+            {
+                bmp.SelectActiveFrame(Dimension, i);
+                Textures[i] = LoadTexture(bmp);
+            }
+
+            return Textures;
         }
 
         public static Mesh.BoundingBox CalculateBoundingBox(Vector3[] vertices, Vector3 scale)
