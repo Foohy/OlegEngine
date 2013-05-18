@@ -24,11 +24,11 @@ namespace OlegEngine
         public static void Init()
         {
             dbgWhite = new Material("engine/white.png", "default");
-            box = Resource.GetMesh("debug/box.obj");
+            box = Resource.GetMesh("engine/box.obj");
             box.mat = dbgWhite;
             box.ShouldDrawDebugInfo = false;
 
-            sphere = Resource.GetMesh("debug/ball.obj");
+            sphere = Resource.GetMesh("engine/ball.obj");
             sphere.mat = dbgWhite;
             sphere.ShouldDrawDebugInfo = false;
 

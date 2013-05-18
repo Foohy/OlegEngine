@@ -24,7 +24,7 @@ namespace Gravity_Car.Entity
         public override void Init()
         {
             previewMesh = new Mesh();
-            this.Model = Resource.GetMesh("debug/ball.obj");
+            this.Model = Resource.GetMesh("engine/ball.obj");
             this.Mat = Resource.GetMaterial("engine/white");
             //this.Mat.SetShader(Resource.GetProgram("default"));
             this.Scale = Vector3.One * 0.05f;

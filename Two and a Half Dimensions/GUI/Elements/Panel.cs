@@ -67,7 +67,7 @@ namespace OlegEngine.GUI
         public event Action<Panel, Vector2> PostDraw;
 
         Material Mat;
-        Mesh panelMesh = Resource.GetMesh("debug/quad.obj");
+        Mesh panelMesh = Resource.GetMesh("engine/quad.obj");
         public Matrix4 modelview;
 
         public Panel()

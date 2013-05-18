@@ -21,7 +21,7 @@ namespace Gravity_Car.Entity
         {
             this.Mat = Resource.GetMaterial("engine/depth");
             this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
-            this.Model = Resource.GetMesh("debug/quad.obj");
+            this.Model = Resource.GetMesh("engine/quad.obj");
 
             DepthScreen = GUIManager.Create<Panel>();
             DepthScreen.SetMaterial(Resource.GetMaterial("engine/depth"));
