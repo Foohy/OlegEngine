@@ -26,22 +26,22 @@ namespace OlegEngine.GUI
             public ushort Base;
             public ushort Width, Height;
             public CharDescriptor[] Chars;
+            public Material CharsetMaterial;
 
             public Charset()
             {
                 Chars = new CharDescriptor[256];
+            }
+
+            public static implicit operator bool(Charset p)
+            {
+                return p != null && p.CharsetMaterial != null && p.Width > 0;
             }
         }
 
         public const string FontPath = "Resources/Fonts/";
         public const string FontmapPath = "gui/fontmaps/"; //Relative to the directory for materials
         public string CurrentText;
-
-        public static Charset CreateFrontFromBitmap(string font)
-        {
-            return ParseFont(font);
-
-        }
 
         public static void ConstructVertexArray(Charset ch, string str, out Vector3[] verts, out Vector2[] UV, out int[] elements )
         {
@@ -104,18 +104,24 @@ namespace OlegEngine.GUI
             }
         }
 
-        static Charset ParseFont(string FNT)
+        public static Charset ParseFont(string FNT)
         {
             Charset charset = new Charset();
-            if (!File.Exists(FNT))
+            if (!File.Exists(Resource.FontDir + FNT + ".fnt"))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Failed to load font: " + FNT);
-                Console.ResetColor();
+                Utilities.Print("Failed to load font '{0}'", Utilities.PrintCode.ERROR, FNT);
                 return charset;
             }
+            //Load the texture
+            if (!File.Exists(Resource.FontDir + FNT + ".png"))
+            {
+                Utilities.Print("Failed to load fontmap '{0}'", Utilities.PrintCode.ERROR, FNT);
+                return charset;
+            }
+            var mapbmp = new System.Drawing.Bitmap(Resource.FontDir + FNT + ".png");
+            charset.CharsetMaterial = new Material(Utilities.LoadTexture(mapbmp), Resource.GetProgram("hud"));
 
-            StreamReader sr = new StreamReader(FNT);
+            StreamReader sr = new StreamReader(Resource.FontDir + FNT + ".fnt");
 
             string Read, Key, Value;
             string FirstWord;
@@ -233,7 +239,7 @@ namespace OlegEngine.GUI
         private Mesh textMesh;
         public Text( string font, string text )
         {
-            this.charset = ParseFont(FontPath + font + ".fnt");
+            this.charset = Resource.GetCharset(font);
 
 
             //Create a blank vertex buffer which we'll update later with our text info
@@ -242,7 +248,7 @@ namespace OlegEngine.GUI
             textMesh.ShouldDrawDebugInfo = false;
 
             this.SetText(text);
-            this.textMesh.mat = new Material(Resource.GetTexture(FontmapPath + font + ".png"), Resource.GetProgram("hud"));
+            this.textMesh.mat = this.charset.CharsetMaterial;
 
             this.ScaleH = 1;
             this.ScaleW = 1;
@@ -341,6 +347,12 @@ namespace OlegEngine.GUI
             {
                 textMesh.UpdateMesh(verts, elements, new Vector3[verts.Length], null, UV);
             }
+        }
+
+        public void SetCharset(Charset ch)
+        {
+            this.charset = ch;
+            this.textMesh.mat = ch.CharsetMaterial;
         }
 
         public void Draw()

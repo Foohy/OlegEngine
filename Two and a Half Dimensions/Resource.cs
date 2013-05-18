@@ -6,6 +6,7 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
+using OlegEngine.GUI;
 namespace OlegEngine
 {
     public class Resource
@@ -13,6 +14,7 @@ namespace OlegEngine
         public const string ModelDir = "Resources/Models/";
         public const string TextureDir = "Resources/Materials/";
         public const string ShaderDir = "Resources/Shaders/";
+        public const string FontDir = "Resources/Fonts/";
         public const string MaterialExtension = ".fmf";
 
         static Dictionary<string, int> Textures = new Dictionary<string, int>();
@@ -20,6 +22,7 @@ namespace OlegEngine
         static Dictionary<string, VBO> Models = new Dictionary<string, VBO>();
         static Dictionary<string, Mesh> Meshes = new Dictionary<string, Mesh>();
         static Dictionary<string, int> Programs = new Dictionary<string, int>();
+        static Dictionary<string, Text.Charset> Charsets = new Dictionary<string, Text.Charset>();
 
         public static Material GetMaterial(string filename)
         {
@@ -32,26 +35,7 @@ namespace OlegEngine
 
             return Utilities.ErrorMat;
         }
-        /*
-        public static Material GetMaterial(string filename, string shader)
-        {
-            if (!Materials.ContainsKey(filename))
-            {
-                Materials[filename] = new Material(filename,shader);
-            }
 
-            return Materials[filename];
-        }
-        public static Material GetMaterial(int textureid, string shader)
-        {
-            if (!Materials.ContainsKey(textureid.ToString()))
-            {
-                Materials[textureid.ToString()] = new Material(textureid, shader);
-            }
-
-            return Materials[textureid.ToString()];
-        }
-         * */
         public static int GetTexture(string filename)
         {
             if (!Textures.ContainsKey(filename))
@@ -61,28 +45,20 @@ namespace OlegEngine
 
             return Textures[filename];
         }
-        /*
-        public static VBO GetModel(string filename)
-        {
-            if (!Models.ContainsKey(filename))
-            {
-                Vector3[] verts;
-                Vector3[] tangents;
-                Vector3[] normals;
-                Vector2[] lsUV;
-                int[] elements;
-                Mesh.BoundingBox boundingbox;
 
-                Utilities.LoadOBJ(filename, out verts, out elements, out tangents,out normals, out lsUV, out boundingbox );
-                Models[filename] = new VBO(verts, elements, null, normals, lsUV);
+        public static Text.Charset GetCharset(string name)
+        {
+            if (!Charsets.ContainsKey(name))
+            {
+                Charsets[name] = Text.ParseFont(name);
             }
 
-            return Models[filename];
+            return Charsets[name];
         }
-         * */
-        public static Mesh GetMesh(string filename)
+
+        public static Mesh GetMesh(string filename, bool newInstance = false)
         {
-            if (!Meshes.ContainsKey(filename) )
+            if (!Meshes.ContainsKey(filename) || newInstance )
             {
                 Vector3[] verts;
                 Vector3[] tangents;
@@ -92,7 +68,11 @@ namespace OlegEngine
                 Mesh.BoundingBox boundingbox;
 
                 Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
-                Meshes[filename] = new Mesh(verts, elements,tangents, normals, lsUV);
+                Mesh m = new Mesh(verts, elements, tangents, normals, lsUV);
+
+                if (newInstance) return m;
+                else Meshes[filename] = m;
+
                 Meshes[filename].BBox = boundingbox;
             }
 
