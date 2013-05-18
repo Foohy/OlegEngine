@@ -213,12 +213,15 @@ namespace OlegEngine.GUI
     {
         static Mesh Square;
         static Matrix4 TranslateMatrix = Matrix4.Identity;
+        static Text genericText;
 
         public static void Init()
         {
             Square = new Mesh("debug/quad.obj");
             Square.mat = new Material(Utilities.AlphaTex, "default"); ;
             Square.ShouldDrawDebugInfo = false;
+
+            genericText = new Text("debug", "Untitled");
         }
 
         /// <summary>
@@ -274,6 +277,42 @@ namespace OlegEngine.GUI
         {
             drawRect(position.X, position.Y, dimensions.X, dimensions.Y);
         }
+
+        public static void DrawText(string font, string str, float x, float y)
+        {
+            Text.Charset ch = Resource.GetCharset( font );
+            if (ch)
+            {
+                genericText.SetCharset(Resource.GetCharset(font));
+            }
+            genericText.SetPos( x, y );
+            genericText.SetText(str);
+            genericText.Draw();
+        }
+
+        public static float GetTextLength(string font, string str)
+        {
+            Text.Charset ch = Resource.GetCharset(font);
+            if (ch)
+            {
+                genericText.SetCharset(Resource.GetCharset(font));
+            }
+
+            genericText.SetText(str);
+            return genericText.GetTextLength();
+        }
+
+        public static float GetTextHeight(string font)
+        {
+            Text.Charset ch = Resource.GetCharset(font);
+            if (ch)
+            {
+                genericText.SetCharset(Resource.GetCharset(font));
+            }
+
+            return genericText.GetTextHeight();
+        }
+
 
         private static void drawRect(float x, float y, float width, float height)
         {
