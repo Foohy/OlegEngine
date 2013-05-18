@@ -1,4 +1,4 @@
 {
-	"Shader" 		: "default_lighting",
-	"Basetexture" 	: "levels/grass.png",
+	"shader" 		: "default_lighting",
+	"basetexture" 	: "levels/grass.png",
 }

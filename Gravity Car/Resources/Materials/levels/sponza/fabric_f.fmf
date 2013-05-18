@@ -1,5 +1,5 @@
 {
-'Shader' 		: 'default_lighting',
+'shader' 		: 'default_lighting',
 'specpower' 		: '10.0000',
 'basetexture' 		: 'textures/sponza_curtain_green_diff.tga',
 }

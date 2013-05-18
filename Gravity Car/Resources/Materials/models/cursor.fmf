@@ -1,5 +1,5 @@
 {
-	"Shader" 		: "default_lighting",
-	"Basetexture" 	: "models/cursor.png",
-	"Color"			: "1.0 0.0 1.0"
+	"shader" 		: "default_lighting",
+	"basetexture" 	: "models/cursor.png",
+	"color"			: "1.0 0.0 1.0"
 }

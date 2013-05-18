@@ -1,4 +1,4 @@
 {
-	"Shader" 		: "default_lighting",
-	"Basetexture" 	: "models/vehicles/van.png",
+	"shader" 		: "default_lighting",
+	"basetexture" 	: "models/vehicles/van.png",
 }

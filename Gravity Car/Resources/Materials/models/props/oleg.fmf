@@ -1,4 +1,4 @@
 {
-	"Shader" 		: "default_lighting",
-	"Basetexture" 	: "models/props/oleg.png",
+	"shader" 		: "default_lighting",
+	"basetexture" 	: "models/props/oleg.png",
 }

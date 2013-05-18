@@ -1,5 +1,5 @@
 {
-	'Shader' 		: 'default_lighting',
+	'shader' 		: 'default_lighting',
 	'Basetexture' 	: 'levels/sponza/vase_plant.tga',
 	'specmap'		: 'levels/sponza/vase_plant_spec.tga',
 	'alphamap'		: 'levels/sponza/vase_plant_mask.png',
