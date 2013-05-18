@@ -69,11 +69,9 @@ namespace OlegEngine
 
                 Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
                 Mesh m = new Mesh(verts, elements, tangents, normals, lsUV);
-
+                m.BBox = boundingbox;
                 if (newInstance) return m;
                 else Meshes[filename] = m;
-
-                Meshes[filename].BBox = boundingbox;
             }
 
             return Meshes[filename];
