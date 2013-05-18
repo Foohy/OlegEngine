@@ -371,6 +371,7 @@ namespace OlegEngine
             private Vector3 vecNegative = -Vector3.One * 0.1f;
             private Vector3 vecPositive = Vector3.One * 0.1f;
             private float fRadius = 1.0f;
+            private Vector3 vecScale = Vector3.One;
 
             public Vector3 Negative {
                 get
@@ -399,6 +400,18 @@ namespace OlegEngine
                         PositiveSet = true;
                     }
                     vecPositive = value;
+                    fRadius = RadiusFromBoundingBox(this);
+                }
+            }
+            public Vector3 Scale
+            {
+                get
+                {
+                    return vecScale;
+                }
+                set
+                {
+                    vecScale = value;
                     fRadius = RadiusFromBoundingBox(this);
                 }
             }
@@ -434,13 +447,13 @@ namespace OlegEngine
             {
                 Vector3 res = this.Negative;
                 if (Normal.X > 0)
-                    res.X += this.Positive.X;
+                    res.X += this.Positive.X * Scale.X;
 
                 if (Normal.Y > 0)
-                    res.Y += this.Positive.Y;
+                    res.Y += this.Positive.Y * Scale.Y;
 
                 if (Normal.Z > 0)
-                    res.Z += this.Positive.Z;
+                    res.Z += this.Positive.Z * Scale.Z;
 
                 return res;
             }
@@ -449,13 +462,13 @@ namespace OlegEngine
             {
                 Vector3 res = this.Negative;
                 if (Normal.X < 0)
-                    res.X += this.Positive.X;
+                    res.X += this.Positive.X * Scale.X;
 
                 if (Normal.Y < 0)
-                    res.Y += this.Positive.Y;
+                    res.Y += this.Positive.Y * Scale.Y;
 
                 if (Normal.Z < 0)
-                    res.Z += this.Positive.Z;
+                    res.Z += this.Positive.Z * Scale.Z;
 
                 return res;
             }
@@ -472,7 +485,7 @@ namespace OlegEngine
 
             public static float RadiusFromBoundingBox(BoundingBox b)
             {
-                return Math.Abs(Distance(b.Negative, b.Positive));
+                return Math.Abs(Distance(b.Negative.Multiply(b.Scale), b.Positive.Multiply(b.Scale)));
             }
 
             /// <summary>
@@ -722,6 +735,7 @@ namespace OlegEngine
 
             modelview *= Matrix4.CreateTranslation(Position);
 
+            this.BBox.Scale = this.Scale;
             render(Utilities.ViewMatrix, modelview, Utilities.ProjectionMatrix);
         }
 
