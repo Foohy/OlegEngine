@@ -74,7 +74,7 @@ namespace OlegEngine
 
             //Initialize our shadow FBO
             float ratio = this.WindowContext.Width / (float)this.WindowContext.Height;
-            shadowFBO.Init(this.WindowContext.Width, this.WindowContext.Height);
+            shadowFBO.Init(1024, 1024);
 
             //Initalize lighting
             LightingTechnique.Init();
@@ -161,6 +161,10 @@ namespace OlegEngine
             if (ShadowTechnique.Enabled && ShadowTechnique._lights.Count > 0)
             {
                 Utilities.ProjectionMatrix = info.matrix;
+                Utilities.ViewMatrix = defaultViewMatrix;
+
+                //Change the viewport accordingly
+                GL.Viewport(this.WindowContext.ClientRectangle.X, this.WindowContext.ClientRectangle.Y, shadowFBO.Width, shadowFBO.Height);
 
                 //Pass 1, render in the view of the light
                 Utilities.CurrentPass = 1;
@@ -169,12 +173,11 @@ namespace OlegEngine
                 RenderScene(e);
             }
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0); //Reset it to the default framebuffer
-
-
-
+            GL.Viewport(this.WindowContext.ClientRectangle.X, this.WindowContext.ClientRectangle.Y, this.WindowContext.ClientRectangle.Width, this.WindowContext.ClientRectangle.Height);
             //Set the view to the normal camera
             //Utilities.ProjectionMatrix = ply.camMatrix;
             Utilities.ProjectionMatrix = View.CameraMatrix;
+            Utilities.ViewMatrix = defaultViewMatrix;
 
             //Second pass, render normally
             Utilities.CurrentPass = 2;

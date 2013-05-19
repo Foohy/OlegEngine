@@ -1168,6 +1168,8 @@ namespace OlegEngine
         private int _shadowMap = 0;
         private int _disabledTex = 0;
         public bool Enabled = true;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
         public int shadowMap
         {
@@ -1186,21 +1188,27 @@ namespace OlegEngine
 
         }
 
-        public bool Init(int Width, int Height)
+        public bool Init(int width, int height)
         {
+            this.Width = width;
+            this.Height = height;
             _disabledTex = Utilities.AlphaTex;
 
-            //Create our shadow framebuffer
-            GL.GenFramebuffers(1, out fbo);
-
+            //Create the shadow texture
             GL.GenTextures(1, out _shadowMap);
             GL.BindTexture(TextureTarget.Texture2D, _shadowMap);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent, Width, Height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)TextureCompareMode.None);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent, Width, Height, 0, PixelFormat.DepthComponent, PixelType.UnsignedByte, IntPtr.Zero);
+
+
+            //Create our shadow framebuffer
+            GL.GenFramebuffers(1, out fbo);
 
             //Attach the depth texture to the framebuffer
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, fbo);
@@ -1219,6 +1227,8 @@ namespace OlegEngine
 
                 return false;
             }
+
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
             return true;
         }
