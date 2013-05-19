@@ -81,6 +81,9 @@ namespace OlegEngine.GUI
 
                         break;
 
+                    case '\n': case '\t': case '\r':
+                        break;
+
                     default:
                         this.TextLabel.SetText(this.TextLabel.Text + e.KeyChar);
                         break;
