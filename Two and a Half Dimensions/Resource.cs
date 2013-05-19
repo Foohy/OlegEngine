@@ -120,29 +120,19 @@ namespace OlegEngine
                     //Check for errors
                     int statV = 0;
                     int statF = 0;
-                    bool over = false;
                     GL.GetShader( VertexShader, ShaderParameter.CompileStatus, out statV );
                     GL.GetShader( FragmentShader, ShaderParameter.CompileStatus, out statF );
 
-                    #if DEBUG
-                    over = true;
-                    #endif
-
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    if (statV == 0 || over)
+                    if (statV == 0)
                     {
-                        if (statV != 0) Console.ForegroundColor = ConsoleColor.Yellow;
-
-                        Console.WriteLine(GL.GetShaderInfoLog(VertexShader));
-                        Console.ForegroundColor = ConsoleColor.Red;
+                        Utilities.Print("{0} failed to compile!", Utilities.PrintCode.ERROR, filenameV);
+                        Utilities.Print(GL.GetShaderInfoLog(VertexShader), Utilities.PrintCode.ERROR);
                     }
-                    if (statF == 0 || over)
+                    if (statF == 0)
                     {
-                        if (statF != 0) Console.ForegroundColor = ConsoleColor.Yellow;
-
-                        Console.WriteLine(GL.GetShaderInfoLog(FragmentShader));
+                        Utilities.Print("{0} failed to compile!", Utilities.PrintCode.ERROR, filenameF);
+                        Utilities.Print(GL.GetShaderInfoLog(FragmentShader), Utilities.PrintCode.ERROR);
                     }
-                    Console.ResetColor();
 
                     //Link them up
                     GL.LinkProgram(program);
