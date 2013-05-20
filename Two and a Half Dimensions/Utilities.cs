@@ -38,7 +38,11 @@ namespace OlegEngine
         #region timing stuff
         public static void Think(FrameEventArgs e)
         {
-            Time += e.Time;
+            Time += e.Time;      
+        }
+
+        public static void Draw(FrameEventArgs e)
+        {
             Frametime = e.Time;
         }
         #endregion
@@ -1080,6 +1084,42 @@ namespace OlegEngine
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.ActiveTexture(TextureUnit.Texture0);
             return id;
+        }
+    }
+
+    class DropOutStack<T>
+    {
+        private T[] items;
+        private int top = 0;
+
+        public int Count
+        {
+            get
+            {
+                return items.Length;
+            }
+
+        }
+
+        public DropOutStack(int capacity)
+        {
+            items = new T[capacity];
+        }
+
+        public void Push(T item)
+        {
+            items[top] = item;
+            top = (top + 1) % items.Length;
+        }
+        public T Pop()
+        {
+            top = (items.Length + top - 1) % items.Length;
+            return items[top];
+        }
+
+        public T Value(int index)
+        {
+            return items[index < items.Length ? index : 0];
         }
     }
 }
