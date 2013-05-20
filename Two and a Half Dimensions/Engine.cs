@@ -28,10 +28,14 @@ namespace OlegEngine
 
         private Matrix4 defaultViewMatrix = Matrix4.Identity;
         private Matrix4 defaultOrthoMatrix = Matrix4.Identity;
+        public Settings GraphicsSettings = new Settings();
 
-        public Engine(GameWindow window )
+        private DropOutStack<double> AveragedFrametimes = new DropOutStack<double>( 30 );
+
+        public Engine(GameWindow window, Settings settings = null )
         {
             this.WindowContext = window;
+            if (settings != null) GraphicsSettings = settings;
         }
 
         /// <summary>Load resources here.</summary>
@@ -73,7 +77,6 @@ namespace OlegEngine
             GL.Enable(EnableCap.DepthClamp);
 
             //Initialize our shadow FBO
-            float ratio = this.WindowContext.Width / (float)this.WindowContext.Height;
             shadowFBO.Init(1024, 1024);
 
             //Initalize lighting
@@ -96,6 +99,28 @@ namespace OlegEngine
 
             //Create some debug stuff
             Graphics.Init();
+
+            //Let's have some built in debug out stuff
+            GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
+        }
+
+        void GUIManager_PostDrawHUD(EventArgs e)
+        {
+
+            if (GraphicsSettings.ShowFPS)
+            {
+                AveragedFrametimes.Push(Utilities.Frametime);
+
+                double frametime = 0;
+                for (int i = 0; i < AveragedFrametimes.Count; i++)
+                {
+                    frametime += AveragedFrametimes.Value(i);
+                }
+
+                frametime = frametime / (double)AveragedFrametimes.Count;
+
+                GUI.Surface.DrawText("debug", string.Format("FPS: {0,3:N0} ({1}ms)", 1 / frametime, frametime), 10, 10);
+            }
         }
 
 
@@ -147,6 +172,7 @@ namespace OlegEngine
         /// <param name="e">Contains timing information.</param>
         public void OnRenderFrame(FrameEventArgs e)
         {
+            Utilities.Draw(e);
             //Reset the view matrix, just in case it's been altered
             Utilities.ViewMatrix = defaultViewMatrix;
 
