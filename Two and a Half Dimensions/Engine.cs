@@ -46,11 +46,11 @@ namespace OlegEngine
             Console.WriteLine("==================================");
             Console.WriteLine("Vendor: {0}", GL.GetString(StringName.Vendor));
             Console.WriteLine("Renderer: {0}", GL.GetString(StringName.Renderer));
-            Console.WriteLine(GL.GetString(StringName.ShadingLanguageVersion));
+            Console.WriteLine("GLSL Version: {0}", GL.GetString(StringName.ShadingLanguageVersion));
             string versionOpenGL = GL.GetString(StringName.Version);
-            GLVersion.Major = versionOpenGL[0];
-            GLVersion.Minor = versionOpenGL[2];
-            Console.WriteLine("OpenGL version: {0}.{1}", GLVersion.Major, GLVersion.Minor);
+            GLVersion.Major = (int)Char.GetNumericValue(versionOpenGL[0]);
+            GLVersion.Minor = (int)Char.GetNumericValue(versionOpenGL[2]);
+            Console.WriteLine("OpenGL version: {0}", versionOpenGL);
             Console.WriteLine("==================================");
 
             Utilities.Init(this.WindowContext, this);
