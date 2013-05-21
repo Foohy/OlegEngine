@@ -108,7 +108,7 @@ namespace OlegEngine
                 bytes = System.IO.File.ReadAllBytes(filename);
                 
             }
-            catch (System.IO.FileNotFoundException ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Failed to load audio file: " + ex.Message);
                 return;

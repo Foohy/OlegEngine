@@ -18,12 +18,13 @@ namespace OlegEngine
         public static double Time = 0.0d;
         public static double Frametime = 0.0d;
         public static int ErrorTex { get; set; }
+        public static int White { get; set; }
         public static int NormalTex { get; set; }
         public static int AlphaTex { get; set; }
         public static int SpecTex { get; set; }
         public static Material ErrorMat { get; set; }
-        public static Material NormalUp { get; private set; }
-        public static GameWindow window { get; private set; }
+        public static Material NormalMat { get; set; }
+        public static GameWindow window { get; set; }
         public static Matrix4 ProjectionMatrix { get; set; }
         public static Matrix4 ViewMatrix { get; set; }
         public static int CurrentPass = 1; //What stage of rendering we're at
@@ -52,14 +53,10 @@ namespace OlegEngine
             window = win;
             engine = eng;
 
-            //Make sure default error textures
-            ErrorTex = GenerateErrorTex();
-            ErrorMat = new Material(ErrorTex, "default");
-            NormalUp = new Material(GenerateNormalTex(), "default");
-            NormalTex = GenerateNormalTex();
-            SpecTex = GenerateWhite();
-            AlphaTex = GenerateWhite();
+            //Create engine-specific resources (debug models/materials, etc.)
+            EngineResources.CreateResources();
 
+            //Create a global random variable that's easily accessable
             Rand = new Random();
         }
 
@@ -424,7 +421,7 @@ namespace OlegEngine
         {
             filename = Resource.ModelDir + filename;
 
-            string[] file = null;
+            string file = null;
             lsVerts = null;
             lsElements = null;
             lsTangents = null;
@@ -434,17 +431,31 @@ namespace OlegEngine
 
             try
             {
-                file = System.IO.File.ReadAllLines(filename);
+                file = System.IO.File.ReadAllText(filename);
             }
-            catch (System.IO.FileNotFoundException ex)
+            catch (Exception ex)
             {
-                Console.WriteLine("Failed to load model file: " + ex.Message);
+                Utilities.Print("Failed to load model '{0}'. {1}", PrintCode.ERROR, filename, ex.Message);
             }
             if (file == null || file.Length == 0)
             {
-                Console.WriteLine("Failed to load model file");
+                Utilities.Print("Failed to load model '{0}'. File is empty!", PrintCode.ERROR, filename);
                 return;
             }
+
+            LoadOBJFromString(file, out lsVerts, out lsElements, out lsTangents, out lsNormals, out lsUV, out boundingBox);
+        }
+
+        public static void LoadOBJFromString(string objString, out Vector3[] lsVerts, out int[] lsElements, out Vector3[] lsTangents, out Vector3[] lsNormals, out Vector2[] lsUV, out Mesh.BoundingBox boundingBox)
+        {
+            lsVerts = null;
+            lsElements = null;
+            lsTangents = null;
+            lsNormals = null;
+            lsUV = null;
+            boundingBox = new Mesh.BoundingBox();
+
+            string[] file = objString.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 
             //scan the file and look for the number of stuffs
             List<Vector3> verts = new List<Vector3>();
@@ -538,9 +549,9 @@ namespace OlegEngine
                     default:
                         if (!string.IsNullOrEmpty(curline))
                         {
-                            #if DEBUG
+#if DEBUG
                             //Console.WriteLine("Unknown line definition ({0}): {1}", i, curline);
-                            #endif
+#endif
                         }
                         break;
                 }
@@ -997,93 +1008,6 @@ namespace OlegEngine
         public static float Lerp( float start, float end, float percent)
         {
             return start + percent * (end - start);
-        }
-
-        private static int GenerateErrorTex()
-        {
-            Bitmap tex = new Bitmap(32, 32);
-            for (int x = 0; x < tex.Height; x++)
-            {
-                for (int y = 0; y < tex.Width; y++)
-                {
-                    if ((x + (y%2)) % 2 == 0)
-                    {
-                        tex.SetPixel(x, y, Color.White);
-                    }
-                    else
-                    {
-                        tex.SetPixel(x, y, Color.Red);
-                    }
-                }
-            }
-
-            //Create the opengl texture
-            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
-            int id = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, id);
-
-            System.Drawing.Imaging.BitmapData bmp_data = tex.LockBits(new Rectangle(0, 0, tex.Width, tex.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-
-            tex.UnlockBits(bmp_data);
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest );
-            GL.ActiveTexture(TextureUnit.Texture0);
-            return id;
-        }
-
-        private static int GenerateNormalTex()
-        {
-            Bitmap tex = new Bitmap(1, 1);
-            
-            tex.SetPixel(0, 0, Color.FromArgb( 133, 119, 253 ));
-
-            //Create the opengl texture
-            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
-            int id = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, id);
-
-            System.Drawing.Imaging.BitmapData bmp_data = tex.LockBits(new Rectangle(0, 0, tex.Width, tex.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-
-            tex.UnlockBits(bmp_data);
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            return id;
-        }
-
-        private static int GenerateWhite()
-        {
-            Bitmap tex = new Bitmap(1, 1);
-
-            tex.SetPixel(0, 0, Color.White);
-
-            //Create the opengl texture
-            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
-            int id = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, id);
-
-            System.Drawing.Imaging.BitmapData bmp_data = tex.LockBits(new Rectangle(0, 0, tex.Width, tex.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-
-            tex.UnlockBits(bmp_data);
-
-            // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
-            // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
-            // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            return id;
         }
     }
 

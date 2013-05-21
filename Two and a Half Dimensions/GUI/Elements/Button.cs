@@ -33,7 +33,7 @@ namespace OlegEngine.GUI
         public Button()
         {
             this.SetColor(33, 36, 45);
-            this.SetImage(Resource.GetTexture("engine/white.png"));
+            this.SetImage( Utilities.White );
 
             TextLabel = GUIManager.Create<Label>();
             TextLabel.SetColor(255, 255, 255);
@@ -99,9 +99,6 @@ namespace OlegEngine.GUI
         public void SetText(string str)
         {
             this.TextLabel.SetText(str);
-
-            //center text
-            //this.TextLabel.SetPos((this.Width / 2) - (this.TextLabel.Width / 2), (this.Height / 2) - (this.TextLabel.Height / 2));
         }
 
         public void SizeToText(int offset = 0)
@@ -126,9 +123,6 @@ namespace OlegEngine.GUI
         public override void Resize(float oldWidth, float oldHeight, float newWidth, float newHeight)
         {
             base.Resize(oldWidth, oldHeight, newWidth, newHeight);
-
-            //center text
-            //this.TextLabel.SetPos((this.Width / 2) - (this.TextLabel.Width / 2), (this.Height / 2) - (this.TextLabel.Height / 2));
         }
 
         public override void Draw()

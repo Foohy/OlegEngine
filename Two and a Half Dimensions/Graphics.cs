@@ -23,7 +23,7 @@ namespace OlegEngine
 
         public static void Init()
         {
-            dbgWhite = new Material("engine/white.png", "default");
+            dbgWhite = Resource.GetMaterial("engine/white_simple");
             box = Resource.GetMesh("engine/box.obj");
             box.mat = dbgWhite;
             box.ShouldDrawDebugInfo = false;
@@ -762,19 +762,19 @@ namespace OlegEngine
             }
 
             GL.BindVertexArray(this.VAO);
-            if (mat != null)
-            {
-                mat.Properties.Color = this.Color;
-                mat.BindMaterial();
+            if (mat == null) mat = Utilities.ErrorMat;
 
-                //Set the matrix to the shader
-                GL.UniformMatrix4(mat.locMMatrix, false, ref mmatrix);
-                GL.UniformMatrix4(mat.locVMatrix, false, ref vmatrix);
-                GL.UniformMatrix4(mat.locPMatrix, false, ref pmatrix);
+            //Automatically update the material properties based on entity settings
+            mat.Properties.Color = this.Color;
+            mat.BindMaterial();
 
-                GL.Uniform1(mat.locTime, (float)Utilities.Time);
+            //Set the matrix to the shader
+            GL.UniformMatrix4(mat.locMMatrix, false, ref mmatrix);
+            GL.UniformMatrix4(mat.locVMatrix, false, ref vmatrix);
+            GL.UniformMatrix4(mat.locPMatrix, false, ref pmatrix);
 
-            }
+            GL.Uniform1(mat.locTime, (float)Utilities.Time);
+
             if (mat.Properties.NoCull) { GL.Disable(EnableCap.CullFace); }
             if (mat.Properties.AlphaTest) { GL.Enable(EnableCap.AlphaTest); }
             

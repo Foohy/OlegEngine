@@ -1,6 +1,63 @@
-# Blender v2.65 (sub 0) OBJ File: ''
-# www.blender.org
-v 0.000000 -1.000000 0.000000
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Drawing;
+
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
+
+
+
+namespace OlegEngine
+{
+    class EngineResources
+    {
+        #region static resources
+        const string Quad = 
+@"v 0.999999 1.000001 -0.000000
+v -0.000001 0.999999 0.000001
+v 1.000001 0.000001 -0.000001
+v 0.000001 -0.000001 0.000000
+vt 0.000000 0.000000
+vt 1.000000 0.000000
+vt 1.000000 1.000000
+vt 0.000000 1.000000
+vn -0.000001 0.000001 -1.000000
+f 2/1/1 1/2/1 3/3/1
+f 2/1/1 3/3/1 4/4/1";
+
+        const string Box = 
+@"v -1.000000 -1.000000 1.000000
+v -1.000000 -1.000000 -1.000000
+v 1.000000 -1.000000 -1.000000
+v 1.000000 -1.000000 1.000000
+v -1.000000 1.000000 1.000000
+v -1.000000 1.000000 -1.000000
+v 1.000000 1.000000 -1.000000
+v 1.000000 1.000000 1.000000
+vn -1.000000 -0.000000 0.000000
+vn 0.000000 0.000000 -1.000000
+vn 1.000000 -0.000000 0.000000
+vn 0.000000 0.000000 1.000000
+vn -0.000000 -1.000000 0.000000
+vn -0.000000 1.000000 0.000000
+s off
+f 2//1 1//1 5//1
+f 2//1 5//1 6//1
+f 6//2 7//2 3//2
+f 6//2 3//2 2//2
+f 7//3 8//3 4//3
+f 7//3 4//3 3//3
+f 1//4 4//4 8//4
+f 1//4 8//4 5//4
+f 1//5 2//5 3//5
+f 1//5 3//5 4//5
+f 8//6 7//6 6//6
+f 8//6 6//6 5//6";
+
+        const string Ball = 
+@"v 0.000000 -1.000000 0.000000
 v 0.723607 -0.447220 0.525725
 v -0.276388 -0.447220 0.850649
 v -0.894426 -0.447216 0.000000
@@ -230,6 +287,7 @@ vt 0.729832 0.716084
 vt 0.729832 0.815207
 vt 0.830523 0.491158
 vt 0.738068 0.554537
+vt 0.738068 0.554537
 vt 0.738068 0.455414
 vt 0.000783 0.099424
 vt 0.112875 0.099424
@@ -362,7 +420,6 @@ vn -0.471300 0.661699 -0.583122
 vn 0.268034 0.943523 -0.194737
 vn 0.491119 0.794657 -0.356821
 vn 0.408946 0.661698 -0.628425
-s off
 f 1/1/1 13/2/1 15/3/1
 f 2/4/2 13/5/2 17/6/2
 f 1/7/3 15/8/3 19/9/3
@@ -442,4 +499,179 @@ f 42/226/76 36/227/76 41/228/76
 f 36/229/77 9/230/77 41/231/77
 f 38/232/78 42/233/78 12/234/78
 f 38/235/79 37/236/79 42/237/79
-f 37/238/80 10/239/80 42/240/80
+f 37/238/80 10/239/80 42/240/80";
+
+        #endregion
+
+        //Internal class to store engine-affiliated resources
+        public static void CreateResources()
+        {
+            #region Important materials for the normal workings of the engine
+
+            //Create some useful materials
+            Utilities.ErrorTex = GenerateErrorTex();
+            Utilities.White = GenerateWhite();
+            Utilities.NormalTex = GenerateNormalTex();
+            Utilities.SpecTex = Utilities.White;
+            Utilities.AlphaTex = Utilities.White;
+            Utilities.ErrorMat = new Material(Utilities.ErrorTex, "default");
+            Utilities.NormalMat = new Material(Utilities.NormalTex, "default");
+
+
+            #endregion
+
+
+            #region Basic/Debug models
+
+            Vector3[] verts;
+            Vector3[] tangents;
+            Vector3[] normals;
+            Vector2[] lsUV;
+            int[] elements;
+            Mesh.BoundingBox boundingbox;
+
+            Resource.InsertMesh("engine/quad.obj", CreateNewQuadMesh());
+
+            Utilities.LoadOBJFromString(Box, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
+            Mesh mBox = new Mesh(verts, elements, tangents, normals, lsUV);
+            Resource.InsertMesh("engine/box.obj", mBox);
+
+            Utilities.LoadOBJFromString(Ball, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
+            Mesh mBall = new Mesh(verts, elements, tangents, normals, lsUV);
+            Resource.InsertMesh("engine/ball.obj", mBall);
+
+            #endregion
+
+
+            #region Engine-based and 'utility' materials
+
+            MaterialProperties properties = new MaterialProperties();
+            properties.ShaderProgram = Resource.GetProgram("default_lighting");
+            properties.BaseTexture = Utilities.White;
+            Material white = new Material(properties);
+            Resource.InsertMaterial("engine/white", white);
+
+            properties = new MaterialProperties();
+            properties.ShaderProgram = Resource.GetProgram("default");
+            properties.BaseTexture = Utilities.White;
+            Material white_simple = new Material(properties);
+            Resource.InsertMaterial("engine/white_simple", white_simple);
+
+            properties = new MaterialProperties();
+            properties.ShaderProgram = Resource.GetProgram("default_lighting");
+            properties.BaseTexture = Utilities.White;
+            properties.SpecularPower = 32.0f;
+            properties.SpecularIntensity = 4.0f;
+            Material white_shiny = new Material(properties);
+            Resource.InsertMaterial("engine/white_shiny", white_shiny);
+
+            properties = new MaterialProperties();
+            properties.ShaderProgram = Resource.GetProgram("depthtest");
+            Material depthtest = new Material(properties);
+            Resource.InsertMaterial("engine/depth", depthtest);
+
+            #endregion
+        }
+
+        //For those instances where a new one is required
+        public static Mesh CreateNewQuadMesh()
+        {
+            Vector3[] verts;
+            Vector3[] tangents;
+            Vector3[] normals;
+            Vector2[] lsUV;
+            int[] elements;
+            Mesh.BoundingBox boundingbox;
+
+            Utilities.LoadOBJFromString(Quad, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
+            return new Mesh(verts, elements, tangents, normals, lsUV);
+        }
+
+        private static int GenerateErrorTex()
+        {
+            Bitmap tex = new Bitmap(32, 32);
+            for (int x = 0; x < tex.Height; x++)
+            {
+                for (int y = 0; y < tex.Width; y++)
+                {
+                    if ((x + (y % 2)) % 2 == 0)
+                    {
+                        tex.SetPixel(x, y, Color.White);
+                    }
+                    else
+                    {
+                        tex.SetPixel(x, y, Color.Red);
+                    }
+                }
+            }
+
+            //Create the opengl texture
+            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, id);
+
+            System.Drawing.Imaging.BitmapData bmp_data = tex.LockBits(new Rectangle(0, 0, tex.Width, tex.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            tex.UnlockBits(bmp_data);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            return id;
+        }
+
+        private static int GenerateNormalTex()
+        {
+            Bitmap tex = new Bitmap(1, 1);
+
+            tex.SetPixel(0, 0, Color.FromArgb(133, 119, 253));
+
+            //Create the opengl texture
+            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, id);
+
+            System.Drawing.Imaging.BitmapData bmp_data = tex.LockBits(new Rectangle(0, 0, tex.Width, tex.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            tex.UnlockBits(bmp_data);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            return id;
+        }
+
+        private static int GenerateWhite()
+        {
+            Bitmap tex = new Bitmap(1, 1);
+
+            tex.SetPixel(0, 0, Color.White);
+
+            //Create the opengl texture
+            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, id);
+
+            System.Drawing.Imaging.BitmapData bmp_data = tex.LockBits(new Rectangle(0, 0, tex.Width, tex.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            tex.UnlockBits(bmp_data);
+
+            // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
+            // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
+            // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            return id;
+        }
+    }
+}

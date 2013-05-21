@@ -217,7 +217,7 @@ namespace OlegEngine.GUI
 
         public static void Init()
         {
-            Square = new Mesh("engine/quad.obj");
+            Square = EngineResources.CreateNewQuadMesh();
             Square.mat = new Material(Utilities.AlphaTex, "default"); ;
             Square.ShouldDrawDebugInfo = false;
 
