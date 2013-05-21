@@ -1170,25 +1170,17 @@ namespace OlegEngine
         public bool Enabled = true;
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public bool Loaded { get; private set; }
 
         public int shadowMap
         {
             get
             {
-                return (this.Enabled) ? _shadowMap : _disabledTex;
+                return (this.Enabled && this.Loaded && Utilities.engine.GraphicsSettings.EnableShadows ) ? _shadowMap : _disabledTex;
             }
         }
 
-        public FBO()
-        {
-
-        }
-        ~FBO()
-        {
-
-        }
-
-        public bool Init(int width, int height)
+        public FBO(int width, int height)
         {
             this.Width = width;
             this.Height = height;
@@ -1221,16 +1213,14 @@ namespace OlegEngine
 
             if (status != FramebufferErrorCode.FramebufferComplete)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Framebuffer error!! Status: " + status.ToString());
-                Console.ResetColor();
+                Utilities.Print("Framebuffer error!! Status: {0}", Utilities.PrintCode.ERROR, status.ToString());
 
-                return false;
+                this.Loaded = false;
+                return;
             }
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-
-            return true;
+            this.Loaded = true; //We have successfully created a framebuffer for framebuffering
         }
 
         public void BindForWriting()

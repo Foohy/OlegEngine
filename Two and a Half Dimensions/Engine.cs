@@ -21,7 +21,7 @@ namespace OlegEngine
     public class Engine
     {
         public GameWindow WindowContext;
-        public FBO shadowFBO = new FBO();
+        public FBO shadowFBO;
         public Matrix4 camMat = Matrix4.Identity;
         public event Action<FrameEventArgs> OnRenderScene;
         public event Action OnSceneResize;
@@ -77,7 +77,7 @@ namespace OlegEngine
             GL.Enable(EnableCap.DepthClamp);
 
             //Initialize our shadow FBO
-            shadowFBO.Init(1024, 1024);
+            shadowFBO = new FBO(this.GraphicsSettings.ShadowMapSize, this.GraphicsSettings.ShadowMapSize);
 
             //Initalize lighting
             LightingTechnique.Init();
@@ -184,7 +184,7 @@ namespace OlegEngine
             ShadowInfo info = ShadowTechnique.GetShadowInfo();
             shadowFBO.Enabled = ShadowTechnique.Enabled;
             ShadowTechnique.SetLightInfo(info);
-            if (ShadowTechnique.Enabled && ShadowTechnique._lights.Count > 0)
+            if (ShadowTechnique.Enabled && shadowFBO.Loaded && ShadowTechnique._lights.Count > 0 && this.GraphicsSettings.EnableShadows )
             {
                 Utilities.ProjectionMatrix = info.matrix;
                 Utilities.ViewMatrix = defaultViewMatrix;

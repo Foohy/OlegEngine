@@ -21,6 +21,7 @@ namespace OlegEngine
         public int Height = 768;
 
         //Rendering settings
+        public bool EnableShadows = true;
         public int ShadowMapSize = 1024;
         public int Samples = 4;
 
