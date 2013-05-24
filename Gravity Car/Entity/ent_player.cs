@@ -185,42 +185,39 @@ namespace Gravity_Car.Entity
 
             if (window.Keyboard[Key.W])
             {
-                NewPos.X += (float)Math.Cos(CamAngle.X) * (float)Utilities.Frametime * multiplier;
-                NewPos.Y += (float)Math.Sin(CamAngle.Y) * (float)Utilities.Frametime * multiplier;
-                NewPos.Z += (float)Math.Sin(CamAngle.X) * (float)Utilities.Frametime * multiplier;
+                NewPos.X += (float)Math.Cos(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
+                NewPos.Y += (float)Math.Sin(CamAngle.Y) * (float)Utilities.ThinkTime * multiplier;
+                NewPos.Z += (float)Math.Sin(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
             }
-                //SetPos(new Vector3(this.Position.X + (float)Math.Cos(CamAngle.X) * (float)Utilities.Frametime * multiplier, this.Position.Y + (float)Math.Sin(CamAngle.Y) * (float)Utilities.Frametime * multiplier, this.Position.Z + (float)Math.Sin(CamAngle.X) * (float)Utilities.Frametime * multiplier));
+
             if (window.Keyboard[Key.S])
             {
-                NewPos.X -= (float)Math.Cos(CamAngle.X) * (float)Utilities.Frametime * multiplier;
-                NewPos.Y -= (float)Math.Sin(CamAngle.Y) * (float)Utilities.Frametime * multiplier;
-                NewPos.Z -= (float)Math.Sin(CamAngle.X) * (float)Utilities.Frametime * multiplier;
+                NewPos.X -= (float)Math.Cos(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
+                NewPos.Y -= (float)Math.Sin(CamAngle.Y) * (float)Utilities.ThinkTime * multiplier;
+                NewPos.Z -= (float)Math.Sin(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
             }
-             //   SetPos(new Vector3(this.Position.X - (float)Math.Cos(CamAngle.X) * (float)Utilities.Frametime * multiplier, this.Position.Y - (float)Math.Sin(CamAngle.Y) * (float)Utilities.Frametime * multiplier, this.Position.Z - (float)Math.Sin(CamAngle.X) * (float)Utilities.Frametime * multiplier));
+
             if (window.Keyboard[Key.D])
             {
-                NewPos.X += (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier;
-                NewPos.Z += (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier;
+                NewPos.X += (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
+                NewPos.Z += (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
             }
-                //SetPos(new Vector3(this.Position.X + (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier, this.Position.Y, this.Position.Z + (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier));
+
             if (window.Keyboard[Key.A])
             {
-                NewPos.X -= (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier;
-                NewPos.Z -= (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier;
+                NewPos.X -= (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
+                NewPos.Z -= (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
             }
-            //SetPos(new Vector3(this.Position.X - (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier, this.Position.Y, this.Position.Z - (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.Frametime * multiplier));
 
             if (window.Keyboard[Key.Space])
             {
                 if (window.Keyboard[Key.ControlLeft])
                 {
-                    NewPos.Y-= (float)Utilities.Frametime * multiplier;
-                    //SetPos(new Vector3(this.Position.X, this.Position.Y - (float)Utilities.Frametime * multiplier, this.Position.Z));
+                    NewPos.Y -= (float)Utilities.ThinkTime * multiplier;
                 }
                 else
                 {
-                    NewPos.Y += (float)Utilities.Frametime * multiplier;
-                    //SetPos(new Vector3(this.Position.X, this.Position.Y + (float)Utilities.Frametime * multiplier, this.Position.Z));
+                    NewPos.Y += (float)Utilities.ThinkTime * multiplier;
                 }
             }
 

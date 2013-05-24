@@ -165,8 +165,8 @@ namespace Gravity_Car.Entity
             //Console.WriteLine(this.Physics.Body.LinearVelocity);
 
             //Zoom
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageDown]) Zoom -= (float)Utilities.Frametime * 100;
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageUp]) Zoom += (float)Utilities.Frametime * 100;
+            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageDown]) Zoom -= (float)Utilities.ThinkTime * 100;
+            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageUp]) Zoom += (float)Utilities.ThinkTime * 100;
             Zoom += Input.deltaZ * 0.7f;
             crZoom += (Zoom - crZoom) / 4;
         }

@@ -255,8 +255,8 @@ namespace OlegEngine
         {
             Input.LockMouse = false;
             //curve dat zoom mmm girl u fine
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageDown]) goalZoom -= ((float)Utilities.Frametime * 100);
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageUp]) goalZoom += ((float)Utilities.Frametime * 100);
+            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageDown]) goalZoom -= ((float)Utilities.ThinkTime * 100);
+            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageUp]) goalZoom += ((float)Utilities.ThinkTime * 100);
 
 
             goalZoom += Input.deltaZ;
@@ -278,19 +278,19 @@ namespace OlegEngine
             //I SAID MOVE
             if (Utilities.window.Keyboard[Key.W])
             {
-                ViewPosition += new Vector3(0.0f, (float)Utilities.Frametime, 0.0f) * multiplier;
+                ViewPosition += new Vector3(0.0f, (float)Utilities.ThinkTime, 0.0f) * multiplier;
             }
             if (Utilities.window.Keyboard[Key.A])
             {
-                ViewPosition += new Vector3(-(float)Utilities.Frametime, 0.0f, 0.0f) * multiplier;
+                ViewPosition += new Vector3(-(float)Utilities.ThinkTime, 0.0f, 0.0f) * multiplier;
             }
             if (Utilities.window.Keyboard[Key.S])
             {
-                ViewPosition += new Vector3(0.0f, -(float)Utilities.Frametime, 0.0f) * multiplier;
+                ViewPosition += new Vector3(0.0f, -(float)Utilities.ThinkTime, 0.0f) * multiplier;
             }
             if (Utilities.window.Keyboard[Key.D])
             {
-                ViewPosition += new Vector3((float)Utilities.Frametime, 0.0f, 0.0f) * multiplier;
+                ViewPosition += new Vector3((float)Utilities.ThinkTime, 0.0f, 0.0f) * multiplier;
             }
 
             if (Cursor != null)

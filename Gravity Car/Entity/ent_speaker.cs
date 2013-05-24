@@ -42,7 +42,7 @@ namespace Gravity_Car.Entity
             }
             if (started)
             {
-                syncedTime += (float)Utilities.Frametime;
+                syncedTime += (float)Utilities.ThinkTime;
             }
             //Thomas the tank engine: 10.04
             //Brodyquest: 10.7

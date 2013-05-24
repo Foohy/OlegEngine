@@ -15,8 +15,18 @@ namespace OlegEngine
 {
     public class Utilities
     {
-        public static double Time = 0.0d;
-        public static double Frametime = 0.0d;
+        /// <summary>
+        /// The current time
+        /// </summary>
+        public static double Time { get; private set; }
+        /// <summary>
+        /// The amount of time the last frame took to render
+        /// </summary>
+        public static double Frametime { get; private set; }
+        /// <summary>
+        /// The amount of time since the last 'think' event happened
+        /// </summary>
+        public static double ThinkTime { get; private set; }
         public static int ErrorTex { get; set; }
         public static int White { get; set; }
         public static int NormalTex { get; set; }
@@ -33,13 +43,20 @@ namespace OlegEngine
 
         public static FarseerPhysics.Dynamics.World PhysicsWorld { get; set; }
 
+        /// <summary>
+        /// Units to the near clipping plane
+        /// </summary>
         public const float NearClip = 1.0f;
+        /// <summary>
+        /// Units to the far clipping plane
+        /// </summary>
         public const float FarClip = 256f;
 
-        #region timing stuff
+        #region Timing information
         public static void Think(FrameEventArgs e)
         {
-            Time += e.Time;      
+            Time += e.Time;
+            ThinkTime = e.Time;
         }
 
         public static void Draw(FrameEventArgs e)

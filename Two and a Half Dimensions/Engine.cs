@@ -160,7 +160,10 @@ namespace OlegEngine
 
             Input.Think(this.WindowContext, e);
             Audio.Think(e);
-            View.Think(e);
+
+            //Update the player's view so we know where to render
+            View.Think(e); 
+
             //Levels.LevelManager.Think(e);
             Entity.EntManager.Think(e);
 
@@ -172,7 +175,9 @@ namespace OlegEngine
         /// <param name="e">Contains timing information.</param>
         public void OnRenderFrame(FrameEventArgs e)
         {
+            //Update timing information
             Utilities.Draw(e);
+
             //Reset the view matrix, just in case it's been altered
             Utilities.ViewMatrix = defaultViewMatrix;
 
