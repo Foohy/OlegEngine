@@ -85,7 +85,7 @@ namespace OlegEngine
 
             //Initialize our shadows
             ShadowTechnique.Init();
-            ShadowTechnique.Enable();
+            ShadowTechnique.Enabled = GraphicsSettings.EnableShadows;
 
             //Initialize skybox
             SkyboxTechnique.Init();
@@ -119,7 +119,7 @@ namespace OlegEngine
 
                 frametime = frametime / (double)AveragedFrametimes.Count;
 
-                GUI.Surface.DrawText("debug", string.Format("FPS: {0,3:N0} ({1}ms)", 1 / frametime, frametime), 10, 10);
+                GUI.Surface.DrawText("debug", string.Format("FPS: {0,3:N0} ({1:0.000}ms)", 1 / frametime, frametime * 1000), 10, 10);
             }
         }
 
@@ -197,9 +197,12 @@ namespace OlegEngine
                 shadowFBO.BindForWriting();
                 GL.Clear(ClearBufferMask.DepthBufferBit);
                 RenderScene(e);
+
+                //Change our renderer back to the default framebuffer/size
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0); 
+                GL.Viewport(this.WindowContext.ClientRectangle.X, this.WindowContext.ClientRectangle.Y, this.WindowContext.ClientRectangle.Width, this.WindowContext.ClientRectangle.Height);
             }
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0); //Reset it to the default framebuffer
-            GL.Viewport(this.WindowContext.ClientRectangle.X, this.WindowContext.ClientRectangle.Y, this.WindowContext.ClientRectangle.Width, this.WindowContext.ClientRectangle.Height);
+
             //Set the view to the normal camera
             //Utilities.ProjectionMatrix = ply.camMatrix;
             Utilities.ProjectionMatrix = View.CameraMatrix;
