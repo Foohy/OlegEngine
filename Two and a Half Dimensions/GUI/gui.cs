@@ -86,13 +86,18 @@ namespace OlegEngine.GUI
 
         static void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs e)
         {
+            //Going through each element in the list (from toplevel to bottom level)
             for (int i = elements.Count-1; i >= 0; i--)
             {
                 Panel p = elements[i];
-                if (p.IsMouseOver())
+                //If the mouse is over the element
+                if (p.Enabled &&  p.IsMouseOver())
                 {
-                    p.MouseDown(e);
+                    if (!p.Parent)
+                        p.MouseDown(e);
+                    else p.TopParent.MouseDown(e);
 
+                    //If the element shouldn't let input pass through or we're not drawing the element stop now
                     if (!p.ShouldPassInput || !p.ShouldDraw)
                     {
                         break;
@@ -132,7 +137,7 @@ namespace OlegEngine.GUI
             for (int i = elements.Count - 1; i >= 0; i--)
             {
                 Panel panel = elements[i];
-                if (panel.Parent == null && panel.IsMouseOver() && !panel.ShouldPassInput && panel.ShouldDraw)
+                if (panel.Parent == null && panel.IsPointOver(pos) && !panel.ShouldPassInput && panel.ShouldDraw)
                 {
                     if (panel == p || p.IsParent(panel))
                     {
@@ -143,6 +148,22 @@ namespace OlegEngine.GUI
             }
 
             return false;
+        }
+
+        //Return which of the given panels is higher (closer to the user/drawn last)
+        public static Panel GetHigherPanel(Panel p1, Panel p2)
+        {
+            return elements.IndexOf(p1) > elements.IndexOf(p2) ? p1 : p2;
+        }
+
+        /// <summary>
+        /// Get the index of a given panel (Useful for comparison with other panels to get a 'height')
+        /// </summary>
+        /// <param name="p">The panel to get the index of</param>
+        /// <returns>Index ('height')</returns>
+        public static int GetPanelIndex( Panel p )
+        {
+            return elements.IndexOf(p);
         }
 
         private static void UpdatePanels()
