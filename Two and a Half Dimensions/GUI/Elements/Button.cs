@@ -56,7 +56,6 @@ namespace OlegEngine.GUI
             {
                 this.CurrentState = State.Hover;
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Hand;
-                GUIManager.IsPanelAbovePoint(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y), this);
             }
             else if (this.CurrentState != State.Pressed )
             {
