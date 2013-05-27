@@ -36,7 +36,7 @@ namespace OlegEngine.GUI
 
         public Window()
         {
-
+            MinimumSize = new Vector2(30, 20);
         }
 
         public override void Init()
@@ -121,6 +121,7 @@ namespace OlegEngine.GUI
         public override void MouseDown(OpenTK.Input.MouseButtonEventArgs e)
         {
             base.MouseDown(e);
+            Offset = new Vector2(Utilities.window.Mouse.X - this.Position.X, Utilities.window.Mouse.Y - this.Position.Y);
             this.SendToFront();
             Title.SendToFront();
 
@@ -191,6 +192,8 @@ namespace OlegEngine.GUI
 
                 Title.SetWidth(this.Width);
             }
+
+            Offset = Vector2.Zero;
         }
 
         protected override void Reposition()
@@ -203,6 +206,7 @@ namespace OlegEngine.GUI
         public override void Resize(float oldWidth, float oldHeight, float newWidth, float newHeight)
         {
             //Make sure our size is within our minimum and maximum
+            float WidthOverDelta = this.MinimumSize.X - this.Width;
             this.Width = Utilities.Clamp(this.Width, (this.MaximumSize.X <= 0) ? float.PositiveInfinity : this.MaximumSize.X, (this.MinimumSize.X < this.closeButton.Width) ? this.closeButton.Width : this.MinimumSize.X);
             this.Height = Utilities.Clamp(this.Height, (this.MaximumSize.Y <= 0) ? float.PositiveInfinity : this.MaximumSize.Y, this.MinimumSize.Y);
 
@@ -305,8 +309,10 @@ namespace OlegEngine.GUI
             CurrentResizeMode == ResizeMode.Left ||
             CurrentResizeMode == ResizeMode.BottomLeft)
             {
-                this.SetWidth((this.Position.X + this.Width) - Utilities.window.Mouse.X + (this.Parent ? this.Parent.Position.X : 0));
-                this.SetPos(Utilities.window.Mouse.X - (this.Parent ? this.Parent.Position.X : 0), this.Position.Y);
+                float NewWidth = (this.Position.X + this.Width) - (Utilities.window.Mouse.X - Offset.X);
+                this.SetWidth(NewWidth);
+                float Delta = NewWidth - this.MinimumSize.X;
+                this.SetPos(Utilities.window.Mouse.X - Offset.X + (Delta < 0 ? Delta : 0), this.Position.Y);
             }
 
             if (CurrentResizeMode == ResizeMode.TopRight ||
@@ -329,18 +335,6 @@ namespace OlegEngine.GUI
             {
                 this.SetHeight(Utilities.window.Mouse.Y - Screenpos.Y);
             }
-        }
-
-        public override void Draw()
-        {
-            //Title.ShouldDraw = true;
-            //closeButton.ShouldDraw = true;
-            base.Draw();
-            //Title.Draw();
-            //TitleText.Draw();
-            //closeButton.Draw();
-            //Title.ShouldDraw = false; //override it's drawing with our own
-            //closeButton.ShouldDraw = false;
         }
     }
 }

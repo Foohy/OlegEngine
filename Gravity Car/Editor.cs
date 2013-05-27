@@ -99,15 +99,21 @@ namespace OlegEngine
             mainwin.SetTitle(Utilities.Time.ToString());
 
             Window subWin = GUIManager.Create<Window>(mainwin);
-            subWin.SetPos(20, 40);
-            subWin.SetWidth(230);
+            subWin.SetPos(10, 10);
+            subWin.SetWidth(330);
             subWin.SetTitle("I'm a window within a window!");
 
-            subWin = GUIManager.Create<Window>(mainwin);
-            subWin.SetPos(250, 70);
-            subWin.SetHeight(80);
+            subWin = GUIManager.Create<Window>(subWin);
+            subWin.SetPos(10, 10);
+            subWin.SetHeight(180);
             subWin.SetWidth(120);
             subWin.SetTitle("I'm another!");
+
+            subWin = GUIManager.Create<Window>(subWin);
+            subWin.SetPos(10, 10);
+            subWin.SetHeight(40);
+            subWin.SetWidth(80);
+            subWin.SetTitle("Budding!");
 
         }
 
