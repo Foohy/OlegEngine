@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace OlegEngine.GUI
 {
@@ -139,7 +140,22 @@ namespace OlegEngine.GUI
             Vector2 truePos = this.GetScreenPos();
             DrawText.SetPos(truePos.X + PosOffset.X, truePos.Y + PosOffset.Y);//TODO: handle aligning to right/center
             DrawText.Color = this.Color;
+
+            int X, Y, W, H;
+            bool clipping = ConstructClip(truePos, out X, out Y, out W, out H);
+            if (clipping)
+            {
+                GL.Enable(EnableCap.ScissorTest);
+                GL.Scissor(X, Y, W, H);
+            }
+
             DrawText.Draw();
+
+
+            if (clipping)
+            {
+                GL.Disable(EnableCap.ScissorTest);
+            }
         }
     }
 }

@@ -627,17 +627,17 @@ namespace OlegEngine.GUI
 
             Vector2 posOffset = this.GetScreenPos();
 
-            if (this.PreDraw != null) { this.PreDraw(this, posOffset); }
-
-            bool clipping = (this.ClipChildren && ((this.Parent != null && !this.Parent.ClipChildren ) || this.Parent == null)); //Clip if clipping is enabled, our parent isn't clipping, or our parent is null
+            int X, Y, W, H;
+            bool clipping = ConstructClip(posOffset, out X, out Y, out W, out H);
             if (clipping)
             {
                 GL.Enable(EnableCap.ScissorTest);
-                GL.Scissor( (int)posOffset.X, (int)(Utilities.window.Height - posOffset.Y - this.Height), (int)this.Width, (int)this.Height );
+                GL.Scissor( X, Y, W, H);
             }
 
             if (this.ShouldDraw)
             {
+                if (this.PreDraw != null) { this.PreDraw(this, posOffset); }
                 if (!AlphaBlendmode) { GL.Disable(EnableCap.Blend); }
 
                 panelMesh.mat = Mat;
@@ -653,17 +653,48 @@ namespace OlegEngine.GUI
 
                 if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
             }
-            //Draw our children
-            if (ShouldDrawChildren)
-            {
-                DrawChildren();
-            }
-
+            
             if (clipping)
             {
                 GL.Disable(EnableCap.ScissorTest);
             }
 
+            //Draw our children
+            if (ShouldDrawChildren)
+            {
+                DrawChildren();
+            }
+        }
+
+        protected bool ConstructClip( Vector2 PosOffset, out int X, out int Y, out int W, out int H )
+        {
+            X = 0;
+            Y = 0;
+            W = int.MaxValue;
+            H = int.MaxValue;
+
+            Panel clipper = this;
+
+            if (!clipper) return false;
+            
+
+            while ( clipper)
+            {
+                if (clipper.ClipChildren)
+                {
+                    Vector2 offset = clipper.GetScreenPos();
+                    X = offset.X > X ? (int)offset.X : X;
+                    Y = offset.Y > Y ? (int)offset.Y : Y;
+                    W = ((offset.X + clipper.Width) - X) < W ? (int)((offset.X + clipper.Width) - X) : W;
+                    H = ((offset.Y + clipper.Height) - Y) < H ? (int)((offset.Y + clipper.Height) - Y) : H;
+                }
+
+                clipper = clipper.Parent;
+            }
+
+            Y = Utilities.window.Height - Y - H;
+
+            return true;
         }
 
         private void DrawChildren()
