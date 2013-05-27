@@ -66,6 +66,13 @@ namespace OlegEngine.GUI
         public event Action<Panel, Vector2> PreDraw;
         public event Action<Panel, Vector2> PostDraw;
 
+        public int Material
+        {
+            get
+            {
+                return Mat.Properties.BaseTexture;
+            }
+        }
         Material Mat;
         Mesh panelMesh = Resource.GetMesh("engine/quad.obj");
         public Matrix4 modelview;
@@ -119,8 +126,12 @@ namespace OlegEngine.GUI
         /// <param name="parent"></param>
         public void SetParent(Panel parent)
         {
+            if (parent)
+                parent.Children.Add(this);
+            else if (this.Parent) //If the parent we're being set to and we have a parent, remove us from its list of children
+                this.Parent.Children.Remove(this);
+
             this.Parent = parent;
-            parent.Children.Add(this);
             UpdateTopParent();
         }
 
@@ -138,10 +149,12 @@ namespace OlegEngine.GUI
 
         public void UpdateTopParent()
         {
+            if (!this.Parent) return;
+
             Panel p = this.Parent;
-            while (p != null)
+            while (p.Parent != null)
             {
-                p = p.Parent;
+                p = p.Parent ? p.Parent : p;
             }
             TopParent = p;
         }
@@ -393,6 +406,11 @@ namespace OlegEngine.GUI
             return IsPointOver( new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y ));
         }
 
+        /// <summary>
+        /// Return if a given 2D point is within this panel's bounds
+        /// </summary>
+        /// <param name="point">2D screen position</param>
+        /// <returns>Point is over this panel</returns>
         public bool IsPointOver(Vector2 point)
         {
             Vector2 PanelPos = this.GetScreenPos();
@@ -403,6 +421,35 @@ namespace OlegEngine.GUI
             if (point.Y > PanelPos.Y + this.Height) return false;
 
             return true;   
+        }
+
+        /// <summary>
+        /// Return if this panel is in a higher layer than a given panel (Drawn last = higher layer)
+        /// </summary>
+        /// <param name="p">The panel to check against</param>
+        /// <returns>Whether this panel is in a higher layer than the given panel</returns>
+        public bool IsOverPanel(Panel p)
+        {
+            return GUIManager.GetHigherPanel(this, p) == this;
+        }
+
+        public Panel GetHighestChildAtPos(Vector2 point)
+        {
+            if (this.Children.Count == 0) return null;
+
+            Panel highestPanel = null;
+            int highestIndex = -1;
+            foreach (Panel child in this.Children)
+            {
+                int index = GUIManager.GetPanelIndex( child );
+                if (!child.ShouldPassInput && child.Enabled && child.IsPointOver(point) && index > highestIndex)
+                {
+                    highestIndex = index;
+                    highestPanel = child;
+                }
+            }
+
+            return highestPanel;
         }
 
         /// <summary>
@@ -476,10 +523,17 @@ namespace OlegEngine.GUI
         /// </summary>
         public virtual void Remove()
         {
-            foreach (Panel p in this.Children)
+            for (int i = 0; i < this.Children.Count; i++)
             {
-                p.Remove();
+                if (this.Children[i])
+                {
+                    this.Children[i].Remove();
+                    i--;
+                }
             }
+
+            if (this.Parent)
+                this.Parent.Children.Remove(this);
 
             this._ToRemove = true;
         }
@@ -488,14 +542,14 @@ namespace OlegEngine.GUI
 
         public virtual void MouseDown(MouseButtonEventArgs e)
         {
-            foreach (Panel child in this.Children)
-            {
-                if (child.IsMouseOver())
-                {
-                    child.MouseDown(e);
-                }
-            }
+            if (!this.Enabled) return;
 
+            //Someone call this child's parents, it's soooo highhh
+            Panel highestChild = GetHighestChildAtPos(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y));
+
+            if (highestChild) highestChild.MouseDown(e);
+
+            //Invoke the event
             if (OnMouseDown != null)
             {
                 OnMouseDown(this, e);
@@ -504,15 +558,14 @@ namespace OlegEngine.GUI
 
         public virtual void MouseUp(MouseButtonEventArgs e)
         {
-            foreach (Panel child in this.Children)
-            {
-                if (child.IsMouseOver())
-                {
-                    child.MouseUp(e);
-                }
-            }
+            if (!this.Enabled) return;
 
+            //Someone call this child's parents, it's soooo highhh
+            Panel highestChild = GetHighestChildAtPos(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y));
 
+            if (highestChild) highestChild.MouseUp(e);
+
+            //Invoke the event
             if (OnMouseUp != null)
             {
                 OnMouseUp(this, e);
@@ -521,11 +574,14 @@ namespace OlegEngine.GUI
 
         public virtual void MouseMove(MouseMoveEventArgs e)
         {
+            if (!this.Enabled) return;
+
             foreach (Panel child in this.Children)
             {
                 child.MouseMove(e);
             }
 
+            //Invoke the event
             if (OnMouseMove != null)
             {
                 OnMouseMove(this, e);
@@ -534,6 +590,8 @@ namespace OlegEngine.GUI
 
         public virtual void KeyPressed(KeyPressEventArgs e)
         {
+            if (!this.Enabled) return;
+
             foreach (Panel child in this.Children)
             {
                 child.KeyPressed(e);
@@ -565,12 +623,12 @@ namespace OlegEngine.GUI
 
         public virtual void Draw()
         {
-            if (!ShouldDraw) { return; }
+            if (!ShouldDraw && !ShouldDrawChildren) { return; }
 
             Vector2 posOffset = this.GetScreenPos();
 
             if (this.PreDraw != null) { this.PreDraw(this, posOffset); }
-            if (!AlphaBlendmode) { GL.Disable(EnableCap.Blend); }
+
             bool clipping = (this.ClipChildren && ((this.Parent != null && !this.Parent.ClipChildren ) || this.Parent == null)); //Clip if clipping is enabled, our parent isn't clipping, or our parent is null
             if (clipping)
             {
@@ -578,19 +636,23 @@ namespace OlegEngine.GUI
                 GL.Scissor( (int)posOffset.X, (int)(Utilities.window.Height - posOffset.Y - this.Height), (int)this.Width, (int)this.Height );
             }
 
-            panelMesh.mat = Mat;
-            modelview = Matrix4.CreateTranslation(Vector3.Zero);
-            modelview *= Matrix4.Scale(Width, Height, 1.0f);
-            modelview *= Matrix4.CreateTranslation(posOffset.X, posOffset.Y, 3.0f);
+            if (this.ShouldDraw)
+            {
+                if (!AlphaBlendmode) { GL.Disable(EnableCap.Blend); }
+
+                panelMesh.mat = Mat;
+                modelview = Matrix4.CreateTranslation(Vector3.Zero);
+                modelview *= Matrix4.Scale(Width, Height, 1.0f);
+                modelview *= Matrix4.CreateTranslation(posOffset.X, posOffset.Y, 3.0f);
 
 
-            this.panelMesh.Color = this.Color;
-            panelMesh.DrawSimple(modelview);
-            if (this.PostDraw != null) { this.PostDraw(this, posOffset); }
+                this.panelMesh.Color = this.Color;
+                panelMesh.DrawSimple(modelview);
+                if (this.PostDraw != null) { this.PostDraw(this, posOffset); }
 
 
-            if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
-
+                if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
+            }
             //Draw our children
             if (ShouldDrawChildren)
             {
