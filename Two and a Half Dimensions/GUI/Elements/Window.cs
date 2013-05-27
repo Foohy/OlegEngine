@@ -48,7 +48,7 @@ namespace OlegEngine.GUI
             this.SetMaterial(Resource.GetTexture("gui/window.png"));
             this.SetColor(20, 24, 33);
 
-            Title = GUIManager.Create<Panel>();
+            Title = GUIManager.Create<Panel>( this.Parent );
             Title.SetMaterial(Resource.GetTexture("gui/title.png"));
             Title.SetHeight(25);
             Title.SetWidth(this.Width);
@@ -229,6 +229,7 @@ namespace OlegEngine.GUI
         {
             this.closeButton.Enabled = enabled;
             this.closeButton.ShouldDraw = enabled;
+            this.closeButton.ShouldDrawChildren = enabled;
         }
 
         private static int size = 10; //must be within a box of this many pixels wide
@@ -304,8 +305,8 @@ namespace OlegEngine.GUI
             CurrentResizeMode == ResizeMode.Left ||
             CurrentResizeMode == ResizeMode.BottomLeft)
             {
-                this.SetWidth((this.Position.X + this.Width) - Utilities.window.Mouse.X );
-                this.SetPos(Utilities.window.Mouse.X, this.Position.Y);
+                this.SetWidth((this.Position.X + this.Width) - Utilities.window.Mouse.X + (this.Parent ? this.Parent.Position.X : 0));
+                this.SetPos(Utilities.window.Mouse.X - (this.Parent ? this.Parent.Position.X : 0), this.Position.Y);
             }
 
             if (CurrentResizeMode == ResizeMode.TopRight ||
