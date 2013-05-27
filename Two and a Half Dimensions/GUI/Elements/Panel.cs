@@ -496,7 +496,7 @@ namespace OlegEngine.GUI
         /// <param name="color">Color</param>
         public void SetColor(System.Drawing.Color color)
         {
-            this.Color = new Vector3(color.R / 255, color.G / 255, color.B / 255);
+            this.Color = new Vector3(color.R / (float)255, color.G / (float)255, color.B / (float)255);
         }
 
         public Panel GetChildByName(string name, bool recursive = false)
