@@ -82,46 +82,65 @@ namespace OlegEngine
                 Button help = TopControl.AddButton("Help...");
                 help.OnButtonPress += new Button.OnButtonPressDel(help_OnButtonPress);
 
+                Button tests = TopControl.AddButton("Panel Tests");
+                tests.OnButtonPress += new Button.OnButtonPressDel(tests_OnButtonPress);
+
             }
 
             TopControl.ShouldDraw = true;
         }
 
-        static Window exitMessageBox;
+        static void tests_OnButtonPress(Panel sender)
+        {
+            Window mainwin = GUIManager.Create<Window>();
+            mainwin.SetPos(300, 200);
+            mainwin.SetWidth(500);
+            mainwin.SetHeight(450);
+            mainwin.SetTitle(Utilities.Time.ToString());
+
+            Window subWin = GUIManager.Create<Window>(mainwin);
+            subWin.SetPos(20, 40);
+            subWin.SetWidth(230);
+            subWin.SetTitle("I'm a window within a window!");
+
+            subWin = GUIManager.Create<Window>(mainwin);
+            subWin.SetPos(250, 70);
+            subWin.SetHeight(80);
+            subWin.SetWidth(120);
+            subWin.SetTitle("I'm another!");
+
+        }
+
         static void exit_OnButtonPress(Panel sender)
         {
-            exitMessageBox = GUIManager.Create<Window>();
+            Window exitMessageBox = GUIManager.Create<Window>();
             exitMessageBox.SetTitle("Hold the fucking phone");
-            exitMessageBox.SetWidth(exitMessageBox.Width);
             exitMessageBox.ClipChildren = true;
             exitMessageBox.SetPos((Utilities.window.Width / 2) - (exitMessageBox.Width / 2), (Utilities.window.Height / 2) - (exitMessageBox.Height / 2));
-
             exitMessageBox.SetWidth(205);
             exitMessageBox.SetHeight(75);
-            
-            Label label = GUIManager.Create<Label>();
+
+            Label label = GUIManager.Create<Label>(exitMessageBox);
             label.Autosize = true;
-            label.SetParent(exitMessageBox);
             label.SetText("Are you sure you'd like to leave?");
             label.SetPos(15, 10);
 
-            Button button = GUIManager.Create<Button>();
+            Button button = GUIManager.Create<Button>(exitMessageBox);
             button.SetText("Yes");
             button.SizeToText(15);
-            button.SetParent(exitMessageBox);
             button.DockPadding(20, 20, 20, 20);
             button.SetHeight(20);
             button.SetPos(20, 40);
+            button.SetAnchorStyle(Panel.Anchors.Bottom);
             button.OnButtonPress += new Button.OnButtonPressDel(button_OnYesButtonPress);
 
-            button = GUIManager.Create<Button>();
+            button = GUIManager.Create<Button>(exitMessageBox);
             button.SetText("Cancel");
             button.SizeToText(15);
-            button.SetParent(exitMessageBox);
             button.DockPadding(20, 20, 20, 20);
             button.SetHeight(20);
             button.SetPos(exitMessageBox.Width - button.Width - 20, 40);
-            button.SetAnchorStyle(Panel.Anchors.Right );
+            button.SetAnchorStyle(Panel.Anchors.Right | Panel.Anchors.Bottom );
             button.OnButtonPress += new Button.OnButtonPressDel(button_OnNoButtonPress);
         }
 
@@ -132,7 +151,7 @@ namespace OlegEngine
 
         static void button_OnNoButtonPress(Panel sender)
         {
-            exitMessageBox.Remove();
+            sender.Parent.Remove();
         }
 
         static void help_OnButtonPress(Panel sender)
