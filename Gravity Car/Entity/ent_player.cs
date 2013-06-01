@@ -29,7 +29,6 @@ namespace Gravity_Car.Entity
         public float radius = 2.0f;
 
         public Matrix4 camMatrix;
-        public Vector2d CamAngle = new Vector2d(-1.5f, 0.0f);
         public float Zoom { get; set; }
         public PlayerMode Mode { get; private set; }
 
@@ -166,8 +165,8 @@ namespace Gravity_Car.Entity
 
             //Levels.LevelManager.physWorld.Gravity = new Microsoft.Xna.Framework.Vector2(-Normal.X, -Normal.Y) * 10;
 
-            Vector3 point = new Vector3((float)Math.Cos(CamAngle.X), (float)Math.Sin(CamAngle.Y) - 0.21f, (float)Math.Sin(CamAngle.X));
-            camMatrix = Matrix4.LookAt(Position + new Vector3(0, crZoom / 90, crZoom), Position + point + new Vector3(0, crZoom / 90, 0), Vector3.UnitY);
+            //Vector3 point = new Vector3((float)Math.Cos(CamAngle.X), (float)Math.Sin(CamAngle.Y) - 0.21f, (float)Math.Sin(CamAngle.X));
+            //camMatrix = Matrix4.LookAt(Position + new Vector3(0, crZoom / 90, crZoom), Position + point + new Vector3(0, crZoom / 90, 0), Vector3.UnitY);
 
             //OlegEngine.Player.ply.SetPos(Position + new Vector3(0, crZoom / 900, 1.0f + crZoom / 10));
 
@@ -182,31 +181,31 @@ namespace Gravity_Car.Entity
                 multiplier = 20;
 
             Vector3 NewPos = this.Position;
+            //Calculate the new angle of the camera
+            this.SetAngle(this.Angles + new Angle(Input.deltaY / -15f, Input.deltaX / 15f, 0));
 
+            Vector3 Forward, Right, Up;
+            this.Angles.AngleVectors(out Forward, out Up, out Right);
+
+            //Calculate the new position
             if (window.Keyboard[Key.W])
             {
-                NewPos.X += (float)Math.Cos(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Y += (float)Math.Sin(CamAngle.Y) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Z += (float)Math.Sin(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
+                NewPos += Forward * (float)Utilities.ThinkTime * multiplier;
             }
 
             if (window.Keyboard[Key.S])
             {
-                NewPos.X -= (float)Math.Cos(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Y -= (float)Math.Sin(CamAngle.Y) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Z -= (float)Math.Sin(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
+                NewPos -= Forward * (float)Utilities.ThinkTime * multiplier;
             }
 
             if (window.Keyboard[Key.D])
             {
-                NewPos.X += (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Z += (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
+                NewPos -= Right * (float)Utilities.ThinkTime * multiplier;
             }
 
             if (window.Keyboard[Key.A])
             {
-                NewPos.X -= (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Z -= (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
+                NewPos += Right * (float)Utilities.ThinkTime * multiplier;
             }
 
             if (window.Keyboard[Key.Space])
@@ -221,16 +220,11 @@ namespace Gravity_Car.Entity
                 }
             }
 
-            CamAngle += new Vector2d(Input.deltaX / 350f, Input.deltaY / -350f);
-            CamAngle = new Vector2d((float)CamAngle.X, Utilities.Clamp((float)CamAngle.Y, 1.0f, -1.0f)); //Clamp it because I can't math correctly
-
 
             this.SetPos(NewPos, false);
-            this.SetAngle(new Vector3((float)CamAngle.X, (float)CamAngle.Y, 0));
-
 
             View.SetPos(this.Position);
-            View.SetAngles(this.Angle);
+            View.SetAngles(this.Angles);
         }
 
         private static float CastCallbackFunc(Fixture fixture, Microsoft.Xna.Framework.Vector2 point, Microsoft.Xna.Framework.Vector2 normal, float fraction)

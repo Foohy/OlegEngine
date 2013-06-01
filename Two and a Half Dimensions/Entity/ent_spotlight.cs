@@ -26,7 +26,7 @@ namespace OlegEngine.Entity
 
         public override void Init()
         {
-            shadowInfo = new ShadowInfo(Position, Angle, Resource.GetTexture("effects/flashlight.png"), 1.0f );
+            shadowInfo = new ShadowInfo(Position, this.Angles.Forward(), Resource.GetTexture("effects/flashlight.png"), 1.0f );
             shadowInfo.Linear = 0.01f;
             cheapLight = new SpotLight();
             cheapLight.Linear = 0.01f;
@@ -50,7 +50,7 @@ namespace OlegEngine.Entity
                 shadowInfo.Color = Color;
                 shadowInfo.Constant = Constant;
                 shadowInfo.Cutoff = Cutoff;
-                shadowInfo.Direction = this.Angle;
+                shadowInfo.Direction = this.Angles.Forward();
                 shadowInfo.Position = Position;
                 shadowInfo.Cheap = !this.ExpensiveShadows;
 

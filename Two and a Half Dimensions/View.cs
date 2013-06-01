@@ -9,9 +9,9 @@ namespace OlegEngine
     public class View
     {
         public static Vector3 Position { get; private set; }
-        public static Vector3 Angles { get; set; }
-        public static Vector3 ViewNormal { get; set; }
-        public static Matrix4 CameraMatrix { get; set; }
+        public static Angle Angles { get; private set; }
+        public static Vector3 ViewNormal { get; private set; }
+        public static Matrix4 CameraMatrix { get; private set; }
 
         public static Entity.BaseEntity Player { get; private set; }
 
@@ -19,6 +19,7 @@ namespace OlegEngine
         public static event Action CalcView;
 
         private static System.Reflection.MethodInfo PlyCalcView;
+        private const float DEG2RAD =  (float)Math.PI / 180f;
 
         public static void Think(FrameEventArgs e)
         {
@@ -36,32 +37,44 @@ namespace OlegEngine
 
             //Create the matrix to be sent to the renderer
             //Find the point where we'll be facing
-            Vector3 point = new Vector3((float)Math.Cos(Angles.X), (float)Math.Sin(Utilities.Clamp((float)Angles.Y, 1.0f, -1.0f)), (float)Math.Sin(Angles.X));
-
-            ViewNormal = point;
+            ViewNormal = Angles.Forward();
             ViewNormal.Normalize();
-            CameraMatrix = Matrix4.LookAt(Position, (Position + point), Vector3.UnitY);
+            CameraMatrix = Matrix4.LookAt(Position, (Position + ViewNormal), Vector3.UnitY);
 
-            Graphics.ViewFrustum.SetCameraDef(Position, (Position + point), Vector3.UnitY);
+            Graphics.ViewFrustum.SetCameraDef(Position, (Position + ViewNormal), Vector3.UnitY);
         }
 
-        //Will do nothing if view is not being overwritten
+        /// <summary>
+        /// Set the position of the camera
+        /// </summary>
+        /// <param name="Pos">The new position</param>
         public static void SetPos(Vector3 Pos)
         {
             Position = Pos;
         }
 
-        //Will do nothing if view is not being overwritten
-        public static void SetAngles(Vector3 Ang)
+        /// <summary>
+        /// Set the angles of the camera. Angles are measured in degrees.
+        /// </summary>
+        /// <param name="Ang">The new angle to set</param>
+        public static void SetAngles(Angle Ang)
         {
             Angles = Ang;
         }
 
+        /// <summary>
+        /// Get the entity that has primary control of the camera.
+        /// </summary>
+        /// <returns>The primary view entity.</returns>
         public static Entity.BaseEntity GetLocalPlayer()
         {
             return Player;
         }
 
+        /// <summary>
+        /// Set the primary view entity that'll control the camera
+        /// </summary>
+        /// <param name="ply">The new view entity</param>
         public static void SetLocalPlayer( Entity.BaseEntity ply )
         {
             System.Reflection.MethodInfo inf = GetMethod(ply, "CalcView");

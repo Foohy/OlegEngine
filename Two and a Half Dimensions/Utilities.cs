@@ -27,6 +27,12 @@ namespace OlegEngine
         /// The amount of time since the last 'think' event happened
         /// </summary>
         public static double ThinkTime { get; private set; }
+
+        public const double D_RAD2DEG = 180d / Math.PI;
+        public const double D_DEG2RAD = Math.PI / 180d;
+        public const float F_RAD2DEG = (float)(180d / Math.PI);
+        public const float F_DEG2RAD = (float)(Math.PI / 180d);
+
         public static int ErrorTex { get; set; }
         public static int White { get; set; }
         public static int NormalTex { get; set; }
@@ -1010,6 +1016,12 @@ namespace OlegEngine
             return num;
         }
         public static float Clamp(float num, float high, float low)
+        {
+            if (num > high) return high;
+            if (num < low) return low;
+            return num;
+        }
+        public static double Clamp(double num, double high, double low)
         {
             if (num > high) return high;
             if (num < low) return low;

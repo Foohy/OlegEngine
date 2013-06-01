@@ -14,7 +14,6 @@ namespace Balance.Entity
 {
     class ent_camera : BaseEntity 
     {
-        Vector2d CamAngle = new Vector2d();
         Text StateText;
         BaseEntity BalanceEnt;
         float PushForce = 20.0f;
@@ -83,33 +82,32 @@ namespace Balance.Entity
                 multiplier = 20;
 
             Vector3 NewPos = this.Position;
+            //Calculate the new angle of the camera
+            this.SetAngle(this.Angles + new Angle(Input.deltaY / -15f, Input.deltaX / 15f, 0));
 
+            Vector3 Forward, Right, Up;
+            this.Angles.AngleVectors(out Forward, out Up, out Right);
+
+            //Calculate the new position
             if (window.Keyboard[Key.W])
             {
-                NewPos.X += (float)Math.Cos(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Y += (float)Math.Sin(CamAngle.Y) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Z += (float)Math.Sin(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
+                NewPos += Forward * (float)Utilities.ThinkTime * multiplier;
             }
 
             if (window.Keyboard[Key.S])
             {
-                NewPos.X -= (float)Math.Cos(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Y -= (float)Math.Sin(CamAngle.Y) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Z -= (float)Math.Sin(CamAngle.X) * (float)Utilities.ThinkTime * multiplier;
+                NewPos -= Forward * (float)Utilities.ThinkTime * multiplier;
             }
 
             if (window.Keyboard[Key.D])
             {
-                NewPos.X += (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Z += (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
+                NewPos -= Right * (float)Utilities.ThinkTime * multiplier;
             }
 
             if (window.Keyboard[Key.A])
             {
-                NewPos.X -= (float)Math.Cos(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
-                NewPos.Z -= (float)Math.Sin(CamAngle.X + Math.PI / 2) * (float)Utilities.ThinkTime * multiplier;
+                NewPos += Right * (float)Utilities.ThinkTime * multiplier;
             }
-
 
             if (window.Keyboard[Key.Space])
             {
@@ -123,21 +121,19 @@ namespace Balance.Entity
                 }
             }
 
-            CamAngle += new Vector2d(Input.deltaX / 350f, Input.deltaY / -350f);
-            CamAngle = new Vector2d((float)CamAngle.X, Utilities.Clamp((float)CamAngle.Y, 1.0f, -1.0f)); //Clamp it because I can't math correctly
 
-            Input.LockMouse = true;
             this.SetPos(NewPos, false);
-            this.SetAngle(new Vector3((float)CamAngle.X, (float)CamAngle.Y, 0));
 
             View.SetPos(this.Position);
-            View.SetAngles(this.Angle);
+            View.SetAngles(this.Angles);
+
+            Input.LockMouse = true;
         }
 
         private void PoleView()
         {
             View.SetPos(new Vector3(0, 8, 20));
-            View.SetAngles(new Vector3((float)Math.PI / -2, 0, 0));
+            View.SetAngles(new Angle(0, -90, 0));
         }
 
         public void SetBalanceEntity(BaseEntity balance)

@@ -345,18 +345,7 @@ namespace OlegEngine
         static void View_CalcView()
         {
             //Set the camera matrix itself
-            View.SetAngles(new Vector3(halfPI, 0, 0));
-            //Player.ply.CamAngle = new Vector2d(halfPI, 0.0f); //Clamp it because I can't math correctly
-
-            //find the point where we'll be facing
-            Vector3 point = new Vector3(0.0f, 0.0f, -1.0f);
-
-            //Player.ply.ViewNormal = point;
-            //Player.ply.ViewNormal.Normalize();
-            //Player.ply.camMatrix = Matrix4.LookAt(Pos, (Pos + point), Vector3.UnitY);
-
-            //Utilities.ProjectionMatrix = Player.ply.camMatrix;
-
+            View.SetAngles(new Angle(0, -90, 0));
             View.SetPos(ViewPosition);
 
             if (Cursor != null)

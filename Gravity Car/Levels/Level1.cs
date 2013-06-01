@@ -47,8 +47,7 @@ namespace Gravity_Car.Levels
             oleg.Name = "Oleg";
             oleg.SetPos(OlegPos);
             oleg.Scale = new Vector3(0.75f);
-            oleg.SetAngle(new Vector3(0, 0, 0.25f));
-            oleg.RenderMode = BaseEntity.RenderModes.Translucent;
+            oleg.SetAngle(new Angle(0, 0, 14.3f));
             /*
             oleg = Entity.EntManager.Create<ent_static>();
             oleg.Spawn();
@@ -147,7 +146,7 @@ namespace Gravity_Car.Levels
 
             if (SetShadow && spotlight != null)
             {
-                spotlight.SetAngle( View.ViewNormal);
+                spotlight.SetAngle(View.Angles);
                 spotlight.SetPos( View.Player.Position );
             }
 

@@ -52,7 +52,7 @@ namespace OlegEngine.Entity
                 {
                     Vector3 pos = new Vector3( ent.Physics.Body.Position.X, ent.Physics.Body.Position.Y, ent.Position.Z );
                     ent.SetPos(pos, false);
-                    ent.SetAngle(ent.Physics.Body.Rotation);
+                    ent.SetAngle(ent.Physics.Body.Rotation * Utilities.F_RAD2DEG);
                 }
                 ent.Think();
             }

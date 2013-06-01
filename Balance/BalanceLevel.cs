@@ -144,7 +144,7 @@ namespace Balance
 
             if ( spotlight != null && Utilities.window.Keyboard[OpenTK.Input.Key.Q])
             {
-                spotlight.SetAngle(View.ViewNormal);
+                spotlight.SetAngle(View.Angles);
                 spotlight.SetPos(View.Player.Position);
             }
 

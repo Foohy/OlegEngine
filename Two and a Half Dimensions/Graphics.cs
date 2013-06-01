@@ -342,7 +342,7 @@ namespace OlegEngine
 
         public Vector3 Position { get; set; }
         public Vector3 Scale { get; set; }
-        public Vector3 Angle { get; set; }
+        public Angle Angles { get; set; }
 
         public const int INDEX_BUFFER  = 0;
         public const int POS_VB        = 1;
@@ -729,9 +729,9 @@ namespace OlegEngine
         {
             Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
             modelview *= Matrix4.Scale(Scale);
-            modelview *= Matrix4.CreateRotationZ(this.Angle.Z);
-            modelview *= Matrix4.CreateRotationX(this.Angle.X);
-            modelview *= Matrix4.CreateRotationY(this.Angle.Y);
+            modelview *= Matrix4.CreateRotationZ(this.Angles.Roll * Utilities.F_DEG2RAD);
+            modelview *= Matrix4.CreateRotationX(this.Angles.Pitch * Utilities.F_DEG2RAD);
+            modelview *= Matrix4.CreateRotationY(this.Angles.Yaw * Utilities.F_DEG2RAD);
 
             modelview *= Matrix4.CreateTranslation(Position);
 

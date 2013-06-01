@@ -39,7 +39,7 @@ namespace OlegEngine.Entity
         public bool ShouldDraw { get; set; }
 
         public Vector3 Position { get; private set; }
-        public Vector3 Angle { get; private set; }
+        public Angle Angles { get; private set; }
         public Vector3 Scale { get; set; }
 
         public Fixture Physics { get; set; }
@@ -85,7 +85,7 @@ namespace OlegEngine.Entity
 
                 Model.Position  = this.Position;
                 Model.Scale     = this.Scale;
-                Model.Angle     = this.Angle;
+                Model.Angles    = this.Angles;
 
                 Model.Draw();
 
@@ -107,19 +107,19 @@ namespace OlegEngine.Entity
             SetPos(new Vector3(pos.X, pos.Y, Position.Z), setPhys);
         }
 
-        public void SetAngle(Vector3 ang, bool phys = false)
+        public void SetAngle(Angle ang, bool phys = false)
         {
-            Angle = ang;
+            this.Angles = ang;
             if (this.Physics != null && phys)
             {
-                this.Physics.Body.Rotation = ang.Z;
+                this.Physics.Body.Rotation = ang.Roll;
             }
             //Update physics position
         }
 
         public void SetAngle(float ang, bool phys = false)
         {
-            this.SetAngle(new Vector3( Angle.X, Angle.Y, ang ), phys);
+            this.SetAngle(this.Angles.SetRoll(ang), phys);
         }
 
         public void SetModel(Mesh model)

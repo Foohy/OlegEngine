@@ -110,10 +110,7 @@ namespace Gravity_Car.Entity
             camMatrix = Matrix4.LookAt(Position + new Vector3(0, crZoom / 90, crZoom), Position + point + new Vector3(0, crZoom / 90, 0), Vector3.UnitY);
 
             View.SetPos(Position + new Vector3(0, crZoom / 90, crZoom));
-            View.SetAngles(Vector3.Zero);
-            //OlegEngine.Player.ply.camMatrix = camMatrix;
-
-            //OlegEngine.Player.ply.SetPos(Position + new Vector3(0, crZoom / 90, crZoom));
+            View.SetAngles(Angle.Zero);
         }
 
         void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -181,13 +178,13 @@ namespace Gravity_Car.Entity
             this.Mat.Properties.SpecularPower = 0;
             this.Mat.Properties.SpecularIntensity = 0;
             
-            wheel.Scale = this.Scale;
-            wheel.Angle = new Vector3(0, 0, wheelang[0]);
-            wheel.Position = wheelpos[0];
+            wheel.Scale     = this.Scale;
+            wheel.Angles    = new Angle(0, 0, wheelang[0]);
+            wheel.Position  = wheelpos[0];
             wheel.Draw();
 
-            wheel.Angle = new Vector3(0, 0, wheelang[1]);
-            wheel.Position = wheelpos[1];
+            wheel.Angles    = new Angle(0, 0, wheelang[1]);
+            wheel.Position  = wheelpos[1];
             wheel.Draw();
         }
 
