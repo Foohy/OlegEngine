@@ -1170,13 +1170,29 @@ namespace OlegEngine
 
     public class FBO
     {
-        private int fbo = 0;
-        private int _RT = 0;
+        /// <summary>
+        /// Whether the current FBO is enabled and should return its rendertexture
+        /// </summary>
         public bool Enabled = true;
+
+        /// <summary>
+        /// The width of the FBO
+        /// </summary>
         public int Width { get; private set; }
+
+        /// <summary>
+        /// The height of the FBO
+        /// </summary>
         public int Height { get; private set; }
+
+        /// <summary>
+        /// Whether the FBO has been loaded successfully
+        /// </summary>
         public bool Loaded { get; private set; }
 
+        /// <summary>
+        /// The automatically-generated RenderTexture attached to the framebuffer
+        /// </summary>
         public int RenderTexture
         {
             get
@@ -1185,6 +1201,32 @@ namespace OlegEngine
             }
         }
 
+        private int fbo = 0;
+        private int _RT = 0;
+
+        /// <summary>
+        /// Create a new framebuffer
+        /// </summary>
+        /// <param name="width">Width of the framebuffer/the RenderTexture</param>
+        /// <param name="height">Height of the framebuffer/the RenderTexture</param>
+        /// <param name="InternalFormat">The internal format for the RenderTexture</param>
+        /// <param name="Format">The format for the RenderTexture</param>
+        /// <param name="Attachment">The attachment point of the framebuffer</param>
+        /// <param name="Mode">The buffer mode that OpenGL will write with</param>
+        public FBO(int width, int height, PixelInternalFormat InternalFormat, PixelFormat Format, FramebufferAttachment Attachment, DrawBufferMode Mode)
+        {
+            this.Width = width;
+            this.Height = height;
+
+            this.Loaded = createFBO(width, height, InternalFormat, Format, Attachment, Mode);
+        }
+
+        /// <summary>
+        /// Create a new framebuffer
+        /// </summary>
+        /// <param name="width">Width of the framebuffer/the RenderTexture</param>
+        /// <param name="height">Height of the framebuffer/the RenderTexture</param>
+        /// <param name="ShadowMap">Automatically use the settings for a shadowmap-dedicated framebuffer</param>
         public FBO(int width, int height, bool ShadowMap = true)
         {
             this.Width = width;
@@ -1196,6 +1238,11 @@ namespace OlegEngine
             FramebufferAttachment Attachment    = ShadowMap ? FramebufferAttachment.DepthAttachment : FramebufferAttachment.ColorAttachment0;
             DrawBufferMode Mode                 = ShadowMap ? DrawBufferMode.None                   : DrawBufferMode.FrontAndBack;
 
+            this.Loaded = createFBO(width, height, InternalFormat, Format, Attachment, Mode);
+        }
+
+        private bool createFBO(int width, int height, PixelInternalFormat InternalFormat, PixelFormat Format, FramebufferAttachment Attachment, DrawBufferMode Mode)
+        {
             //Create the render texture
             GL.GenTextures(1, out _RT);
             GL.BindTexture(TextureTarget.Texture2D, _RT);
@@ -1223,18 +1270,20 @@ namespace OlegEngine
             if (status != FramebufferErrorCode.FramebufferComplete)
             {
                 Utilities.Print("Framebuffer error!! Status: {0}", Utilities.PrintCode.ERROR, status.ToString());
-
-                this.Loaded = false;
-                return;
+                return false;
             }
 
             //Set it back to our default framebuffer
             this.ResetFramebuffer();
 
             //We have successfully created a framebuffer for framebuffing
-            this.Loaded = true; 
+            return true;
         }
 
+        /// <summary>
+        /// Bind this framebuffer, setting it as the currently active framebuffer.
+        /// </summary>
+        /// <param name="SetViewPort">Whether the viewport size should be modified to the bounds of the framebuffer</param>
         public void BindForWriting( bool SetViewPort = true)
         {
             //Change the viewport to fit the size of our framebuffer
@@ -1242,11 +1291,20 @@ namespace OlegEngine
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
         }
 
+        /// <summary>
+        /// Reset the framebuffer back to the one provided by the windowing system.
+        /// </summary>
+        /// <param name="SetViewPort">Whether the viewport size should be modified to the bounds of the framebuffer</param>
         public void ResetFramebuffer(bool SetViewPort = true)
         {
             this.ResetFramebuffer(FramebufferTarget.Framebuffer, SetViewPort);
         }
 
+        /// <summary>
+        /// Reset the framebuffer back to the one provided by the windowing system.
+        /// </summary>
+        /// <param name="target">The specified framebuffer target type</param>
+        /// <param name="SetViewPort">Whether the viewport size should be modified to the bounds of the framebuffer</param>
         public void ResetFramebuffer(FramebufferTarget target, bool SetViewPort )
         {
             //Change the viewport back to the size of the window
