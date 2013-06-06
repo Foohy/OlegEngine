@@ -22,7 +22,6 @@ namespace OlegEngine
     {
         public GameWindow WindowContext;
         public FBO shadowFBO;
-        public Matrix4 camMat = Matrix4.Identity;
         public event Action<FrameEventArgs> OnRenderSceneOpaque;
         public event Action<FrameEventArgs> OnRenderSceneTranslucent;
         public event Action OnSceneResize;
@@ -93,10 +92,6 @@ namespace OlegEngine
 
             //Initalize our gui system
             GUI.GUIManager.Init();
-
-            //Create a camera matrix
-            Vector3 point = new Vector3((float)Math.Cos(-0.6f), (float)Math.Sin(-0.52) - 0.21f, (float)Math.Sin(-0.6));
-            camMat = Matrix4.LookAt(new Vector3(88.94199f, 22.27345f, 5.085441f) + new Vector3(0, 1, 0), new Vector3(88.94199f, 22.27345f, 5.085441f) + point + new Vector3(0, 1, 0), Vector3.UnitY);
 
             //Create some debug stuff
             Graphics.Init();
