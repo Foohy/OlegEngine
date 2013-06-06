@@ -1165,49 +1165,54 @@ namespace OlegEngine
     public class FBO
     {
         private int fbo = 0;
-        private int _shadowMap = 0;
+        private int _RT = 0;
         private int _disabledTex = 0;
         public bool Enabled = true;
         public int Width { get; private set; }
         public int Height { get; private set; }
         public bool Loaded { get; private set; }
 
-        public int shadowMap
+        public int RenderTexture
         {
             get
             {
-                return (this.Enabled && this.Loaded && Utilities.engine.GraphicsSettings.EnableShadows ) ? _shadowMap : _disabledTex;
+                return (this.Enabled && this.Loaded && Utilities.engine.GraphicsSettings.EnableShadows ) ? _RT : _disabledTex;
             }
         }
 
-        public FBO(int width, int height)
+        public FBO(int width, int height, bool ShadowMap = true)
         {
             this.Width = width;
             this.Height = height;
             _disabledTex = Utilities.AlphaTex;
 
-            //Create the shadow texture
-            GL.GenTextures(1, out _shadowMap);
-            GL.BindTexture(TextureTarget.Texture2D, _shadowMap);
+            //Modify the parameters based on if we're gonna be about depth or not
+            PixelInternalFormat InternalFormat  = ShadowMap ? PixelInternalFormat.DepthComponent    : PixelInternalFormat.Rgba;
+            PixelFormat Format                  = ShadowMap ? PixelFormat.DepthComponent            : PixelFormat.Rgba;
+            FramebufferAttachment Attachment    = ShadowMap ? FramebufferAttachment.DepthAttachment : FramebufferAttachment.ColorAttachment0;
+            DrawBufferMode Mode                 = ShadowMap ? DrawBufferMode.None                   : DrawBufferMode.FrontAndBack;
+
+            //Create the render texture
+            GL.GenTextures(1, out _RT);
+            GL.BindTexture(TextureTarget.Texture2D, _RT);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat, Width, Height, 0, Format, PixelType.UnsignedByte, IntPtr.Zero);
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)TextureCompareMode.None);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent, Width, Height, 0, PixelFormat.DepthComponent, PixelType.UnsignedByte, IntPtr.Zero);
-
+            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
+            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
 
             //Create our shadow framebuffer
             GL.GenFramebuffers(1, out fbo);
 
             //Attach the depth texture to the framebuffer
-            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, fbo);
-            GL.FramebufferTexture2D(FramebufferTarget.DrawFramebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, _shadowMap, 0);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, Attachment, TextureTarget.Texture2D, _RT, 0);
 
-            //Tell opengl we are not going to render into the color buffer
-            GL.DrawBuffer(DrawBufferMode.None);
+            //Tell opengl we are not going to render into the color buffer if we're a shadow map
+            GL.DrawBuffer(Mode);
 
             FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
 
@@ -1219,27 +1224,30 @@ namespace OlegEngine
                 return;
             }
 
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            this.Loaded = true; //We have successfully created a framebuffer for framebuffering
+            //Set it back to our default framebuffer
+            this.ResetFramebuffer();
+
+            //We have successfully created a framebuffer for framebuffing
+            this.Loaded = true; 
         }
 
-        public void BindForWriting()
+        public void BindForWriting( bool SetViewPort = true)
         {
-            GL.CullFace(CullFaceMode.Front);
-            //GL.ActiveTexture(TextureUnit.Texture2);
-            //GL.Disable(EnableCap.Texture2D);
-            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, fbo);
-            GL.ActiveTexture(TextureUnit.Texture2);
-            GL.BindTexture(TextureTarget.Texture2D, _disabledTex);
+            //Change the viewport to fit the size of our framebuffer
+            if (SetViewPort) GL.Viewport(Utilities.window.ClientRectangle.X, Utilities.window.ClientRectangle.Y, this.Width, this.Height);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
         }
 
-        public void BindForReading()
+        public void ResetFramebuffer(bool SetViewPort = true)
         {
-            GL.CullFace(CullFaceMode.Back);
-            //GL.Enable(EnableCap.Texture2D);
-            GL.ActiveTexture(TextureUnit.Texture2);
-            GL.BindTexture(TextureTarget.Texture2D, shadowMap);
-            GL.ActiveTexture(TextureUnit.Texture0);
+            this.ResetFramebuffer(FramebufferTarget.Framebuffer, SetViewPort);
+        }
+
+        public void ResetFramebuffer(FramebufferTarget target, bool SetViewPort )
+        {
+            //Change the viewport back to the size of the window
+            if (SetViewPort) GL.Viewport(Utilities.window.ClientRectangle.X, Utilities.window.ClientRectangle.Y, Utilities.window.ClientRectangle.Width, Utilities.window.ClientRectangle.Height);
+            GL.BindFramebuffer(target, 0);
         }
     }
 }

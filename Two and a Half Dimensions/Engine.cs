@@ -81,7 +81,7 @@ namespace OlegEngine
 
             //Initalize lighting
             LightingTechnique.Init();
-            LightingTechnique.SetShadowTexture(shadowFBO.shadowMap);
+            LightingTechnique.SetShadowTexture(shadowFBO.RenderTexture);
 
             //Initialize our shadows
             ShadowTechnique.Init();
@@ -119,7 +119,7 @@ namespace OlegEngine
 
                 frametime = frametime / (double)AveragedFrametimes.Count;
 
-                GUI.Surface.DrawText("debug", string.Format("FPS: {0,3:N0} ({1:0.000}ms)", 1 / frametime, frametime * 1000), 10, 10);
+                GUI.Surface.DrawSimpleText("debug", string.Format("FPS: {0,3:N0} ({1:0.000}ms)", 1 / frametime, frametime * 1000), 10, 10);
             }
         }
 
@@ -194,22 +194,29 @@ namespace OlegEngine
                 Utilities.ProjectionMatrix = info.matrix;
                 Utilities.ViewMatrix = defaultViewMatrix;
 
-                //Change the viewport accordingly
-                GL.Viewport(this.WindowContext.ClientRectangle.X, this.WindowContext.ClientRectangle.Y, shadowFBO.Width, shadowFBO.Height);
-
                 //Pass 1, render in the view of the light
                 Utilities.CurrentPass = 1;
+
+                //Reverse the culling mode to make shadowmaps easier
+                GL.CullFace(CullFaceMode.Front);
+
+                //Insert a blank texture for where the shadowmap is bound just for rendering (fixes artifacts on AMD cards)
+                GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2D, Utilities.White);
+
                 shadowFBO.BindForWriting();
                 GL.Clear(ClearBufferMask.DepthBufferBit);
                 RenderScene(e);
 
                 //Change our renderer back to the default framebuffer/size
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0); 
-                GL.Viewport(this.WindowContext.ClientRectangle.X, this.WindowContext.ClientRectangle.Y, this.WindowContext.ClientRectangle.Width, this.WindowContext.ClientRectangle.Height);
+                shadowFBO.ResetFramebuffer();
+
+                //Bind the actual shadow map back
+                GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2D, shadowFBO.RenderTexture);
             }
 
             //Set the view to the normal camera
-            //Utilities.ProjectionMatrix = ply.camMatrix;
             Utilities.ProjectionMatrix = View.CameraMatrix;
             Utilities.ViewMatrix = defaultViewMatrix;
 
@@ -217,7 +224,8 @@ namespace OlegEngine
             Utilities.CurrentPass = 2;
             
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            shadowFBO.BindForReading();
+            GL.CullFace(CullFaceMode.Back);
+
             LightingTechnique.Render();
             RenderScene(e);
 
