@@ -1182,7 +1182,7 @@ namespace OlegEngine
         {
             get
             {
-                return (this.Enabled && this.Loaded && Utilities.engine.GraphicsSettings.EnableShadows ) ? _RT : _disabledTex;
+                return (this.Enabled && this.Loaded ) ? _RT : _disabledTex;
             }
         }
 
