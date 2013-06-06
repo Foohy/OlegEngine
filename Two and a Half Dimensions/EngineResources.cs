@@ -11,7 +11,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace OlegEngine
 {
-    class EngineResources
+    public class EngineResources
     {
         #region static resources
         const string Quad = 
@@ -503,7 +503,10 @@ f 37/238/80 10/239/80 42/240/80";
 
         #endregion
 
-        //Internal class to store engine-affiliated resources
+        /// <summary>
+        /// Internal class to create engine-related sources
+        /// Do not call unless you know exactly what you're doing
+        /// </summary>
         public static void CreateResources()
         {
             #region Important materials for the normal workings of the engine
@@ -573,7 +576,10 @@ f 37/238/80 10/239/80 42/240/80";
             #endregion
         }
 
-        //For those instances where a new one is required
+        /// <summary>
+        /// Create a new quad mesh outside of the resource manager
+        /// </summary>
+        /// <returns>Mesh quad</returns>
         public static Mesh CreateNewQuadMesh()
         {
             Vector3[] verts;
@@ -587,6 +593,10 @@ f 37/238/80 10/239/80 42/240/80";
             return new Mesh(verts, elements, tangents, normals, lsUV);
         }
 
+        /// <summary>
+        /// Generate the error texture to be displayed when a texture could not be found
+        /// </summary>
+        /// <returns>Erro texture</returns>
         private static int GenerateErrorTex()
         {
             Bitmap tex = new Bitmap(32, 32);
@@ -623,6 +633,10 @@ f 37/238/80 10/239/80 42/240/80";
             return id;
         }
 
+        /// <summary>
+        /// Generate the normal texture that defines that all normals are facing up. Used when a material has no normal map
+        /// </summary>
+        /// <returns>Default normal map</returns>
         private static int GenerateNormalTex()
         {
             Bitmap tex = new Bitmap(1, 1);
@@ -647,6 +661,10 @@ f 37/238/80 10/239/80 42/240/80";
             return id;
         }
 
+        /// <summary>
+        /// A completely white texture.
+        /// </summary>
+        /// <returns>White 1x1 texture</returns>
         private static int GenerateWhite()
         {
             Bitmap tex = new Bitmap(1, 1);
