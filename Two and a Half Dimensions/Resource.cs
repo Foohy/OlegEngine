@@ -19,7 +19,6 @@ namespace OlegEngine
 
         static Dictionary<string, int> Textures = new Dictionary<string, int>();
         static Dictionary<string, Material> Materials = new Dictionary<string, Material>();
-        static Dictionary<string, VBO> Models = new Dictionary<string, VBO>();
         static Dictionary<string, Mesh> Meshes = new Dictionary<string, Mesh>();
         static Dictionary<string, int> Programs = new Dictionary<string, int>();
         static Dictionary<string, Text.Charset> Charsets = new Dictionary<string, Text.Charset>();
