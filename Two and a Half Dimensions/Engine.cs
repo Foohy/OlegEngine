@@ -118,7 +118,7 @@ namespace OlegEngine
                 }
 
                 frametime = frametime / (double)AveragedFrametimes.Count;
-
+                GUI.Surface.SetDrawColor(255, 255, 255);
                 GUI.Surface.DrawSimpleText("debug", string.Format("FPS: {0,3:N0} ({1:0.000}ms)", 1 / frametime, frametime * 1000), 10, 10);
             }
         }
