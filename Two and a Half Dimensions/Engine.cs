@@ -207,11 +207,12 @@ namespace OlegEngine
 
                 //Change our renderer back to the default framebuffer/size
                 shadowFBO.ResetFramebuffer();
-
-                //Bind the actual shadow map back
-                GL.ActiveTexture(TextureUnit.Texture2);
-                GL.BindTexture(TextureTarget.Texture2D, shadowFBO.RenderTexture);
             }
+
+            //Bind the shadow map into its texture slot
+            GL.ActiveTexture(TextureUnit.Texture2);
+            GL.BindTexture(TextureTarget.Texture2D, shadowFBO.RenderTexture);
+            GL.ActiveTexture(TextureUnit.Texture0);
 
             //Set the view to the normal camera
             Utilities.ProjectionMatrix = View.CameraMatrix;
