@@ -254,6 +254,7 @@ namespace OlegEngine.GUI
         public static void SetDrawColorVector(float x, float y, float z)
         {
             Square.Color = new Vector3(x, y, z);
+            genericText.Color = Square.Color;
         }
         /// <summary>
         /// Set the color
@@ -263,7 +264,7 @@ namespace OlegEngine.GUI
         /// <param name="b">Blue component 0-255</param>
         public static void SetDrawColor(float r, float g, float b)
         {
-            Square.Color = new Vector3(r / 255, g / 255, b / 255);
+            SetDrawColorVector(r / 255, g / 255, b / 255);
         }
         /// <summary>
         /// Set the color
@@ -271,7 +272,7 @@ namespace OlegEngine.GUI
         /// <param name="color">Color</param>
         public static void SetDrawColor(System.Drawing.Color color)
         {
-            Square.Color = new Vector3(color.R / 255, color.G / 255, color.B / 255);
+            SetDrawColorVector(color.R / 255, color.G / 255, color.B / 255);
         }
 
         public static void SetTexture(int texID)
@@ -299,7 +300,46 @@ namespace OlegEngine.GUI
             drawRect(position.X, position.Y, dimensions.X, dimensions.Y);
         }
 
-        public static void DrawText(string font, string str, float x, float y)
+        public static void DrawWrappedText( string font, string text, float x, float y, float Width)
+        {
+            float textWidth, lineHeight, curX, curY;
+            GetTextSize(font, text, out textWidth, out lineHeight);
+            curX = curY = 0;
+            string tempString = "";
+            string curWord = "";
+            float curWordLength = 0;
+            for (int i = 0; i < text.Length; i++)
+            {
+                float charSize = GetTextLength(font, text[i].ToString());
+                curWord += text[i].ToString();
+                curWordLength += charSize;
+                //Word seperator
+                if (text[i] == ' ')
+                {
+                    tempString += curWord;
+                    curX += curWordLength;
+                    curWord = "";
+                    curWordLength = 0;
+                }
+
+
+                if (curX + curWordLength > Width)
+                {
+                    DrawSimpleText(font, tempString, x, y + curY);
+
+                    curX = 0;
+                    curY += lineHeight;
+                    tempString = "";
+                }
+
+                if (i == text.Length-1)
+                    tempString += curWord;
+            }
+
+            DrawSimpleText(font, tempString, x, y + curY);
+        }
+
+        public static void DrawSimpleText(string font, string str, float x, float y)
         {
             Text.Charset ch = Resource.GetCharset( font );
             if (ch)
@@ -332,6 +372,12 @@ namespace OlegEngine.GUI
             }
 
             return genericText.GetTextHeight();
+        }
+
+        public static void GetTextSize(string font, string str, out float Width, out float Height)
+        {
+            Width = GetTextLength(font, str);
+            Height = GetTextHeight(font);
         }
 
 
