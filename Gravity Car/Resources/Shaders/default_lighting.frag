@@ -90,6 +90,7 @@ uniform int gNumSpotLights;
 uniform int gNumShadowCasters;
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
+uniform float gAlpha = 1.0;
 uniform vec3 gEyeWorldPos;
 uniform vec3 _color = vec3( 1.0, 1.0, 1.0);
 
@@ -117,13 +118,13 @@ float CalcShadowFactor(vec4 LightSpacePos)
 
 	float visibility = 1.0;
 
-	for (int i=0;i<16;i++)
+	for (int i=0;i<4;i++)
 	{
 		int index = int(16.0*random(gl_FragCoord.xyy, i))%16;
 		float Depth = texture2D(sampler_shadow, UVCoords + poissonDisk[index]/900.0);
 		if ( Depth < z + 0.00000001)
 		{
-			visibility -= 0.07;
+			visibility -= 0.25;
 		}
 	}
 
@@ -277,5 +278,5 @@ void main()
 		TotalLight += CalcShadowSpotLight(gShadowCasters[i], Normal, ex_LightSpacePos );
 	}
 
-	gl_FragColor = vec4(texture2D( sampler, ex_UV.st).rgb, texture2D( sampler, ex_UV.st).a * texture(sampler_alpha, ex_UV.st) ) * vec4(_color * TotalLight.rgb, 1.0 );
+	gl_FragColor = vec4(texture2D( sampler, ex_UV.st).rgb, gAlpha * texture2D( sampler, ex_UV.st).a * texture(sampler_alpha, ex_UV.st) ) * vec4(_color * TotalLight.rgb, 1.0 );
 }

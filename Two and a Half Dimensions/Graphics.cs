@@ -337,6 +337,7 @@ namespace OlegEngine
         public BeginMode DrawMode = BeginMode.Triangles;
         public BufferUsageHint UsageHint = BufferUsageHint.StaticDraw;
         public Vector3 Color = Vector3.One;
+        public float Alpha = 1.0f;
         public BoundingBox BBox = new BoundingBox();
         public bool ShouldDrawDebugInfo = true;
 
@@ -764,8 +765,9 @@ namespace OlegEngine
             GL.BindVertexArray(this.VAO);
             if (mat == null) mat = Utilities.ErrorMat;
 
-            //Automatically update the material properties based on entity settings
+            //Automatically update the material properties based on mesh settings
             mat.Properties.Color = this.Color;
+            mat.Properties.Alpha = this.Alpha;
             mat.BindMaterial();
 
             //Set the matrix to the shader
@@ -928,6 +930,7 @@ namespace OlegEngine
         public int locColor = -1;
         public int locSpecularIntensity = -1;
         public int locSpecularPower = -1;
+        public int locAlpha = -1;
 
         /// <summary>
         /// Initialize a new material object - all by yourself!
@@ -1010,6 +1013,7 @@ namespace OlegEngine
                 locColor = GL.GetUniformLocation(Program, "_color");
                 locSpecularIntensity = GL.GetUniformLocation(Program, "gMatSpecularIntensity");
                 locSpecularPower = GL.GetUniformLocation(Program, "gSpecularPower");
+                locAlpha = GL.GetUniformLocation(Program, "gAlpha");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -1060,6 +1064,7 @@ namespace OlegEngine
                 locColor = GL.GetUniformLocation(Properties.ShaderProgram, "_color");
                 locSpecularIntensity = GL.GetUniformLocation(Properties.ShaderProgram, "gMatSpecularIntensity");
                 locSpecularPower = GL.GetUniformLocation(Properties.ShaderProgram, "gSpecularPower");
+                locAlpha = GL.GetUniformLocation(Properties.ShaderProgram, "gAlpha");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -1081,8 +1086,6 @@ namespace OlegEngine
                 GL.Uniform1(locAlphaMap, 5);
 
                 GL.ActiveTexture(TextureUnit.Texture0);
-
-                //Console.WriteLine("VMatrix: {0}, PMatrix: {1}, MMatrixL {2}, Time: {3}", locVMatrix, locPMatrix, locMMatrix, locTime);
             }
         }
 
@@ -1119,6 +1122,7 @@ namespace OlegEngine
             GL.Uniform1(locSpecularPower, Properties.SpecularPower);
 
             GL.Uniform3(this.locColor, this.Properties.Color);
+            GL.Uniform1(locAlpha, this.Properties.Alpha);
         }
 
         public int GetCurrentTexture()
@@ -1148,6 +1152,7 @@ namespace OlegEngine
         public int _CurrentFrame;
         public float SpecularPower;
         public float SpecularIntensity;
+        public float Alpha;
         public double Framelength; //How long each frame is for an animated texture
         public double _NextFrameChange;
         public Vector3 Color;
@@ -1158,6 +1163,7 @@ namespace OlegEngine
         public MaterialProperties()
         {
             Color = Vector3.One;
+            Alpha = 1.0f;
             AlphaTest = false;
         }
     }

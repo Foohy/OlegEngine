@@ -16,6 +16,8 @@ namespace OlegEngine.Entity
     public class EntManager
     {
         public static bool Paused { get; private set; }
+        public static event Action OnPostDrawOpaqueEntities;
+        public static event Action OnPostDrawTranslucentEntities;
 
         static List<BaseEntity> Ents = new List<BaseEntity>();
         static int _nmEnts = 0;
@@ -67,6 +69,9 @@ namespace OlegEngine.Entity
                     ent.Draw();
                 }
             }
+
+            if (OnPostDrawOpaqueEntities != null)
+                OnPostDrawOpaqueEntities();
         }
 
         public static void DrawTranslucent(FrameEventArgs e)
@@ -78,6 +83,9 @@ namespace OlegEngine.Entity
                     ent.Draw();
                 }
             }
+
+            if (OnPostDrawTranslucentEntities != null)
+                OnPostDrawTranslucentEntities();
         }
 
         private static void removePhys(BaseEntity ent)

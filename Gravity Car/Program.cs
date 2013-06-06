@@ -20,7 +20,8 @@ namespace Gravity_Car
         {
             VSync = VSyncMode.Adaptive;
             engine = new Engine(this); //Create the engine class that'll do all the heavy lifting
-            engine.OnRenderScene += new Action<FrameEventArgs>(RenderScene);
+            engine.OnRenderSceneOpaque += new Action<FrameEventArgs>(RenderSceneOpaque);
+            engine.OnRenderSceneTranslucent += new Action<FrameEventArgs>(RenderSceneTranslucent);
         }
 
         /// <summary>Load resources here.</summary>
@@ -68,20 +69,22 @@ namespace Gravity_Car
             SwapBuffers();
         }
 
-        private void RenderScene(FrameEventArgs e)
+        private void RenderSceneOpaque(FrameEventArgs e)
         {
             //Draw opaque geometry
             Levels.LevelManager.Draw(e);
             OlegEngine.Entity.EntManager.DrawOpaque(e);
-            //ply.Draw(e);
 
+            //Draw debug stuff
+            Graphics.DrawDebug();
+        }
+
+        private void RenderSceneTranslucent(FrameEventArgs e)
+        {
             //Now draw geometry that is potentially transcluent
             GL.Enable(EnableCap.Blend);
             OlegEngine.Entity.EntManager.DrawTranslucent(e);
             GL.Disable(EnableCap.Blend);
-
-            //Draw debug stuff
-            Graphics.DrawDebug();
         }
 
         [STAThread]

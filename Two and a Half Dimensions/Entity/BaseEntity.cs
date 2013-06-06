@@ -35,6 +35,7 @@ namespace OlegEngine.Entity
         public OpenTK.Graphics.OpenGL.BeginMode drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
         public bool WorldSpawn = false;
         public Vector3 Color { get; set; }
+        public float Alpha { get; set; }
         public MoveTypes Movetype { get; set; }
         public bool ShouldDraw { get; set; }
 
@@ -50,6 +51,7 @@ namespace OlegEngine.Entity
         public void Spawn()
         {
             this.Color = Vector3.One;
+            this.Alpha = 1.0f;
             this.Scale = Vector3.One;
             this.DisableLighting = false;
             this.RenderMode = RenderModes.Opaque;
@@ -82,6 +84,7 @@ namespace OlegEngine.Entity
 
                 Model.mat       = this.Mat;
                 Model.Color     = this.Color;
+                Model.Alpha     = this.Alpha;
 
                 Model.Position  = this.Position;
                 Model.Scale     = this.Scale;

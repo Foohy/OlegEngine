@@ -23,7 +23,8 @@ namespace OlegEngine
         public GameWindow WindowContext;
         public FBO shadowFBO;
         public Matrix4 camMat = Matrix4.Identity;
-        public event Action<FrameEventArgs> OnRenderScene;
+        public event Action<FrameEventArgs> OnRenderSceneOpaque;
+        public event Action<FrameEventArgs> OnRenderSceneTranslucent;
         public event Action OnSceneResize;
 
         private Matrix4 defaultViewMatrix = Matrix4.Identity;
@@ -206,7 +207,8 @@ namespace OlegEngine
 
                 shadowFBO.BindForWriting();
                 GL.Clear(ClearBufferMask.DepthBufferBit);
-                RenderScene(e);
+                RenderSceneOpaque(e);
+                RenderSceneTranslucent(e);
 
                 //Change our renderer back to the default framebuffer/size
                 shadowFBO.ResetFramebuffer();
@@ -227,10 +229,13 @@ namespace OlegEngine
             GL.CullFace(CullFaceMode.Back);
 
             LightingTechnique.Render();
-            RenderScene(e);
+            RenderSceneOpaque(e);
 
             //Draw the skybox
             SkyboxTechnique.Render();
+
+            //Draw potentially-translucent renderables after all that other stuff
+            RenderSceneTranslucent(e);
 
             //Draw surface stuff
             Utilities.ViewMatrix = defaultOrthoMatrix;
@@ -239,11 +244,19 @@ namespace OlegEngine
             GUI.GUIManager.Draw();
         }
 
-        private void RenderScene(FrameEventArgs e)
+        private void RenderSceneOpaque(FrameEventArgs e)
         {
-            if (this.OnRenderScene != null)
+            if (this.OnRenderSceneOpaque != null)
             {
-                this.OnRenderScene(e);
+                this.OnRenderSceneOpaque(e);
+            }
+        }
+
+        private void RenderSceneTranslucent(FrameEventArgs e)
+        {
+            if (this.OnRenderSceneTranslucent != null)
+            {
+                this.OnRenderSceneTranslucent(e);
             }
         }
     }
