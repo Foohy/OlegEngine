@@ -1172,7 +1172,6 @@ namespace OlegEngine
     {
         private int fbo = 0;
         private int _RT = 0;
-        private int _disabledTex = 0;
         public bool Enabled = true;
         public int Width { get; private set; }
         public int Height { get; private set; }
@@ -1182,7 +1181,7 @@ namespace OlegEngine
         {
             get
             {
-                return (this.Enabled && this.Loaded ) ? _RT : _disabledTex;
+                return (this.Enabled && this.Loaded ) ? _RT : Utilities.White;
             }
         }
 
@@ -1190,7 +1189,6 @@ namespace OlegEngine
         {
             this.Width = width;
             this.Height = height;
-            _disabledTex = Utilities.AlphaTex;
 
             //Modify the parameters based on if we're gonna be about depth or not
             PixelInternalFormat InternalFormat  = ShadowMap ? PixelInternalFormat.DepthComponent    : PixelInternalFormat.Rgba;
