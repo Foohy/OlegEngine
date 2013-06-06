@@ -23,10 +23,20 @@ namespace OlegEngine
         static Dictionary<string, int> Programs = new Dictionary<string, int>();
         static Dictionary<string, Text.Charset> Charsets = new Dictionary<string, Text.Charset>();
 
+        /// <summary>
+        /// Manually insert a given material into the resource system
+        /// </summary>
+        /// <param name="filename">The name associated with the file to load</param>
+        /// <param name="m">A Material</param>
         public static void InsertMaterial(string filename, Material m)
         {
             Materials[filename] = m;
         }
+        /// <summary>
+        /// Retrieve a material of a given name, loading it from the disk if it hasn't been loaded already
+        /// </summary>
+        /// <param name="filename">Filename of the material</param>
+        /// <returns>A Material</returns>
         public static Material GetMaterial(string filename)
         {
             if (!Materials.ContainsKey(filename))
@@ -39,10 +49,20 @@ namespace OlegEngine
             return Utilities.ErrorMat;
         }
 
+        /// <summary>
+        /// Manually insert a given texture into the resource system
+        /// </summary>
+        /// <param name="filename">The name associated with the file to load</param>
+        /// <param name="m">A texture</param>
         public static void InsertTexture(string filename, int texture)
         {
             Textures[filename] = texture;
         }
+        /// <summary>
+        /// Retrieve a texture of a given name, loading it from the disk if it hasn't been loaded already
+        /// </summary>
+        /// <param name="filename">Filename of the texture</param>
+        /// <returns>A texture</returns>
         public static int GetTexture(string filename)
         {
             if (!Textures.ContainsKey(filename))
@@ -53,6 +73,11 @@ namespace OlegEngine
             return Textures[filename];
         }
 
+        /// <summary>
+        /// Get the charset with a given name, loading it from the disk if it hasn't been loaded already
+        /// </summary>
+        /// <param name="name">The name of the charset</param>
+        /// <returns>The charset</returns>
         public static Text.Charset GetCharset(string name)
         {
             if (!Charsets.ContainsKey(name))
@@ -63,10 +88,20 @@ namespace OlegEngine
             return Charsets[name];
         }
 
+        /// <summary>
+        /// Manually insert a given Mesh into the resource system
+        /// </summary>
+        /// <param name="filename">The name associated with the file to load</param>
+        /// <param name="m">A Mesh</param>
         public static void InsertMesh(string name, Mesh m)
         {
             Meshes[name] = m;
         }
+        /// <summary>
+        /// Retrieve a Mesh of a given name, loading it from the disk if it hasn't been loaded already
+        /// </summary>
+        /// <param name="filename">Filename of the texture</param>
+        /// <returns>A Mesh</returns>
         public static Mesh GetMesh(string filename, bool newInstance = false)
         {
             if (!Meshes.ContainsKey(filename) || newInstance )
@@ -88,6 +123,10 @@ namespace OlegEngine
             return Meshes[filename];
         }
 
+        /// <summary>
+        /// Manually insert a shader program into the resource system
+        /// </summary>
+        /// <param name="filename">The name of the program (without extensions)</param>
         public static void InsertProgram(string filename)
         {
             int prog = CreateProgramPair(filename);
@@ -95,6 +134,11 @@ namespace OlegEngine
 
             Programs[filename] = prog;
         }
+        /// <summary>
+        /// Retrieve a shader program, loading it from the disk if it hasn't been loaded already.
+        /// </summary>
+        /// <param name="filename">The name of the program (without extensions)</param>
+        /// <returns>OpenGL program object</returns>
         public static int GetProgram(string filename)
         {
             string filenameV = filename + ".vert";
@@ -111,6 +155,11 @@ namespace OlegEngine
             return Programs[filename];
         }
 
+        /// <summary>
+        /// Determine if a given program exists within the resource system
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static bool ProgramExists(string filename)
         {
             string filenameV = filename + ".vert";
