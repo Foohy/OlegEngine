@@ -28,6 +28,11 @@ namespace OlegEngine
         /// </summary>
         public static double ThinkTime { get; private set; }
 
+        /// <summary>
+        /// The current engine settings that are active
+        /// </summary>
+        public static Settings EngineSettings { get; set; }
+
         public const double D_RAD2DEG = 180d / Math.PI;
         public const double D_DEG2RAD = Math.PI / 180d;
         public const float F_RAD2DEG = (float)(180d / Math.PI);

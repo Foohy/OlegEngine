@@ -28,14 +28,13 @@ namespace OlegEngine
 
         private Matrix4 defaultViewMatrix = Matrix4.Identity;
         private Matrix4 defaultOrthoMatrix = Matrix4.Identity;
-        public Settings GraphicsSettings = new Settings();
 
         private DropOutStack<double> AveragedFrametimes = new DropOutStack<double>( 30 );
 
-        public Engine(GameWindow window, Settings settings = null )
+        public Engine(GameWindow window)
         {
             this.WindowContext = window;
-            if (settings != null) GraphicsSettings = settings;
+            if (Utilities.EngineSettings == null) Utilities.EngineSettings = new Settings();
         }
 
         /// <summary>Load resources here.</summary>
@@ -77,7 +76,7 @@ namespace OlegEngine
             GL.Enable(EnableCap.DepthClamp);
 
             //Initialize our shadow FBO
-            shadowFBO = new FBO(this.GraphicsSettings.ShadowMapSize, this.GraphicsSettings.ShadowMapSize);
+            shadowFBO = new FBO(Utilities.EngineSettings.ShadowMapSize, Utilities.EngineSettings.ShadowMapSize);
 
             //Initalize lighting
             LightingTechnique.Init();
@@ -85,7 +84,7 @@ namespace OlegEngine
 
             //Initialize our shadows
             ShadowTechnique.Init();
-            ShadowTechnique.Enabled = GraphicsSettings.EnableShadows;
+            ShadowTechnique.Enabled = Utilities.EngineSettings.EnableShadows;
 
             //Initialize skybox
             SkyboxTechnique.Init();
@@ -103,7 +102,7 @@ namespace OlegEngine
         void GUIManager_PostDrawHUD(EventArgs e)
         {
 
-            if (GraphicsSettings.ShowFPS)
+            if (Utilities.EngineSettings.ShowFPS)
             {
                 AveragedFrametimes.Push(Utilities.Frametime);
 
@@ -185,7 +184,7 @@ namespace OlegEngine
             ShadowInfo info = ShadowTechnique.GetShadowInfo();
             shadowFBO.Enabled = ShadowTechnique.Enabled;
             ShadowTechnique.SetLightInfo(info);
-            if (ShadowTechnique.Enabled && shadowFBO.Loaded && ShadowTechnique._lights.Count > 0 && this.GraphicsSettings.EnableShadows )
+            if (ShadowTechnique.Enabled && shadowFBO.Loaded && ShadowTechnique._lights.Count > 0 && Utilities.EngineSettings.EnableShadows)
             {
                 Utilities.ProjectionMatrix = info.matrix;
                 Utilities.ViewMatrix = defaultViewMatrix;

@@ -30,7 +30,7 @@ namespace OlegEngine
 
         //private static Dictionary<Audio, int> musics = new Dictionary<Audio, int>();
         public static bool init = false;
-        public Audio( int handle, string filename )
+        private Audio( int handle, string filename )
         {
             Handle = handle;
             Filename = filename;
@@ -50,6 +50,10 @@ namespace OlegEngine
                 //Set the distance for 3D sounds
                 Bass.BASS_Set3DFactors(1.0f, 0.0f, 1.0f);
                 Bass.BASS_Apply3D(); // apply the change
+
+                //Set default volume
+                SetGlobalVolume(Utilities.EngineSettings.GlobalVolume);
+
                 _SyncDel = new SYNCPROC(SyncThink);
             }
             catch (Exception ex)
@@ -60,6 +64,37 @@ namespace OlegEngine
             }
         }
 
+        /// <summary>
+        /// Set the global volume for bass and bass accessories.
+        /// </summary>
+        /// <param name="vol">Floating point volume from 0-1</param>
+        public static void SetGlobalVolume(float vol)
+        {
+            Utilities.EngineSettings.GlobalVolume = vol;
+
+            foreach (Audio sng in _lsAudio)
+            {
+                Bass.BASS_ChannelSetAttribute(sng.Handle, BASSAttribute.BASS_ATTRIB_VOL, sng.Volume * Utilities.EngineSettings.GlobalVolume);
+            }
+        }
+
+        /// <summary>
+        /// Retrieve the global volume for bass and bass accessories.
+        /// </summary>
+        /// <returns>A floating point volume from 0-1</returns>
+        public static float GetGlobalVolume()
+        {
+            return Utilities.EngineSettings.GlobalVolume;
+        }
+
+        /// <summary>
+        /// Load a song from the hard disk and create a new Audio instance.
+        /// </summary>
+        /// <param name="filename">The filename on the hard disk</param>
+        /// <param name="Loop">Should the sound loop?</param>
+        /// <param name="Positional">Should the sound play at a specific position? (else global)</param>
+        /// <param name="ent">If it is positional, what entity should this be attached to?</param>
+        /// <returns>A new Audio class</returns>
         public static Audio LoadSong(string filename, bool Loop = false, bool Positional = false, Entity.BaseEntity ent = null)
         {
             int handle = 0;
@@ -100,6 +135,10 @@ namespace OlegEngine
             return new Audio(-1, "rude");
         }
 
+        /// <summary>
+        /// Precache a specific sound into memory (to reduce having to load the sound on demand)
+        /// </summary>
+        /// <param name="filename">The soundfile name on the hard disk</param>
         public static void Precache(string filename )
         {
             byte[] bytes = null;
@@ -124,6 +163,12 @@ namespace OlegEngine
             }
         }
 
+        /// <summary>
+        /// Play a specific one-off sound, caching it in memory if it hasn't been already.
+        /// </summary>
+        /// <param name="name">The filename of the specific sound</param>
+        /// <param name="volume">Volume the sound should be played at (0-1)</param>
+        /// <param name="frequency">Frequency (in hertz) the sound should be played at</param>
         public static void PlaySound( string name, float volume = 1.0f, int frequency = 44100 )
         {
             if (!_lsPrecached.ContainsKey(name))
@@ -134,7 +179,7 @@ namespace OlegEngine
 
             int handle = Bass.BASS_StreamCreateFile(_lsPrecached[name].bufferPointer, 0, _lsPrecached[name].bufferLength, BASSFlag.BASS_DEFAULT | BASSFlag.BASS_STREAM_AUTOFREE); //Bass.BASS_StreamCreatePush( 44100, 1, BASSFlag.BASS_DEFAULT, IntPtr.Zero );
             if (handle == 0) Console.WriteLine("Failed to play precached sound! " + Bass.BASS_ErrorGetCode());
-            Bass.BASS_ChannelSetAttribute(handle, BASSAttribute.BASS_ATTRIB_VOL, volume);
+            Bass.BASS_ChannelSetAttribute(handle, BASSAttribute.BASS_ATTRIB_VOL, volume * Utilities.EngineSettings.GlobalVolume);
             Bass.BASS_ChannelSetAttribute(handle, BASSAttribute.BASS_ATTRIB_FREQ, frequency);
             Bass.BASS_ChannelPlay(handle, true);
         }
@@ -228,7 +273,7 @@ namespace OlegEngine
             if (_lsAudio.Contains(this) && this.Handle != 0)
             {
                 Volume = volume;
-                Bass.BASS_ChannelSetAttribute(this.Handle, BASSAttribute.BASS_ATTRIB_VOL, volume);
+                Bass.BASS_ChannelSetAttribute(this.Handle, BASSAttribute.BASS_ATTRIB_VOL, volume * Utilities.EngineSettings.GlobalVolume);
             }
         }
         public void SetFrequency(float freq)
