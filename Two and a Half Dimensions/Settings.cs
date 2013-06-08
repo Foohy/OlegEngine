@@ -25,6 +25,9 @@ namespace OlegEngine
         public int ShadowMapSize = 1024;
         public int Samples = 4;
 
+        //Audio settings
+        public float GlobalVolume = 1.0f;
+
         //Debug settings
         public bool ShowFPS = false;
 
