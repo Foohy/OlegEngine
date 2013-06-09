@@ -356,6 +356,9 @@ namespace OlegEngine
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             }
 
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
+
             //TODO: Settings system that'll only set supported modes
             float maxAniso;
             GL.GetFloat((GetPName)ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out maxAniso);
