@@ -28,6 +28,7 @@ namespace OlegEngine
     public class LightingTechnique : Technique
     {
         public static event Action SetLights;
+        public static bool EnvironmentLightEnabled = true;
         new public static int Program = 0; //Override
 
         const int MAX_SPOTLIGHTS = 2;
@@ -123,7 +124,9 @@ namespace OlegEngine
             //Now that we have a list of all the lights to render this frame, friggin set em
             SetPointLights(Pointlights.ToArray());
             SetSpotlights(Spotlights.ToArray());
-            SetDirectionalLight(EnvironmentLight);
+
+            if (EnvironmentLightEnabled)
+                SetDirectionalLight(EnvironmentLight);
         }
 
         public static void AddPointLight(PointLight pl)
@@ -139,6 +142,11 @@ namespace OlegEngine
         public static void SetEnvironmentLight(DirectionalLight light)
         {
             EnvironmentLight = light;
+        }
+
+        public static void EnableEnvironmentLight(bool enabled)
+        {
+            EnvironmentLightEnabled = enabled;
         }
 
         static Vector3 day = new Vector3(1.0f, 1.0f, 0.862f);
