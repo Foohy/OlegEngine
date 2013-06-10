@@ -221,118 +221,7 @@ namespace OlegEngine
 
             return new Material(properties, Name);
         }
-        /*
-        public static Material LoadMaterial2(string filename)
-        {
-            filename = Resource.TextureDir + filename + Resource.MaterialExtension;
-            if (String.IsNullOrEmpty(filename))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Failed to load material. Filename is empty!");
-                Console.ResetColor();
 
-                return null;
-            }
-
-            if (!System.IO.File.Exists(filename))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Failed to load material. Couldn't find: " + filename);
-                Console.ResetColor();
-
-                return null;
-            }
-            string jsonString = File.ReadAllText(filename);
-            JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
-            MaterialProperties properties = new MaterialProperties();
-            string Name = "DYNAMIC";
-            string lastVal = "";
-            while (reader.Read())
-            {
-                if (reader.Value != null)
-                {
-                    lastVal = lastVal.ToLower();
-                    switch (lastVal)
-                    {
-                        case "shader":
-                            properties.ShaderProgram = Resource.GetProgram( reader.Value.ToString() );
-                            break;
-
-                        case "basetexture":
-                            properties.BaseTexture = Resource.GetTexture(reader.Value.ToString());
-                            Name = reader.Value.ToString();
-                            break;
-
-                        case "normalmap":
-                            properties.NormalMapTexture = Resource.GetTexture(reader.Value.ToString());
-                            break;
-
-                        case "specmap":
-                            properties.SpecMapTexture = Resource.GetTexture(reader.Value.ToString());
-                            break;
-
-                        case "alphamap":
-                            properties.AlphaMapTexture = Resource.GetTexture(reader.Value.ToString());
-                            break;
-
-                        case "nocull":
-                            bool nocull = false;
-                            bool.TryParse(reader.Value.ToString(), out nocull);
-                            properties.NoCull = nocull;
-                            break;
-
-                        case "alphatest":
-                            bool alphatest = false;
-                            bool.TryParse(reader.Value.ToString(), out alphatest);
-                            properties.AlphaTest = alphatest;
-                            break;
-
-                        case "specpower":
-                            float pwr = 0.0f;
-                            float.TryParse(reader.Value.ToString(), out pwr );
-                            properties.SpecularPower = pwr;
-                            break;
-
-                        case "specintensity":
-                            float intensity = 0.0f;
-                            float.TryParse(reader.Value.ToString(), out intensity);
-                            properties.SpecularIntensity = intensity;
-                            break;
-
-                        case "color":
-                            string curline = reader.Value.ToString();
-                            string[] components = curline.Split(' ');
-                            if (components.Length > 2)
-                            {
-                                float r= 1.0f, g = 1.0f, b = 1.0f;
-                                float.TryParse(components[0], out r);
-                                float.TryParse(components[1], out g);
-                                float.TryParse(components[2], out b);
-
-                                properties.Color = new Vector3(r, g, b);
-                            }
-                            break;
-
-                        case "animated":
-                            properties.IsAnimated = true;
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    lastVal = reader.Value.ToString();
-                }
-                else
-                {
-                    //Console.WriteLine(reader.TokenType);
-                }
-
-            }
-
-            return new Material(properties, Name);
-        }
-        */
         public static int LoadTexture(Bitmap bmp)
         {
             GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
@@ -340,9 +229,13 @@ namespace OlegEngine
             GL.BindTexture(TextureTarget.Texture2D, id);
 
             System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            bool hasAlpha = Image.IsAlphaPixelFormat(bmp.PixelFormat);
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+            PixelFormat pixFormat = hasAlpha ? PixelFormat.Bgra : PixelFormat.Bgr;
+            PixelInternalFormat internalPixFormat = hasAlpha ? PixelInternalFormat.Rgba : PixelInternalFormat.Rgb;
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, internalPixFormat, bmp_data.Width, bmp_data.Height, 0,
+                pixFormat, PixelType.UnsignedByte, bmp_data.Scan0);
 
             bmp.UnlockBits(bmp_data);
 
@@ -400,7 +293,9 @@ namespace OlegEngine
                 bmp = new Bitmap(filename);
             }
 
-            return LoadTexture(bmp);
+            int Tex = LoadTexture(bmp);
+            bmp.Dispose();
+            return Tex;
         }
 
         public static int[] LoadAnimatedTexture(string filename)
@@ -429,6 +324,7 @@ namespace OlegEngine
                 bmp.SelectActiveFrame(Dimension, i);
                 Textures[i] = LoadTexture(bmp);
             }
+            bmp.Dispose();
 
             return Textures;
         }

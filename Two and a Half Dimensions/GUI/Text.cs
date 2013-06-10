@@ -120,6 +120,7 @@ namespace OlegEngine.GUI
             }
             var mapbmp = new System.Drawing.Bitmap(Resource.FontDir + FNT + ".png");
             charset.CharsetMaterial = new Material(Utilities.LoadTexture(mapbmp), Resource.GetProgram("hud"));
+            mapbmp.Dispose();
 
             StreamReader sr = new StreamReader(Resource.FontDir + FNT + ".fnt");
 
