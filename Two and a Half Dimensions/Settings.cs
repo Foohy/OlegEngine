@@ -24,6 +24,7 @@ namespace OlegEngine
         public bool EnableShadows = true;
         public int ShadowMapSize = 1024;
         public int Samples = 4;
+        public int AnisotropicFiltering = 4;
 
         //Audio settings
         public float GlobalVolume = 1.0f;

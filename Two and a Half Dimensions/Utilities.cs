@@ -231,11 +231,8 @@ namespace OlegEngine
             System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             bool hasAlpha = Image.IsAlphaPixelFormat(bmp.PixelFormat);
 
-            PixelFormat pixFormat = hasAlpha ? PixelFormat.Bgra : PixelFormat.Bgr;
-            PixelInternalFormat internalPixFormat = hasAlpha ? PixelInternalFormat.Rgba : PixelInternalFormat.Rgb;
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, internalPixFormat, bmp_data.Width, bmp_data.Height, 0,
-                pixFormat, PixelType.UnsignedByte, bmp_data.Scan0);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
 
             bmp.UnlockBits(bmp_data);
 
@@ -255,6 +252,7 @@ namespace OlegEngine
             //TODO: Settings system that'll only set supported modes
             float maxAniso;
             GL.GetFloat((GetPName)ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out maxAniso);
+            maxAniso = Utilities.Clamp(Utilities.EngineSettings.AnisotropicFiltering, maxAniso, 0);
             GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, maxAniso);
 
             GL.ActiveTexture(TextureUnit.Texture0);
