@@ -326,7 +326,7 @@ namespace OlegEngine
             v3LightDirection = vLight / vLight.Length;
 
             skymodel = Resource.GetMesh("skybox.obj");
-            skymodel.mat = new Material("starm.png", "skybox2");
+            skymodel.mat = new Material(Utilities.White, "skybox2");
             skymodel.ShouldDrawDebugInfo = false;
 
             int prog = Resource.GetProgram("skybox2");
