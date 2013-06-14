@@ -41,8 +41,6 @@ namespace OlegEngine
         public float Roll;
         public static readonly Angle Zero;
 
-        private const double DEG2RAD = Math.PI / 180;
-
         //Operator overloads
         public static Angle operator +(Angle ang1, Angle ang2)
         {
@@ -94,9 +92,9 @@ namespace OlegEngine
         public void AngleVectors(out Vector3 Forward, out Vector3 Up, out Vector3 Right)
         {
             float sr, sp, sy, cr, cp, cy;
-            sy = (float)Math.Sin(this.Yaw * DEG2RAD); cy = (float)Math.Cos(this.Yaw * DEG2RAD);
-            sp = (float)Math.Sin(this.Pitch * DEG2RAD); cp = (float)Math.Cos(this.Pitch * DEG2RAD);
-            sr = (float)Math.Sin(this.Roll * DEG2RAD); cr = (float)Math.Cos(this.Roll * DEG2RAD);
+            sy = (float)Math.Sin(this.Yaw * Utilities.F_DEG2RAD); cy = (float)Math.Cos(this.Yaw * Utilities.F_DEG2RAD);
+            sp = (float)Math.Sin(this.Pitch * Utilities.F_DEG2RAD); cp = (float)Math.Cos(this.Pitch * Utilities.F_DEG2RAD);
+            sr = (float)Math.Sin(this.Roll * Utilities.F_DEG2RAD); cr = (float)Math.Cos(this.Roll * Utilities.F_DEG2RAD);
 
             Forward = new Vector3(cp * cy, sp, cp * sy);
             Right = new Vector3((sr * sp * cy + -1 * cr * -sy), (-1 * sr * cp), (sr * sp * sy + -1 * cr * cy));
@@ -107,8 +105,8 @@ namespace OlegEngine
         {
             float sp, sy, cp, cy;
 
-            sy = (float)Math.Sin(this.Yaw * DEG2RAD); cy = (float)Math.Cos(this.Yaw * DEG2RAD);
-            sp = (float)Math.Sin(this.Pitch * DEG2RAD); cp = (float)Math.Cos(this.Pitch * DEG2RAD);
+            sy = (float)Math.Sin(this.Yaw * Utilities.F_DEG2RAD); cy = (float)Math.Cos(this.Yaw * Utilities.F_DEG2RAD);
+            sp = (float)Math.Sin(this.Pitch * Utilities.F_DEG2RAD); cp = (float)Math.Cos(this.Pitch * Utilities.F_DEG2RAD);
 
             return new Vector3(cp * cy, sp, cp * sy);
         }
