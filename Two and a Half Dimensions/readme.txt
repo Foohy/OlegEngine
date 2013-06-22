@@ -23,6 +23,8 @@ http://foohy.net
 	Width/Height: The resolution of the screen. This is rather self explanatory
 	ShadowMapSize: The size (width and height) of the shadowmap. Higher values will result in a better looking map but is more perfomance intensive.
 	Samples: MSAA samples for antialiasing
+	AnisotropicFiltering: How much anisotropic filtering should be applied to textures. This makes textures that aren't perpendicular to the camera look better.
+	GlobalVolume: Global volume override for all audio.
 	ShowFPS: Draw an FPS indicator ingame
 
 2) I'm not responsible if it breaks your everything
