@@ -706,6 +706,7 @@ namespace OlegEngine
         public int locSpecularIntensity = -1;
         public int locSpecularPower = -1;
         public int locAlpha = -1;
+        public int locCheap = -1;
 
         /// <summary>
         /// Initialize a new material object - all by yourself!
@@ -789,6 +790,7 @@ namespace OlegEngine
                 locSpecularIntensity = GL.GetUniformLocation(Program, "gMatSpecularIntensity");
                 locSpecularPower = GL.GetUniformLocation(Program, "gSpecularPower");
                 locAlpha = GL.GetUniformLocation(Program, "gAlpha");
+                locCheap = GL.GetUniformLocation(Program, "gCheap");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -840,6 +842,7 @@ namespace OlegEngine
                 locSpecularIntensity = GL.GetUniformLocation(Properties.ShaderProgram, "gMatSpecularIntensity");
                 locSpecularPower = GL.GetUniformLocation(Properties.ShaderProgram, "gSpecularPower");
                 locAlpha = GL.GetUniformLocation(Properties.ShaderProgram, "gAlpha");
+                locCheap = GL.GetUniformLocation(Properties.ShaderProgram, "gCheap");
 
                 //Bind relevant sampler locations
                 GL.ActiveTexture(TextureUnit.Texture0);

@@ -404,7 +404,20 @@ namespace OlegEngine
     public class ShadowTechnique : Technique
     {
         const int MAX_SHADOWCASTERS = 2;
-        public static bool Enabled = true;
+        private static bool _enabled = false;
+        public static bool Enabled
+        {
+            get
+            {
+                return _enabled;
+            }
+            set
+            {
+                _enabled = value;
+                SetDrawCheapShadows(!value);
+            }
+        }
+
         new public static int Program = 0; //Override
 
         public static event Action SetLights;
@@ -415,6 +428,7 @@ namespace OlegEngine
         static int shadowMapLocation;
         static int shadowTextureLocation;
         static int numShadowCastersLocation;
+        static int shadowCheapDraw;
 
         static ShadowCasterLocations[] shadowcasterLocations = new ShadowCasterLocations[MAX_SHADOWCASTERS];
 
@@ -427,7 +441,7 @@ namespace OlegEngine
             lightWVPLocation = GL.GetUniformLocation(prog, "gLightWVP");
             shadowTextureLocation = GL.GetUniformLocation(prog, "sampler_shadow_tex");
             numShadowCastersLocation = GL.GetUniformLocation(prog, "gNumShadowCasters");
-
+            shadowCheapDraw = GL.GetUniformLocation(prog, "gCheap");
 
             for (int i = 0; i < shadowcasterLocations.Length; i++)
             {
@@ -504,6 +518,12 @@ namespace OlegEngine
         public static void AddLightPositionDirection(Vector3 Position, Vector3 Direction)
         {
 
+        }
+
+        public static void SetDrawCheapShadows(bool cheap)
+        {
+            GL.UseProgram(Program);
+            GL.Uniform1(shadowCheapDraw, cheap ? 1 : 0);
         }
 
         public static void SetLightInfo(ShadowInfo info)
