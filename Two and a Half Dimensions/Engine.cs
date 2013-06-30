@@ -205,7 +205,7 @@ namespace OlegEngine
                 RenderSceneTranslucent(e);
 
                 //Change our renderer back to the default framebuffer/size
-                shadowFBO.ResetFramebuffer();
+                FBO.ResetFramebuffer();
             }
 
             //Bind the shadow map into its texture slot

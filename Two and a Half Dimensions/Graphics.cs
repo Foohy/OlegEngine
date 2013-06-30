@@ -1052,7 +1052,7 @@ namespace OlegEngine
             }
 
             //Set it back to our default framebuffer
-            this.ResetFramebuffer();
+            FBO.ResetFramebuffer();
 
             //We have successfully created a framebuffer for framebuffing
             return true;
@@ -1073,9 +1073,9 @@ namespace OlegEngine
         /// Reset the framebuffer back to the one provided by the windowing system.
         /// </summary>
         /// <param name="SetViewPort">Whether the viewport size should be modified to the bounds of the framebuffer</param>
-        public void ResetFramebuffer(bool SetViewPort = true)
+        public static void ResetFramebuffer(bool SetViewPort = true)
         {
-            this.ResetFramebuffer(FramebufferTarget.Framebuffer, SetViewPort);
+            ResetFramebuffer(FramebufferTarget.Framebuffer, SetViewPort);
         }
 
         /// <summary>
@@ -1083,7 +1083,7 @@ namespace OlegEngine
         /// </summary>
         /// <param name="target">The specified framebuffer target type</param>
         /// <param name="SetViewPort">Whether the viewport size should be modified to the bounds of the framebuffer</param>
-        public void ResetFramebuffer(FramebufferTarget target, bool SetViewPort )
+        public static void ResetFramebuffer(FramebufferTarget target, bool SetViewPort )
         {
             //Change the viewport back to the size of the window
             if (SetViewPort) GL.Viewport(Utilities.window.ClientRectangle.X, Utilities.window.ClientRectangle.Y, Utilities.window.ClientRectangle.Width, Utilities.window.ClientRectangle.Height);
