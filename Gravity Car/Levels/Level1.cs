@@ -20,7 +20,6 @@ namespace Gravity_Car.Levels
         bool SetShadow = true;
         Vector3 Angle = new Vector3();
         ent_spotlight spotlight;
-        ent_car playerCar;
 
         public override void Preload()
         {

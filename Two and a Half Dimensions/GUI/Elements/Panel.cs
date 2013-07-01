@@ -62,9 +62,17 @@ namespace OlegEngine.GUI
         public event Action<Panel, MouseMoveEventArgs> OnMouseMove;
         public event Action<Panel, KeyPressEventArgs> OnKeyPressed;
         public event Action<Panel, ResizeEventArgs> OnResize;
-        public class ResizeEventArgs : EventArgs { float OldWidth; float OldHeight; float NewWidth; float NewHeight; public ResizeEventArgs(float oldWidth, float oldHeight, float newWidth, float newHeight) { OldWidth = oldWidth; oldHeight = OldHeight; newWidth = NewWidth; newHeight = NewHeight; } }
         public event Action<Panel, Vector2> PreDraw;
         public event Action<Panel, Vector2> PostDraw;
+
+        public class ResizeEventArgs : EventArgs 
+        { 
+            float OldWidth = 0; float OldHeight = 0; float NewWidth = 0; float NewHeight = 0; 
+            public ResizeEventArgs(float oldWidth, float oldHeight, float newWidth, float newHeight) 
+            { 
+                OldWidth = oldWidth; oldHeight = OldHeight; newWidth = NewWidth; newHeight = NewHeight; 
+            } 
+        }
 
         public int Material
         {

@@ -15,7 +15,6 @@ namespace OlegEngine
 
         public static Entity.BaseEntity Player { get; private set; }
 
-        public class CalcViewEventArgs : EventArgs { Entity.BaseEntity ply; Vector3 Pos; Vector3 Ang; }
         public static event Action CalcView;
 
         private static System.Reflection.MethodInfo PlyCalcView;

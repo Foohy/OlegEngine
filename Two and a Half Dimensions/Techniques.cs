@@ -425,7 +425,6 @@ namespace OlegEngine
         public static List<ShadowInfo> _lights = new List<ShadowInfo>();
 
         static int shadowSamplerLocation;
-        static int shadowMapLocation;
         static int shadowTextureLocation;
         static int numShadowCastersLocation;
         static int shadowCheapDraw;
@@ -463,7 +462,6 @@ namespace OlegEngine
             }
 
             if (!GL.IsProgram(prog) ||
-                shadowMapLocation == -1 ||
                 lightWVPLocation == -1)
             {
                 return false;

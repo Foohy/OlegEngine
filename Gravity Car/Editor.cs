@@ -35,8 +35,6 @@ namespace OlegEngine
         private static Text CurrentModeText;
         private static float goalZoom = 5.0f;
         private static float multiplier = 8;
-        private static float halfPI = -1.570796326794896f;
-        private static float Multiplier = 0.001223f; //0.000924f;
 
         //Editor GUI
         private static Toolbar TopControl;
