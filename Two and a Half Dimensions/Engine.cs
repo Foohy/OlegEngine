@@ -26,8 +26,8 @@ namespace OlegEngine
         public event Action<FrameEventArgs> OnRenderSceneTranslucent;
         public event Action OnSceneResize;
 
-        private Matrix4 defaultViewMatrix = Matrix4.Identity;
-        private Matrix4 defaultOrthoMatrix = Matrix4.Identity;
+        public Matrix4 defaultViewMatrix = Matrix4.Identity;
+        public Matrix4 defaultOrthoMatrix = Matrix4.Identity;
 
         private DropOutStack<double> AveragedFrametimes = new DropOutStack<double>( 30 );
 

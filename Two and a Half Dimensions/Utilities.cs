@@ -755,6 +755,12 @@ namespace OlegEngine
             return new MeshGroup(meshList);
         }
 
+        /// <summary>
+        /// Get the world position of a screenspace (x,y) position.
+        /// </summary>
+        /// <param name="x">X position on the screen</param>
+        /// <param name="y">Y position on the screen</param>
+        /// <returns>Normal pointing outwards from where the xy pair are.</returns>
         public static Vector3 Get2Dto3D(int x, int y)
         {
             int[] viewport = new int[4];
@@ -770,6 +776,13 @@ namespace OlegEngine
             return UnProject(new Vector3(x, viewport[3] - y, t[0]), modelviewMatrix, projectionMatrix, viewport);
         }
 
+        /// <summary>
+        /// Get the world position of a screenspace (x,y) position.
+        /// </summary>
+        /// <param name="x">X position on the screen</param>
+        /// <param name="y">Y position on the screen</param>
+        /// <param name="z">The specified 'depth' of the final vector</param>
+        /// <returns>XYZ world position with a specified depth</returns>
         public static Vector3 Get2Dto3D(int x, int y, float z)
         {
             int[] viewport = new int[4];
@@ -786,6 +799,37 @@ namespace OlegEngine
 
 
             return UnProject(new Vector3(x, viewport[3] - y, z), modelviewMatrix, projectionMatrix, viewport);
+        }
+
+        /// <summary>
+        /// Convert a 3 dimensional world position to screenspace (x,y)
+        /// </summary>
+        /// <param name="position">World position</param>
+        /// <returns>2D position relative to the screen of a world positon</returns>
+        public static Vector2 Get3Dto2D(Vector3 position)
+        {
+            return Get3Dto2D(position, View.CameraMatrix, Utilities.engine.defaultViewMatrix, Utilities.window.Width, Utilities.window.Height);
+        }
+
+        /// <summary>
+        /// Convert a 3 dimensional world position to screenspace (x,y)
+        /// </summary>
+        /// <param name="position">World position</param>
+        /// <param name="viewMatrix">Active view matrix for the camera</param>
+        /// <param name="projectionMatrix">Active projection matrix for the camrea</param>
+        /// <param name="screenWidth">Width, in pixels, of the screen</param>
+        /// <param name="screenHeight">Height, in pixels, of the screen</param>
+        /// <returns>2D position relative to the screen of a world positon</returns>
+        public static Vector2 Get3Dto2D(Vector3 position, Matrix4 viewMatrix, Matrix4 projectionMatrix, int screenWidth, int screenHeight)
+        {
+            position = Vector3.Transform(position, viewMatrix);
+            position = Vector3.Transform(position, projectionMatrix);
+            position.X /= position.Z;
+            position.Y /= position.Z;
+            position.X = (position.X + 1) * screenWidth / 2;
+            position.Y = (position.Y + 1) * screenHeight / 2;
+
+            return new Vector2(position.X, screenHeight - position.Y);
         }
 
         public static Vector3 UnProject(Vector3 screen, Matrix4 view, Matrix4 projection, int[] view_port)
