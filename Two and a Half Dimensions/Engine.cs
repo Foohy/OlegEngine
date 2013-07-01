@@ -78,6 +78,10 @@ namespace OlegEngine
             //Initialize our shadow FBO
             shadowFBO = new FBO(Utilities.EngineSettings.ShadowMapSize, Utilities.EngineSettings.ShadowMapSize);
 
+            //Bind some textures to our default framebuffer
+            //Utilities.ScreenDepthTex = FBO.BindTextureToFBO(0, this.WindowContext.Width, this.WindowContext.Height, PixelInternalFormat.DepthComponent, PixelFormat.DepthComponent, FramebufferAttachment.DepthAttachment);
+            //Utilities.ScreenTex = FBO.BindTextureToFBO(0, this.WindowContext.Width, this.WindowContext.Height, PixelInternalFormat.Rgba, PixelFormat.Rgba, FramebufferAttachment.ColorAttachment1);
+            
             //Initalize lighting
             LightingTechnique.Init();
             LightingTechnique.SetShadowTexture(shadowFBO.RenderTexture);

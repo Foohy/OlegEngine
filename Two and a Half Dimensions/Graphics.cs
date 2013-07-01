@@ -844,22 +844,27 @@ namespace OlegEngine
                 locAlpha = GL.GetUniformLocation(Properties.ShaderProgram, "gAlpha");
                 locCheap = GL.GetUniformLocation(Properties.ShaderProgram, "gCheap");
 
-                //Bind relevant sampler locations
+                //BASETEXTURE
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.Uniform1(locBaseTexture, 0);
 
+                //NORMAL MAP
                 GL.ActiveTexture(TextureUnit.Texture1);
                 GL.Uniform1(locNormalMap, 1);
 
+                //SHADOW MAP
                 GL.ActiveTexture(TextureUnit.Texture2);
                 GL.Uniform1(locShadowMap, 2);
 
+                //SHADOWMAP OVERLAY TEXTURE
                 GL.ActiveTexture(TextureUnit.Texture3);
                 GL.Uniform1(locShadowMapTexture, 3);
 
+                //SPECULARITY MAP
                 GL.ActiveTexture(TextureUnit.Texture4);
                 GL.Uniform1(locSpecMap, 4);
 
+                //ALPHA MAP
                 GL.ActiveTexture(TextureUnit.Texture5);
                 GL.Uniform1(locAlphaMap, 5);
 
@@ -1088,6 +1093,25 @@ namespace OlegEngine
             //Change the viewport back to the size of the window
             if (SetViewPort) GL.Viewport(Utilities.window.ClientRectangle.X, Utilities.window.ClientRectangle.Y, Utilities.window.ClientRectangle.Width, Utilities.window.ClientRectangle.Height);
             GL.BindFramebuffer(target, 0);
+        }
+
+        public static int BindTextureToFBO(int FBO, int Width, int Height, PixelInternalFormat InternalFormat, PixelFormat Format, FramebufferAttachment Attachment)
+        {
+            int tex = 0;
+            //Create the render texture
+            GL.GenTextures(1, out tex);
+            GL.BindTexture(TextureTarget.Texture2D, tex);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat, Width, Height, 0, Format, PixelType.UnsignedByte, IntPtr.Zero);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)TextureCompareMode.None);
+
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, FBO);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, Attachment, TextureTarget.Texture2D, tex, 0);
+
+            return tex;
         }
     }
 }

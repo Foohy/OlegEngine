@@ -43,6 +43,8 @@ namespace OlegEngine
         public static int NormalTex { get; set; }
         public static int AlphaTex { get; set; }
         public static int SpecTex { get; set; }
+        public static int ScreenDepthTex { get; set; }
+        public static int ScreenTex { get; set; }
         public static Material ErrorMat { get; set; }
         public static Material NormalMat { get; set; }
         public static GameWindow window { get; set; }
