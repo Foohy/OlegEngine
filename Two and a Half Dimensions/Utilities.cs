@@ -37,6 +37,8 @@ namespace OlegEngine
         public const double D_DEG2RAD = Math.PI / 180d;
         public const float F_RAD2DEG = (float)(180d / Math.PI);
         public const float F_DEG2RAD = (float)(Math.PI / 180d);
+        public const float F_2PI = (float)Math.PI * 2;
+        public const float F_3PI = (float)Math.PI * 3;
 
         public static int ErrorTex { get; set; }
         public static int White { get; set; }
@@ -957,24 +959,52 @@ namespace OlegEngine
             return src;
         }
 
+        /// <summary>
+        /// Clamp a given number between two numbers
+        /// </summary>
+        /// <param name="num">The number to be clamped</param>
+        /// <param name="high">The highest possible value</param>
+        /// <param name="low">The lowest possible value</param>
+        /// <returns>A clamped value of the input value</returns>
         public static int Clamp(int num, int high, int low)
         {
             if (num > high) return high;
             if (num < low) return low;
             return num;
         }
+        /// <summary>
+        /// Clamp a given number between two numbers
+        /// </summary>
+        /// <param name="num">The number to be clamped</param>
+        /// <param name="high">The highest possible value</param>
+        /// <param name="low">The lowest possible value</param>
+        /// <returns>A clamped value of the input value</returns>
         public static float Clamp(float num, float high, float low)
         {
             if (num > high) return high;
             if (num < low) return low;
             return num;
         }
+        /// <summary>
+        /// Clamp a given number between two numbers
+        /// </summary>
+        /// <param name="num">The number to be clamped</param>
+        /// <param name="high">The highest possible value</param>
+        /// <param name="low">The lowest possible value</param>
+        /// <returns>A clamped value of the input value</returns>
         public static double Clamp(double num, double high, double low)
         {
             if (num > high) return high;
             if (num < low) return low;
             return num;
         }
+        /// <summary>
+        /// Clamp a given number between two numbers
+        /// </summary>
+        /// <param name="num">The number to be clamped</param>
+        /// <param name="high">The highest possible value</param>
+        /// <param name="low">The lowest possible value</param>
+        /// <returns>A clamped value of the input value</returns>
         public static long Clamp(long num, long high, long low)
         {
             if (num > high) return high;
@@ -982,9 +1012,45 @@ namespace OlegEngine
             return num;
         }
 
+        /// <summary>
+        /// Linearly interpolate between two values by a given percent
+        /// </summary>
+        /// <param name="start">The starting value</param>
+        /// <param name="end">The ending value</param>
+        /// <param name="percent">The percent towards the end value from the start value</param>
+        /// <returns>Interpolated value</returns>
         public static float Lerp( float start, float end, float percent)
         {
             return start + percent * (end - start);
+        }
+
+        /// <summary>
+        /// Linearly interpolate between two angles, in radians
+        /// </summary>
+        /// <param name="start">The starting angle</param>
+        /// <param name="end">The ending angle</param>
+        /// <param name="percent">The percent towards the end angle from the start angle</param>
+        /// <returns>Interpolated angle</returns>
+        public static float LerpAngle(float start, float end, float percent)
+        {
+            if (Math.Abs(start - end) > Math.PI)
+            {
+                if (end > start) start += Utilities.F_2PI;
+                else end += Utilities.F_2PI;
+            }
+
+            return (float)NormalizeAngle(Utilities.Lerp(start, end, percent));
+        }
+
+        /// <summary>
+        /// Given an angle in radians, normalize it to be between -PI and PI
+        /// </summary>
+        /// <param name="angle">Angle in radians</param>
+        /// <returns>Equivalent angle in radians wrapped between -PI and PI</returns>
+        public static double NormalizeAngle(double angle)
+        {
+            angle = angle % (Math.PI * 2);
+            return angle >= 0 ? angle : angle + Math.PI * 2;
         }
     }
 
