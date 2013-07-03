@@ -110,5 +110,19 @@ namespace OlegEngine
 
             return new Vector3(cp * cy, sp, cp * sy);
         }
+
+        public Vector3 Right()
+        {
+            Vector3 forward, up, right;
+            AngleVectors(out forward, out up, out right);
+            return right;
+        }
+
+        public Vector3 Up()
+        {
+            Vector3 forward, up, right;
+            AngleVectors(out forward, out up, out right);
+            return up;
+        }
     }
 }
