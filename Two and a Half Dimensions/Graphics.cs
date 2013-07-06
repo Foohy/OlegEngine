@@ -689,6 +689,8 @@ namespace OlegEngine
 
     public class Material
     {
+        private static int LastShader = -1;
+
         public MaterialProperties Properties = new MaterialProperties();
         public string Name { get; private set; }
 
@@ -899,7 +901,11 @@ namespace OlegEngine
             //The shadow map is bound to texture unit three in Techniques.cs. It only needs to be bound once.
 
             //Bind the program and set some parameters to the lighting
-            GL.UseProgram(Properties.ShaderProgram);
+            if (LastShader != Properties.ShaderProgram)
+            {
+                GL.UseProgram(Properties.ShaderProgram);
+                LastShader = Properties.ShaderProgram;
+            }
 
             GL.Uniform1(locSpecularIntensity, Properties.SpecularIntensity);
             GL.Uniform1(locSpecularPower, Properties.SpecularPower);
