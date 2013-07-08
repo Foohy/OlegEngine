@@ -56,6 +56,8 @@ namespace OlegEngine.GUI
         public List<Panel> Children = new List<Panel>();
         public bool _ToRemove = false;
 
+        public object Userdata { get; set; }
+
         //Events
         public event Action<Panel, MouseButtonEventArgs> OnMouseDown;
         public event Action<Panel, MouseButtonEventArgs> OnMouseUp;
