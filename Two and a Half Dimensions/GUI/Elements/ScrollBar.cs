@@ -68,7 +68,7 @@ namespace OlegEngine.GUI
 
             int GrabHeight = (int)Utilities.Clamp((int)((float)this.Height * ((float)this.Height / (float)this.ScrollPanel.Height)), this.ScrollPanel.Height, 10 );
 
-            this.ShouldDrawBar = GrabHeight <= this.ScrollPanel.Height;
+            this.ShouldDrawBar = GrabHeight < this.ScrollPanel.Height;
             Grip.SetHeight(GrabHeight);
         }
 
