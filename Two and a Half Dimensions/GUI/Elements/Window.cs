@@ -59,7 +59,7 @@ namespace OlegEngine.GUI
             Title.SetColor(135, 36, 31);
 
             TitleText = GUIManager.Create<Label>();
-            TitleText.SetFont("windowtitle");
+            TitleText.SetFont("defaultTitle");
             TitleText.SetParent(Title);
             TitleText.SetPos(0, 0);
             TitleText.SetColor(255, 255, 255);
