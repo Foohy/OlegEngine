@@ -52,6 +52,8 @@ namespace OlegEngine.GUI
 
             p.SetWidth(this.ScrollPanel.Width);
             p.SetAnchorStyle(Anchors.Left | Anchors.Top | Anchors.Right);
+
+            this.ScrollPanel.SetHeight(p.Position.Y + p.Height);
         }
 
         public void AddListItem(object Userdata, params string[] Labels)

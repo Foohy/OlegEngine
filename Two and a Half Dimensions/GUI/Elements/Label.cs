@@ -33,11 +33,13 @@ namespace OlegEngine.GUI
         public Label()
         {
             this.Text = "";
-            DrawText = new Text("title", this.Text);
+            DrawText = new Text("default", this.Text);
             SizeToText();
             this.ShouldPassInput = true;
             this.Autosize = false;
             this.SetColor(255, 255, 255);
+
+            this.Alignment = TextAlign.MiddleLeft;
         }
 
         public void SetText(string str)
@@ -160,7 +162,6 @@ namespace OlegEngine.GUI
             }
 
             DrawText.Draw();
-
 
             if (clipping)
             {

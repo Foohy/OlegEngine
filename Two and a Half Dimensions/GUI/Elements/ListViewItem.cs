@@ -59,6 +59,7 @@ namespace OlegEngine.GUI
                 Label l = GUIManager.Create<Label>(this);
                 l.SetText(label);
                 l.SizeToText();
+                l.SetHeight(this.Height);
 
                 //TODO: Set position according to listview categories
                 if (i > 0) l.SetPos(labelPanels.Length * 70 + 3, 0);
