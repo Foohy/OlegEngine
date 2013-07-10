@@ -652,8 +652,8 @@ namespace OlegEngine.GUI
 
                 panelMesh.mat = Mat;
                 modelview = Matrix4.CreateTranslation(Vector3.Zero);
-                modelview *= Matrix4.Scale(Width, Height, 1.0f);
-                modelview *= Matrix4.CreateTranslation(posOffset.X, posOffset.Y, 3.0f);
+                modelview *= Matrix4.Scale((int)Width, (int)Height, 1.0f);
+                modelview *= Matrix4.CreateTranslation((int)posOffset.X, (int)posOffset.Y, 3.0f);
 
 
                 this.panelMesh.Color = this.Color;

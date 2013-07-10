@@ -233,8 +233,8 @@ namespace OlegEngine.GUI
 
         //instanced class
         public Charset charset { get; private set; }
-        public float X { get; private set; }
-        public float Y { get; private set; }
+        public int X { get; private set; }
+        public int Y { get; private set; }
         public float ScaleW { get; private set; }
         public float ScaleH { get; private set; }
         public Vector3 Color = Vector3.One;
@@ -261,8 +261,8 @@ namespace OlegEngine.GUI
 
         public void SetPos(float x, float y)
         {
-            this.X = x;
-            this.Y = y;
+            this.X = (int)x;
+            this.Y = (int)y;
 
             this.UpdateMatrix();
         }
