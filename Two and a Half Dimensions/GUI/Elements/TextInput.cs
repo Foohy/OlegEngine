@@ -33,11 +33,11 @@ namespace OlegEngine.GUI
             this.SetWidth(40);
 
             TextLabel = GUIManager.Create<Label>();
-            TextLabel.SetColor(0, 0, 0);
+            TextLabel.SetColor(73, 73, 73);
             TextLabel.SetParent(this);
-            TextLabel.Autosize = true;
+            TextLabel.DockPadding(3, 3, 0, 0);
             TextLabel.Dock(DockStyle.FILL);
-            TextLabel.SetAlignment(Label.TextAlign.TopLeft);
+            TextLabel.SetAlignment(Label.TextAlign.MiddleLeft);
 
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
             Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
@@ -187,7 +187,7 @@ namespace OlegEngine.GUI
 
                 if (blinkOn)
                 {
-                    Vector2 ScreenPos = this.GetScreenPos();
+                    Vector2 ScreenPos = TextLabel.GetScreenPos();
 
                     float caretX = Surface.GetTextLength(this.TextLabel.GetFont(), this.TextLabel.Text.Substring(0, CaretPos));
 
