@@ -119,6 +119,11 @@ namespace OlegEngine.GUI
             this.DrawText = new Text(font, this.Text);
         }
 
+        public string GetFont()
+        {
+            return this.DrawText.charset.FontName;
+        }
+
         protected override void Reposition()
         {
             base.Reposition();
@@ -133,6 +138,11 @@ namespace OlegEngine.GUI
         public float GetTextHeight()
         {
             return this.DrawText.GetTextHeight();
+        }
+
+        public int GetIndexFromPosition(float X)
+        {
+            return this.DrawText.GetClosestCharacterIndex(X);
         }
 
         public override void Draw()

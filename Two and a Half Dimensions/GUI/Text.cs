@@ -27,6 +27,7 @@ namespace OlegEngine.GUI
             public ushort Width, Height;
             public CharDescriptor[] Chars;
             public Material CharsetMaterial;
+            public string FontName;
 
             public Charset()
             {
@@ -107,6 +108,8 @@ namespace OlegEngine.GUI
         public static Charset ParseFont(string FNT)
         {
             Charset charset = new Charset();
+            charset.FontName = FNT;
+
             if (!File.Exists(Resource.FontDir + FNT + ".fnt"))
             {
                 Utilities.Print("Failed to load font '{0}'", Utilities.PrintCode.ERROR, FNT);
@@ -242,7 +245,6 @@ namespace OlegEngine.GUI
         {
             this.charset = Resource.GetCharset(font);
 
-
             //Create a blank vertex buffer which we'll update later with our text info
             textMesh = new Mesh(new Vector3[0], new int[0], new Vector3[0], null, new Vector2[0]);
             textMesh.DrawMode = BeginMode.Quads;
@@ -325,9 +327,50 @@ namespace OlegEngine.GUI
             return GetTextLength(this.CurrentText);
         }
 
+        /// <summary>
+        /// Get the height, in pixels, of the text's font
+        /// </summary>
+        /// <returns></returns>
         public float GetTextHeight()
         {
             return this.charset.LineHeight * ScaleH;
+        }
+
+        /// <summary>
+        /// Given an x value, return the character index closest to that value. Useful for text selection.
+        /// </summary>
+        /// <param name="x">X value of the 'pointer' or to be compared to.</param>
+        /// <param name="str">The string to test against</param>
+        /// <returns>Character index of the string</returns>
+        public int GetClosestCharacterIndex(float x, string str)
+        {
+            if (string.IsNullOrEmpty(str)) return 0;
+
+            float CurX = 0;
+            float StartX = 0;
+            float EndX = 0;
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (str[i] > this.charset.Chars.Length) continue;
+
+                if (i == 0) StartX = this.charset.Chars[str[i]].XOffset;
+                if (i == str.Length - 1) EndX = this.charset.Chars[str[i]].Width + CurX + this.charset.Chars[str[i]].XOffset;
+
+                CurX += this.charset.Chars[str[i]].XAdvance;
+                if (CurX > (x - this.X)) return i;
+            }
+
+            return (str.Length);
+        }
+
+        /// <summary>
+        /// Given an x value, return the character index closest to that value. Useful for text selection.
+        /// </summary>
+        /// <param name="x">X value of the 'pointer' or to be compared to.</param>
+        /// <returns>Character index of the string</returns>
+        public int GetClosestCharacterIndex(float x)
+        {
+            return this.GetClosestCharacterIndex(x, this.CurrentText);
         }
 
         public void SetText(string text)
