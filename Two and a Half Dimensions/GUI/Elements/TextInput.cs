@@ -15,6 +15,10 @@ namespace OlegEngine.GUI
         public bool Selected { get; private set; }
         public Label TextLabel;
         public event Action<Panel, bool> OnSelectedChange;
+        public int CaretPos = 0;
+
+        private bool blinkOn = false;
+        private double nextBlink = 0;
 
         public TextInput()
         {
@@ -36,6 +40,26 @@ namespace OlegEngine.GUI
             TextLabel.SetAlignment(Label.TextAlign.TopLeft);
 
             Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+        }
+
+        void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
+        {
+            if (e.Key == Key.Left || e.Key == Key.Right)
+            {
+                //Set the caret position
+                int newCaretPos = e.Key == Key.Right ? CaretPos + 1 : CaretPos - 1;
+                CaretPos = Utilities.Clamp(newCaretPos, this.TextLabel.Text.Length, 0);
+
+                //Reset caret blinking
+                blinkOn = true;
+                nextBlink = System.Windows.Forms.SystemInformation.CaretBlinkTime / 1000f + Utilities.Time;
+            }
+            else if (e.Key == Key.Delete)
+            {
+                //Delete characters in front of the caret
+                delete();
+            }
         }
 
         void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
@@ -63,6 +87,9 @@ namespace OlegEngine.GUI
             if (this.Enabled && this.IsMouseOver())
             {
                 this.SetIsSelected(true);
+
+                //Set the caret position based on mouse click position
+                this.CaretPos = this.TextLabel.GetIndexFromPosition(e.X);
             }
             else { this.SetIsSelected(false); }
         }
@@ -74,21 +101,45 @@ namespace OlegEngine.GUI
                 switch (e.KeyChar)
                 {
                     case '\b':
-                        if (this.TextLabel.Text.Length > 1 )
-                            this.TextLabel.SetText(this.TextLabel.Text.Remove(this.TextLabel.Text.Length - 1));
-                        else if (this.TextLabel.Text.Length == 1)
-                            this.TextLabel.SetText("");
-
+                        backspace();
                         break;
 
                     case '\n': case '\t': case '\r':
                         break;
 
                     default:
-                        this.TextLabel.SetText(this.TextLabel.Text + e.KeyChar);
+                        this.typeKey(e.KeyChar.ToString());
                         break;
                 }
             }
+        }
+
+        private void backspace()
+        {
+            if (CaretPos > 1)
+            {
+                this.TextLabel.SetText(this.TextLabel.Text.Remove(CaretPos-1, 1));
+                CaretPos--;
+            }
+            else if (this.TextLabel.Text.Length == 1)
+            {
+                this.TextLabel.SetText("");
+                CaretPos = 0;
+            }
+        }
+
+        private void delete()
+        {
+            if (this.TextLabel.Text.Length > 1 && CaretPos != this.TextLabel.Text.Length)
+            {
+                this.TextLabel.SetText(this.TextLabel.Text.Remove(CaretPos, 1));
+            }
+        }
+
+        private void typeKey(string Key)
+        {
+            this.TextLabel.SetText(this.TextLabel.Text.Insert(CaretPos, Key));
+            CaretPos++;
         }
 
         /// <summary>
@@ -118,6 +169,33 @@ namespace OlegEngine.GUI
         public override void Resize(float oldWidth, float oldHeight, float newWidth, float newHeight)
         {
             base.Resize(oldWidth, oldHeight, newWidth, newHeight);
+        }
+
+        public override void Draw()
+        {
+            base.Draw();
+            
+            //Draw the caret
+            if (this.Selected)
+            {
+                //think about how we should be blinking
+                if (Utilities.Time > nextBlink)
+                {
+                    blinkOn = !blinkOn;
+                    nextBlink = System.Windows.Forms.SystemInformation.CaretBlinkTime/1000f + Utilities.Time;
+                }
+
+                if (blinkOn)
+                {
+                    Vector2 ScreenPos = this.GetScreenPos();
+
+                    float caretX = Surface.GetTextLength(this.TextLabel.GetFont(), this.TextLabel.Text.Substring(0, CaretPos));
+
+                    Surface.SetDrawColor(0, 0, 0);
+                    Surface.SetNoTexture();
+                    Surface.DrawRect(ScreenPos.X + caretX, ScreenPos.Y + 2, 1, this.Height - 4);
+                }
+            }
         }
 
         public override void Remove()
