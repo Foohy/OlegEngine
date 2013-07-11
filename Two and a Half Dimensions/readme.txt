@@ -26,6 +26,7 @@ http://foohy.net
 	AnisotropicFiltering: How much anisotropic filtering should be applied to textures. This makes textures that aren't perpendicular to the camera look better.
 	GlobalVolume: Global volume override for all audio.
 	ShowFPS: Draw an FPS indicator ingame
+	ShowConsole: Show the debug console. Do this if bad things are happening.
 
 2) I'm not responsible if it breaks your everything
 	I was nowhere near isle 7
