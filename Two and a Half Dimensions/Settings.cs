@@ -31,6 +31,7 @@ namespace OlegEngine
 
         //Debug settings
         public bool ShowFPS = false;
+        public bool ShowConsole = false;
 
         public Settings()
         {

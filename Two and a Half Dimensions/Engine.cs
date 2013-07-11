@@ -15,6 +15,11 @@ namespace OlegEngine
     {
         static public int Major;
         static public int Minor;
+
+        public static string SimpleString()
+        {
+            return string.Format("{0}.{1}", GLVersion.Major, GLVersion.Minor);
+        }
     }
 
 
@@ -50,6 +55,11 @@ namespace OlegEngine
             GLVersion.Major = (int)Char.GetNumericValue(versionOpenGL[0]);
             GLVersion.Minor = (int)Char.GetNumericValue(versionOpenGL[2]);
             Console.WriteLine("OpenGL version: {0}", versionOpenGL);
+
+            if (GLVersion.Major < 3 || (GLVersion.Major == 3 && GLVersion.Minor < 2))
+            {
+                Utilities.Print("You graphics card is on an older version of OpenGL ({0}). This application uses OpenGL 3.2. Good luck!", Utilities.PrintCode.WARNING, GLVersion.SimpleString() );
+            }
             Console.WriteLine("==================================");
 
             Utilities.Init(this.WindowContext, this);
