@@ -34,11 +34,13 @@ namespace OlegEngine.GUI
         public float Width { get; protected set; }
         public float Height { get; protected set; }
         public bool ShouldDraw { get; set; }
+        public bool Enabled { get; set; }
+
         public bool AlphaBlendmode { get; set; }
         public bool ShouldDrawChildren { get; set; }
         public bool ShouldPassInput { get; set; } //Clicks should pass 'through' this panel to underlying panels
         public bool ClipChildren { get; set; } //Should the panel clip child panels when they go off the edge?
-        public bool Enabled { get; set; }
+
         public bool ShouldAnchor { get; set; } //Control which style should be used: Docking, or anchor style
         public DockStyle DockingStyle { get; protected set; }
         public Anchors AnchorStyle { get; protected set; }
@@ -441,6 +443,12 @@ namespace OlegEngine.GUI
         public bool IsOverPanel(Panel p)
         {
             return GUIManager.GetHigherPanel(this, p) == this;
+        }
+
+        public void SetEnabled(bool enabled, bool disableChildren = false)
+        {
+            this.Enabled = enabled;
+            foreach (Panel child in this.Children) child.Enabled = enabled;
         }
 
         public Panel GetHighestChildAtPos(Vector2 point)
