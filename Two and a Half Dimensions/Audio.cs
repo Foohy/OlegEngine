@@ -139,7 +139,8 @@ namespace OlegEngine
         /// Precache a specific sound into memory (to reduce having to load the sound on demand)
         /// </summary>
         /// <param name="filename">The soundfile name on the hard disk</param>
-        public static void Precache(string filename )
+        /// <returns>If the sound was successfully precached</returns>
+        public static bool Precache(string filename )
         {
             byte[] bytes = null;
             try
@@ -149,8 +150,8 @@ namespace OlegEngine
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to load audio file: " + ex.Message);
-                return;
+                Utilities.Print("Failed to load audio file. {0}", Utilities.PrintCode.WARNING, ex.Message);
+                return false;
             }
             int length = bytes.Length;
             GCHandle rawDataHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
@@ -161,6 +162,8 @@ namespace OlegEngine
             {
                 _lsPrecached.Add(filename, memAudio);
             }
+
+            return true;
         }
 
         /// <summary>
@@ -173,8 +176,9 @@ namespace OlegEngine
         {
             if (!_lsPrecached.ContainsKey(name))
             {
-                Precache(name);
-                Console.WriteLine("Sound not precached: {0}", name);
+                if (Precache(name))
+                    Utilities.Print("Sound '{0}' was not precached!", Utilities.PrintCode.WARNING, name);
+                else return;
             }
 
             int handle = Bass.BASS_StreamCreateFile(_lsPrecached[name].bufferPointer, 0, _lsPrecached[name].bufferLength, BASSFlag.BASS_DEFAULT | BASSFlag.BASS_STREAM_AUTOFREE); //Bass.BASS_StreamCreatePush( 44100, 1, BASSFlag.BASS_DEFAULT, IntPtr.Zero );
