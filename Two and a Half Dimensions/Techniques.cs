@@ -378,11 +378,11 @@ namespace OlegEngine
         {
             GL.UseProgram(Program);
 
-            GL.Uniform3(v3CameraPosLocation, View.Player.Position);
+            GL.Uniform3(v3CameraPosLocation, View.Position);
             GL.Uniform3(v3LightPosLocation, v3LightDirection);
             GL.Uniform3(v3InvWavelengthLocation, 1 / fWavelength4[0], 1 / fWavelength4[1], 1 / fWavelength4[2]);
-            GL.Uniform1(fCameraHeightLocation, View.Player.Position.Length);
-            GL.Uniform1(fCameraHeight2Location, View.Player.Position.LengthSquared);
+            GL.Uniform1(fCameraHeightLocation, View.Position.Length);
+            GL.Uniform1(fCameraHeight2Location, View.Position.LengthSquared);
             GL.Uniform1(fInnerRadiusLocation, fInnerRadius);
             GL.Uniform1(fInnerRadius2Location, fInnerRadius * fInnerRadius);
             GL.Uniform1(fOuterRadiusLocation, fOuterRadius);
