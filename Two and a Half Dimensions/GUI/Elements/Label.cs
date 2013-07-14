@@ -126,6 +126,11 @@ namespace OlegEngine.GUI
             return this.DrawText.charset.FontName;
         }
 
+        public bool IsValidCharacter(char character)
+        {
+            return this.DrawText.GetCharExists(character);
+        }
+
         protected override void Reposition()
         {
             base.Reposition();

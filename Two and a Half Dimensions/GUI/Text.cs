@@ -373,6 +373,11 @@ namespace OlegEngine.GUI
             return this.GetClosestCharacterIndex(x, this.CurrentText);
         }
 
+        public bool GetCharExists(char character)
+        {
+            return character < this.charset.Chars.Length;
+        }
+
         public void SetText(string text)
         {
             if (text == null || text == this.CurrentText) return;
