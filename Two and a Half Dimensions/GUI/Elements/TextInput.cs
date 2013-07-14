@@ -60,6 +60,16 @@ namespace OlegEngine.GUI
                 //Delete characters in front of the caret
                 delete();
             }
+            //Paste
+            else if (e.Key == Key.V && (Utilities.window.Keyboard[Key.ControlLeft] || Utilities.window.Keyboard[Key.ControlRight]))
+            {
+                if (System.Windows.Clipboard.ContainsText())
+                {
+                    string paste = System.Windows.Clipboard.GetText();
+
+                    this.typeKey(paste);
+                }
+            }
         }
 
         void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
@@ -108,7 +118,11 @@ namespace OlegEngine.GUI
                         break;
 
                     default:
-                        this.typeKey(e.KeyChar.ToString());
+                        //Only type the key if it's a valid character
+                        if (TextLabel.IsValidCharacter(e.KeyChar))
+                        {
+                            this.typeKey(e.KeyChar.ToString());
+                        }
                         break;
                 }
             }
@@ -139,7 +153,7 @@ namespace OlegEngine.GUI
         private void typeKey(string Key)
         {
             this.TextLabel.SetText(this.TextLabel.Text.Insert(CaretPos, Key));
-            CaretPos++;
+            CaretPos += Key.Length;
         }
 
         /// <summary>
