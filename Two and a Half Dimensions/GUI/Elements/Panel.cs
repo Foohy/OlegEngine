@@ -34,7 +34,7 @@ namespace OlegEngine.GUI
         public float Width { get; protected set; }
         public float Height { get; protected set; }
         public bool ShouldDraw { get; set; }
-        public bool Enabled { get; set; }
+        public bool Enabled { get; protected set; }
 
         public bool AlphaBlendmode { get; set; }
         public bool ShouldDrawChildren { get; set; }
@@ -66,8 +66,10 @@ namespace OlegEngine.GUI
         public event Action<Panel, MouseMoveEventArgs> OnMouseMove;
         public event Action<Panel, KeyPressEventArgs> OnKeyPressed;
         public event Action<Panel, ResizeEventArgs> OnResize;
+        public event Action<Panel, bool> OnEnableChange;
         public event Action<Panel, Vector2> PreDraw;
         public event Action<Panel, Vector2> PostDraw;
+        public event Action<Panel> OnRemove;
 
         public class ResizeEventArgs : EventArgs 
         { 
@@ -292,6 +294,15 @@ namespace OlegEngine.GUI
             this.Resize(this.Width, oldH, this.Width, this.Height);
         }
 
+        public void SetWidthHeight(float width, float height)
+        {
+            float oldH = this.Height;
+            float oldW = this.Width;
+            this.Height = height;
+            this.Width = width;
+            this.Resize(oldW, oldH, this.Width, this.Height);
+        }
+
         public void Dock(DockStyle style)
         {
             this.DockingStyle = style;
@@ -445,10 +456,21 @@ namespace OlegEngine.GUI
             return GUIManager.GetHigherPanel(this, p) == this;
         }
 
-        public void SetEnabled(bool enabled, bool disableChildren = false)
+        public void SetEnabled(bool enabled, bool enableChildren = false)
         {
+            if (this.Enabled == enabled && !enableChildren ) return;
+
             this.Enabled = enabled;
-            foreach (Panel child in this.Children) child.Enabled = enabled;
+
+            if (enableChildren)
+            {
+                foreach (Panel child in this.Children) child.SetEnabled(enabled);
+            }
+
+            if (OnEnableChange != null)
+            {
+                OnEnableChange(this, enabled);
+            }
         }
 
         public Panel GetHighestChildAtPos(Vector2 point)
@@ -552,6 +574,9 @@ namespace OlegEngine.GUI
 
             if (this.Parent)
                 this.Parent.Children.Remove(this);
+
+            if (OnRemove != null)
+                OnRemove(this);
 
             this._ToRemove = true;
         }
