@@ -14,12 +14,27 @@ namespace OlegEngine
             return new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
         }
 
+        public static Vector3 Divide(this Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.X / b.X, a.Y / b.Y, a.Z / b.Z);
+        }
+
         public static Vector3 Cross(this Vector3 a, Vector3 b)
         {
             return new Vector3(
                 a.Y * b.Z - a.Z * b.Y,
                 a.Z * b.X - a.X * b.Z,
                 a.X * b.Y - a.Y * b.X);
+        }
+
+        public static Vector2 Multiply(this Vector2 a, Vector2 b)
+        {
+            return new Vector2(a.X * b.X, a.Y * b.Y);
+        }
+
+        public static Vector2 Divide(this Vector2 a, Vector2 b)
+        {
+            return new Vector2(a.X / b.X, a.Y / b.Y);
         }
 
         public static float InnerProduct(this Vector3 a, Vector3 b)
