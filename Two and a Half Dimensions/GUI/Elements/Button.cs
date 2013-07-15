@@ -33,7 +33,8 @@ namespace OlegEngine.GUI
         public Button()
         {
             this.SetColor(33, 36, 45);
-            this.SetImage( Utilities.White );
+            this.SetImage( Utilities.White);
+            this.OnEnableChange += new Action<Panel, bool>(Button_OnEnableChange);
 
             TextLabel = GUIManager.Create<Label>();
             TextLabel.SetColor(255, 255, 255);
@@ -41,6 +42,11 @@ namespace OlegEngine.GUI
             TextLabel.Autosize = false;
             TextLabel.Dock(DockStyle.FILL);
             TextLabel.SetAlignment(Label.TextAlign.MiddleCenter);
+        }
+
+        void Button_OnEnableChange(Panel panel, bool enabled)
+        {
+            CheckButtonState();
         }
 
         public override void Init()
@@ -52,15 +58,7 @@ namespace OlegEngine.GUI
         {
             base.MouseMove(e);
 
-            if (this.Enabled && this.IsMouseOver() && this.CurrentState != State.Pressed && !this.ShouldPassInput && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y), this) )
-            {
-                this.CurrentState = State.Hover;
-                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Hand;
-            }
-            else if (this.CurrentState != State.Pressed )
-            {
-                this.CurrentState = State.Idle;
-            }
+            CheckButtonState();
         }
 
         public override void MouseDown(MouseButtonEventArgs e)
@@ -119,9 +117,30 @@ namespace OlegEngine.GUI
             this.TexPressed = pressed;
         }
 
+        private bool IsClickable()
+        {
+            return this.Enabled && this.IsMouseOver() && this.CurrentState != State.Pressed && !this.ShouldPassInput && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y), this);
+        }
+
+        private void CheckButtonState()
+        {
+            if (this.IsClickable())
+            {
+                this.CurrentState = State.Hover;
+                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Hand;
+            }
+            else if (this.CurrentState != State.Pressed)
+            {
+                this.CurrentState = State.Idle;
+            }
+        }
+
         public override void Resize(float oldWidth, float oldHeight, float newWidth, float newHeight)
         {
             base.Resize(oldWidth, oldHeight, newWidth, newHeight);
+
+            //If we were resized but the mouse didn't move, check if we are still clickable
+            CheckButtonState();
         }
 
         public override void Draw()
