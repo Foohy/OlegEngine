@@ -231,7 +231,7 @@ namespace OlegEngine.GUI
 
         public void SetEnableCloseButton(bool enabled)
         {
-            this.closeButton.Enabled = enabled;
+            this.closeButton.SetEnabled( enabled );
             this.closeButton.ShouldDraw = enabled;
             this.closeButton.ShouldDrawChildren = enabled;
         }
