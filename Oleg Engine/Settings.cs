@@ -14,7 +14,7 @@ namespace OlegEngine
     public class Settings
     {
         //General settings
-        public VSyncMode VSync = VSyncMode.Off;
+        public VSyncMode VSync = VSyncMode.On;
         public WindowState WindowMode = WindowState.Normal;
         public bool NoBorder = false;
         public int Width = 1024;
@@ -23,8 +23,8 @@ namespace OlegEngine
         //Rendering settings
         public bool EnableShadows = true;
         public int ShadowMapSize = 1024;
-        public int Samples = 4;
-        public int AnisotropicFiltering = 4;
+        public int Samples = 2;
+        public int AnisotropicFiltering = 2;
 
         //Audio settings
         public float GlobalVolume = 1.0f;

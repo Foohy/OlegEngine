@@ -1,16 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlegEngine", "Two and a Half Dimensions\OlegEngine.csproj", "{78402D63-5943-49C3-9DA8-D957BE2E96A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlegEngine", "Oleg Engine\OlegEngine.csproj", "{78402D63-5943-49C3-9DA8-D957BE2E96A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gravity Car", "Gravity Car\Gravity Car.csproj", "{97CCD20B-5F84-4F9B-98AE-62EC0BA000E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EngineTest", "Gravity Car\EngineTest.csproj", "{97CCD20B-5F84-4F9B-98AE-62EC0BA000E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Balance", "Balance\Balance.csproj", "{0BC4E103-BBBD-4171-A308-9F679468310C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{46F3FD5D-AC17-43A2-99E6-43B808B94C4B}"
-	ProjectSection(SolutionItems) = preProject
-		Performance1.psess = Performance1.psess
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

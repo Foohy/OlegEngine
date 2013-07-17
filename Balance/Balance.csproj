@@ -61,7 +61,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Two and a Half Dimensions\OlegEngine.csproj">
+    <ProjectReference Include="..\Oleg Engine\OlegEngine.csproj">
       <Project>{78402D63-5943-49C3-9DA8-D957BE2E96A6}</Project>
       <Name>OlegEngine</Name>
     </ProjectReference>
