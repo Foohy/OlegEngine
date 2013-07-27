@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.IO;
+using System.Globalization;
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -405,11 +406,11 @@ namespace OlegEngine
                         string[] vert = curline.Split(' ');
                         if (vert[1].Length == 0 && vert.Length > 4)
                         {
-                            verts_UNSORTED.Add(new Vector3(float.Parse(vert[2]), float.Parse(vert[3]), float.Parse(vert[4])));
+                            verts_UNSORTED.Add(new Vector3(ParseFloatSafe(vert[2]), ParseFloatSafe(vert[3]), ParseFloatSafe(vert[4])));
                         }
                         else
                         {
-                            verts_UNSORTED.Add(new Vector3(float.Parse(vert[1]), float.Parse(vert[2]), float.Parse(vert[3])));
+                            verts_UNSORTED.Add(new Vector3(ParseFloatSafe(vert[1]), ParseFloatSafe(vert[2]), ParseFloatSafe(vert[3])));
                         }
                         break;
 
@@ -417,11 +418,11 @@ namespace OlegEngine
                         string[] norms = curline.Split(' ');
                         if (norms[1].Length == 0 && norms.Length > 4)
                         {
-                            normals_UNSORTED.Add(new Vector3(float.Parse(norms[2]), float.Parse(norms[3]), float.Parse(norms[4])));
+                            normals_UNSORTED.Add(new Vector3(ParseFloatSafe(norms[2]), ParseFloatSafe(norms[3]), ParseFloatSafe(norms[4])));
                         }
                         else
                         {
-                            normals_UNSORTED.Add(new Vector3(float.Parse(norms[1]), float.Parse(norms[2]), float.Parse(norms[3])));
+                            normals_UNSORTED.Add(new Vector3(ParseFloatSafe(norms[1]), ParseFloatSafe(norms[2]), ParseFloatSafe(norms[3])));
                         }
                         break;
 
@@ -429,11 +430,11 @@ namespace OlegEngine
                         string[] coords = curline.Split(' ');
                         if (coords[1].Length == 0 && coords.Length > 3)
                         {
-                            uv_UNSORTED.Add(new Vector2(float.Parse(coords[2]), -float.Parse(coords[3])));
+                            uv_UNSORTED.Add(new Vector2(ParseFloatSafe(coords[2]), -ParseFloatSafe(coords[3])));
                         }
                         else
                         {
-                            uv_UNSORTED.Add(new Vector2(float.Parse(coords[1]), -float.Parse(coords[2])));
+                            uv_UNSORTED.Add(new Vector2(ParseFloatSafe(coords[1]), -ParseFloatSafe(coords[2])));
                         }
                         break;
 
@@ -643,11 +644,11 @@ namespace OlegEngine
                         string[] vert = curline.Split(' ');
                         if (vert[1].Length == 0 && vert.Length > 4)
                         {
-                            verts_UNSORTED.Add(new Vector3(float.Parse(vert[2]), float.Parse(vert[3]), float.Parse(vert[4])));
+                            verts_UNSORTED.Add(new Vector3(ParseFloatSafe(vert[2]), ParseFloatSafe(vert[3]), ParseFloatSafe(vert[4])));
                         }
                         else
                         {
-                            verts_UNSORTED.Add(new Vector3(float.Parse(vert[1]), float.Parse(vert[2]), float.Parse(vert[3])));
+                            verts_UNSORTED.Add(new Vector3(ParseFloatSafe(vert[1]), ParseFloatSafe(vert[2]), ParseFloatSafe(vert[3])));
                         }
                         break;
 
@@ -655,11 +656,11 @@ namespace OlegEngine
                         string[] norms = curline.Split(' ');
                         if (norms[1].Length == 0 && norms.Length > 4)
                         {
-                            normals_UNSORTED.Add(new Vector3(float.Parse(norms[2]), float.Parse(norms[3]), float.Parse(norms[4])));
+                            normals_UNSORTED.Add(new Vector3(ParseFloatSafe(norms[2]), ParseFloatSafe(norms[3]), ParseFloatSafe(norms[4])));
                         }
                         else
                         {
-                            normals_UNSORTED.Add(new Vector3(float.Parse(norms[1]), float.Parse(norms[2]), float.Parse(norms[3])));
+                            normals_UNSORTED.Add(new Vector3(ParseFloatSafe(norms[1]), ParseFloatSafe(norms[2]), ParseFloatSafe(norms[3])));
                         }
                         break;
 
@@ -667,11 +668,11 @@ namespace OlegEngine
                         string[] coords = curline.Split(' ');
                         if (coords[1].Length == 0 && coords.Length > 3)
                         {
-                            uv_UNSORTED.Add(new Vector2(float.Parse(coords[2]), -float.Parse(coords[3])));
+                            uv_UNSORTED.Add(new Vector2(ParseFloatSafe(coords[2]), -ParseFloatSafe(coords[3])));
                         }
                         else
                         {
-                            uv_UNSORTED.Add(new Vector2(float.Parse(coords[1]), -float.Parse(coords[2])));
+                            uv_UNSORTED.Add(new Vector2(ParseFloatSafe(coords[1]), -ParseFloatSafe(coords[2])));
                         }
                         break;
 
@@ -755,6 +756,15 @@ namespace OlegEngine
             }
 
             return new MeshGroup(meshList);
+        }
+
+        private static CultureInfo ParseCultureInfo = CultureInfo.CreateSpecificCulture("en-US");
+        private static float ParseFloatSafe(string num)
+        {
+            float fNum = 0;
+            float.TryParse(num, NumberStyles.Float, ParseCultureInfo, out fNum);
+
+            return fNum;
         }
 
         /// <summary>
