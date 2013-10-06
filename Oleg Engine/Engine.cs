@@ -184,6 +184,9 @@ namespace OlegEngine
         /// <param name="e">Contains timing information.</param>
         public void OnRenderFrame(FrameEventArgs e)
         {
+            //Slow the heck down when we're not in focus
+            if (!WindowContext.Focused) System.Threading.Thread.Sleep(33);
+
             //Update timing information
             Utilities.Draw(e);
 
