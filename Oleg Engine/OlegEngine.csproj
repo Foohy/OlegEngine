@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio.cs" />
+    <Compile Include="ConsoleManager.cs" />
     <Compile Include="EngineResources.cs" />
     <Compile Include="Entity\BaseEntity.cs" />
     <Compile Include="Entity\ent_physics.cs" />
