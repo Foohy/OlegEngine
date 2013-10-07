@@ -32,28 +32,48 @@ namespace OlegEngine.GUI
             button.SetText(text);
             button.SizeToText(15);
             button.SetHeight(this.Height);
-            //button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-            //button.TexIdle = Resource.GetTexture("gui/toolbar.png");
-            //button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+
             this.AddToolPanel(button);
 
             return button;
         }
 
+        public ContextMenu AddButtonDropDown(string text)
+        {
+            Button btn = this.AddButton(text);
+            ContextMenu ctxt = GUIManager.Create<ContextMenu>();
+            ctxt.Hide();
+
+            btn.Userdata = ctxt;
+
+            //When the button is clicked, show the context menu
+            btn.OnButtonPress += (sender) =>
+            {
+                ContextMenu menu = sender.Userdata as ContextMenu;
+
+                if (menu)
+                {
+                    menu.SetPos(sender.Position.X, sender.Position.Y + sender.Height);
+                    menu.Toggle();
+                }
+            };
+
+
+            return ctxt;
+        }
+        /*
         public ButtonDropDown AddButtonDropDown(string text)
         {
             ButtonDropDown button = GUIManager.Create<ButtonDropDown>();
             button.SetText(text);
             button.SizeToText(15);
             button.SetHeight(this.Height);
-            //button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-            //button.TexIdle = Resource.GetTexture("gui/toolbar.png");
-            //button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
+
             this.AddToolPanel(button);
 
             return button;
         }
-
+        */
         public override void Draw()
         {
             base.Draw();

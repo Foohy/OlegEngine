@@ -70,7 +70,7 @@ namespace OlegEngine
                 TopControl = GUIManager.Create<Toolbar>();
                 TopControl.SetWidth(Utilities.engine.Width);
 
-                ButtonDropDown dd = TopControl.AddButtonDropDown("File");
+                ContextMenu dd = TopControl.AddButtonDropDown("File");
                 Button add = dd.AddButton("Load");
                 Button save = dd.AddButton("Save");
                 Button exit = dd.AddButton("Exit");
