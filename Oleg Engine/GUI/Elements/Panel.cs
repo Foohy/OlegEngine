@@ -681,7 +681,7 @@ namespace OlegEngine.GUI
             if (this.ShouldDraw)
             {
                 if (this.PreDraw != null) { this.PreDraw(this, posOffset); }
-                if (!AlphaBlendmode) { GL.Disable(EnableCap.Blend); }
+                if (!AlphaBlendmode) { Graphics.EnableBlending(false); }
 
                 panelMesh.mat = Mat;
                 modelview = Matrix4.CreateTranslation(Vector3.Zero);
@@ -694,7 +694,7 @@ namespace OlegEngine.GUI
                 if (this.PostDraw != null) { this.PostDraw(this, posOffset); }
 
 
-                if (!AlphaBlendmode) { GL.Enable(EnableCap.Blend); }
+                if (!AlphaBlendmode) { Graphics.EnableBlending( true ); }
             }
             
             if (clipping)

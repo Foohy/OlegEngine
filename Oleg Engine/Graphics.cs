@@ -21,6 +21,8 @@ namespace OlegEngine
         private static Mesh sphere;
         private static Material dbgWhite;
 
+        #region Debug drawing functions
+
         public static void Init()
         {
             dbgWhite = Resource.GetMaterial("engine/white_simple");
@@ -105,6 +107,16 @@ namespace OlegEngine
                 DrawLine(m.Position + m.DBG_Vertices[element], m.Position + m.DBG_Vertices[element] + m.DBG_Normals[element], false);
             }
         }
+
+        #endregion
+
+        #region Default graphics library function wrappers
+        public static void EnableBlending(bool enabled)
+        {
+            if (enabled) GL.Enable(EnableCap.Blend);
+            else GL.Disable(EnableCap.Blend);
+        }
+        #endregion
     }
 
     public class Mesh

@@ -204,7 +204,7 @@ namespace OlegEngine.GUI
             GL.Disable(EnableCap.CullFace);
             GL.Disable(EnableCap.Multisample);
             GL.DepthFunc(DepthFunction.Always);
-            GL.Enable(EnableCap.Blend);
+            Graphics.EnableBlending(true);
 
             UpdatePanels();
             UpdateIsOverElement();
@@ -226,7 +226,7 @@ namespace OlegEngine.GUI
             GL.Enable(EnableCap.CullFace);
             GL.DepthFunc(DepthFunction.Less);
             GL.Enable(EnableCap.Multisample);
-            GL.Disable(EnableCap.Blend);
+            Graphics.EnableBlending(false);
         }
     }
 

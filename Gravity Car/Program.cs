@@ -82,9 +82,9 @@ namespace Gravity_Car
         private void RenderSceneTranslucent(FrameEventArgs e)
         {
             //Now draw geometry that is potentially transcluent
-            GL.Enable(EnableCap.Blend);
+            Graphics.EnableBlending(true);
             OlegEngine.Entity.EntManager.DrawTranslucent(e);
-            GL.Disable(EnableCap.Blend);
+            Graphics.EnableBlending(false);
         }
 
         [STAThread]
