@@ -9,7 +9,7 @@ namespace OlegEngine.GUI
     {
         public override void Init()
         {
-            this.Width = Utilities.window.Width;
+            this.Width = Utilities.engine.Width;
             this.Height = 20;
             this.SetMaterial(Resource.GetTexture("gui/toolbar.png"));
             this.SetColor(40, 40, 40);

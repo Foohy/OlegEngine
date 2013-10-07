@@ -98,7 +98,7 @@ namespace Gravity_Car.Entity
 
             Zoom = 15.0f;
 
-            Utilities.window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             View.CalcView += new Action(ply_CalcView);
             horn = Audio.LoadSong("Resources/Audio/horn.mp3", false, true, this);
         }
@@ -142,17 +142,17 @@ namespace Gravity_Car.Entity
             //Console.WriteLine(upforce);
             float multiplier = Math.Abs( Physics.Body.Mass * physScale * this.Physics.Body.LinearVelocity.X * 0.07f) + 0.1f;
             //Physics
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.W])
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.W])
             {
                 this.Physics.Body.ApplyForce( new Microsoft.Xna.Framework.Vector2( 0, 170.0f ) );
             }
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.D])
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.D])
             {
                 //this.Physics.Body.ApplyTorque(-9.0f * multiplier);
                 //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(3.0f * multiplier, 0));
                 wheels[0].Body.ApplyTorque(-15.0f * multiplier - 20.0f);
             }
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.A])
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.A])
             {
                 //this.Physics.Body.ApplyTorque(9.0f * multiplier);
                 //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(-3.0f * multiplier, 0));
@@ -162,8 +162,8 @@ namespace Gravity_Car.Entity
             //Console.WriteLine(this.Physics.Body.LinearVelocity);
 
             //Zoom
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageDown]) Zoom -= (float)Utilities.ThinkTime * 100;
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageUp]) Zoom += (float)Utilities.ThinkTime * 100;
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.PageDown]) Zoom -= (float)Utilities.ThinkTime * 100;
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.PageUp]) Zoom += (float)Utilities.ThinkTime * 100;
             Zoom += Input.deltaZ * 0.7f;
             crZoom += (Zoom - crZoom) / 4;
         }
@@ -195,7 +195,7 @@ namespace Gravity_Car.Entity
             Utilities.PhysicsWorld.RemoveBody(wheels[0].Body);
             Utilities.PhysicsWorld.RemoveBody(wheels[1].Body);
 
-            Utilities.window.Keyboard.KeyDown -= Keyboard_KeyDown;
+            Utilities.engine.Keyboard.KeyDown -= Keyboard_KeyDown;
             View.CalcView -= ply_CalcView;
         }
     }

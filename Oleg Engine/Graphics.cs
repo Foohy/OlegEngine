@@ -1088,7 +1088,7 @@ namespace OlegEngine
         public void BindForWriting( bool SetViewPort = true)
         {
             //Change the viewport to fit the size of our framebuffer
-            if (SetViewPort) GL.Viewport(Utilities.window.ClientRectangle.X, Utilities.window.ClientRectangle.Y, this.Width, this.Height);
+            if (SetViewPort) GL.Viewport(Utilities.engine.ClientRectangle.X, Utilities.engine.ClientRectangle.Y, this.Width, this.Height);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
         }
 
@@ -1109,7 +1109,7 @@ namespace OlegEngine
         public static void ResetFramebuffer(FramebufferTarget target, bool SetViewPort )
         {
             //Change the viewport back to the size of the window
-            if (SetViewPort) GL.Viewport(Utilities.window.ClientRectangle.X, Utilities.window.ClientRectangle.Y, Utilities.window.ClientRectangle.Width, Utilities.window.ClientRectangle.Height);
+            if (SetViewPort) GL.Viewport(Utilities.engine.ClientRectangle.X, Utilities.engine.ClientRectangle.Y, Utilities.engine.ClientRectangle.Width, Utilities.engine.ClientRectangle.Height);
             GL.BindFramebuffer(target, 0);
         }
 

@@ -142,7 +142,7 @@ namespace Balance
                 Utilities.PhysicsWorld.Step(0.033333f );
             }
 
-            if ( spotlight != null && Utilities.window.Keyboard[OpenTK.Input.Key.Q])
+            if ( spotlight != null && Utilities.engine.Keyboard[OpenTK.Input.Key.Q])
             {
                 spotlight.SetAngle(View.Angles);
                 spotlight.SetPos(View.Player.Position);

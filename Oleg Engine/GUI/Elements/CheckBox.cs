@@ -48,7 +48,7 @@ namespace OlegEngine.GUI
         {
             base.MouseMove(e);
 
-            if (this.IsMouseOver() && !this.ShouldPassInput && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y), this) )
+            if (this.IsMouseOver() && !this.ShouldPassInput && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y), this))
             {
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Hand;
             }

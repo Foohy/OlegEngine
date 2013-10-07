@@ -56,19 +56,19 @@ namespace OlegEngine
 
             //Slap some text on the screen
             CurrentModeText = new GUI.Text("debug", "Mode: " + CurrentMode.ToString());
-            CurrentModeText.SetPos(Utilities.window.Width - 200, Utilities.window.Height - CurrentModeText.GetTextHeight() );
+            CurrentModeText.SetPos(Utilities.engine.Width - 200, Utilities.engine.Height - CurrentModeText.GetTextHeight() );
             GUI.GUIManager.PostDrawHUD += new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
 
-            Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
-            Utilities.window.Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
-            Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            Utilities.engine.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.engine.Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
+            Utilities.engine.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
             View.CalcView += new Action(View_CalcView);
 
             //Create our GUI stuff, if neccessary
             if (TopControl == null)
             {
                 TopControl = GUIManager.Create<Toolbar>();
-                TopControl.SetWidth(Utilities.window.Width);
+                TopControl.SetWidth(Utilities.engine.Width);
 
                 ButtonDropDown dd = TopControl.AddButtonDropDown("File");
                 Button add = dd.AddButton("Load");
@@ -120,7 +120,7 @@ namespace OlegEngine
             Window exitMessageBox = GUIManager.Create<Window>();
             exitMessageBox.SetTitle("Hold the fucking phone");
             exitMessageBox.ClipChildren = true;
-            exitMessageBox.SetPos((Utilities.window.Width / 2) - (exitMessageBox.Width / 2), (Utilities.window.Height / 2) - (exitMessageBox.Height / 2));
+            exitMessageBox.SetPos((Utilities.engine.Width / 2) - (exitMessageBox.Width / 2), (Utilities.engine.Height / 2) - (exitMessageBox.Height / 2));
             exitMessageBox.SetWidth(205);
             exitMessageBox.SetHeight(75);
 
@@ -150,7 +150,7 @@ namespace OlegEngine
 
         static void button_OnYesButtonPress(Panel sender)
         {
-            Utilities.window.Exit();
+            Utilities.engine.Exit();
         }
 
         static void button_OnNoButtonPress(Panel sender)
@@ -278,8 +278,8 @@ namespace OlegEngine
         {
             Input.LockMouse = false;
             //curve dat zoom mmm girl u fine
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageDown]) goalZoom -= ((float)Utilities.ThinkTime * 100);
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.PageUp]) goalZoom += ((float)Utilities.ThinkTime * 100);
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.PageDown]) goalZoom -= ((float)Utilities.ThinkTime * 100);
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.PageUp]) goalZoom += ((float)Utilities.ThinkTime * 100);
 
 
             goalZoom += Input.deltaZ;
@@ -288,38 +288,38 @@ namespace OlegEngine
 
             //How fast should we move
             multiplier = 7;
-            if (Utilities.window.Keyboard[Key.LShift])
+            if (Utilities.engine.Keyboard[Key.LShift])
             {
                 multiplier = 25;
             }
-            else if (Utilities.window.Keyboard[Key.LControl])
+            else if (Utilities.engine.Keyboard[Key.LControl])
             {
                 multiplier = 1.0f;
             }
             
 
             //I SAID MOVE
-            if (Utilities.window.Keyboard[Key.W])
+            if (Utilities.engine.Keyboard[Key.W])
             {
                 ViewPosition += new Vector3(0.0f, (float)Utilities.ThinkTime, 0.0f) * multiplier;
             }
-            if (Utilities.window.Keyboard[Key.A])
+            if (Utilities.engine.Keyboard[Key.A])
             {
                 ViewPosition += new Vector3(-(float)Utilities.ThinkTime, 0.0f, 0.0f) * multiplier;
             }
-            if (Utilities.window.Keyboard[Key.S])
+            if (Utilities.engine.Keyboard[Key.S])
             {
                 ViewPosition += new Vector3(0.0f, -(float)Utilities.ThinkTime, 0.0f) * multiplier;
             }
-            if (Utilities.window.Keyboard[Key.D])
+            if (Utilities.engine.Keyboard[Key.D])
             {
                 ViewPosition += new Vector3((float)Utilities.ThinkTime, 0.0f, 0.0f) * multiplier;
             }
 
             if (Cursor != null)
             {
-                Vector3 mousePos = new Vector3((Utilities.window.Mouse.X - (Utilities.window.Width / 2)), -(Utilities.window.Mouse.Y - (Utilities.window.Height / 2)), 0);
-                MousePos = ViewPosition + Utilities.Get2Dto3D(Utilities.window.Mouse.X, Utilities.window.Mouse.Y, -ViewPosition.Z);
+                Vector3 mousePos = new Vector3((Utilities.engine.Mouse.X - (Utilities.engine.Width / 2)), -(Utilities.engine.Mouse.Y - (Utilities.engine.Height / 2)), 0);
+                MousePos = ViewPosition + Utilities.Get2Dto3D(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y, -ViewPosition.Z);
                 Cursor.SetPos( MousePos);
             }
 
@@ -359,11 +359,11 @@ namespace OlegEngine
                 Cursor.Remove();
             }
 
-            Utilities.window.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
-            Utilities.window.Mouse.ButtonUp -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
+            Utilities.engine.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.engine.Mouse.ButtonUp -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonUp);
 
             GUI.GUIManager.PostDrawHUD -= new GUI.GUIManager.OnDrawHUD(GUIManager_PostDrawHUD);
-            Utilities.window.Keyboard.KeyDown -= new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            Utilities.engine.Keyboard.KeyDown -= new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
             View.CalcView -= new Action(View_CalcView);
 
 

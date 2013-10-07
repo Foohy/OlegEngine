@@ -25,12 +25,12 @@ namespace Gravity_Car.Entity
 
             DepthScreen = GUIManager.Create<Panel>();
             DepthScreen.SetMaterial(Resource.GetMaterial("engine/depth"));
-            DepthScreen.SetWidth(Utilities.window.Width / Size);
-            DepthScreen.SetHeight(Utilities.window.Height / Size);
-            DepthScreen.SetPos(new Vector2(0, Utilities.window.Height - DepthScreen.Height));
+            DepthScreen.SetWidth(Utilities.engine.Width / Size);
+            DepthScreen.SetHeight(Utilities.engine.Height / Size);
+            DepthScreen.SetPos(new Vector2(0, Utilities.engine.Height - DepthScreen.Height));
             DepthScreen.AlphaBlendmode = false;
 
-            Utilities.window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
 
         void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)

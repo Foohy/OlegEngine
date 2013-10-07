@@ -47,10 +47,10 @@ namespace OlegEngine.GUI
         {
             Surface.Init();
 
-            Utilities.window.Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
-            Utilities.window.Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
-            Utilities.window.Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
-            Utilities.window.KeyPress += new EventHandler<KeyPressEventArgs>(window_KeyPress);
+            Utilities.engine.Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.engine.Mouse.Move += new EventHandler<OpenTK.Input.MouseMoveEventArgs>(Mouse_Move);
+            Utilities.engine.Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
+            Utilities.engine.KeyPress += new EventHandler<KeyPressEventArgs>(window_KeyPress);
         }
 
         private static void UpdateIsOverElement()

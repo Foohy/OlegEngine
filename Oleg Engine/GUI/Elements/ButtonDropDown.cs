@@ -53,7 +53,7 @@ namespace OlegEngine.GUI
 
             this.SetButtonState(State.Idle);
 
-            Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.engine.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
         }
 
         void Mouse_ButtonDown(object sender, MouseButtonEventArgs e)
@@ -68,7 +68,7 @@ namespace OlegEngine.GUI
         {
             base.MouseMove(e);
 
-            if (this.IsMouseOver() && this.CurrentState != State.Pressed && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y), this))
+            if (this.IsMouseOver() && this.CurrentState != State.Pressed && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y), this))
             {
                 SetButtonState(State.Hover);
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Hand;
@@ -201,7 +201,7 @@ namespace OlegEngine.GUI
         {
             base.Remove();
 
-            Utilities.window.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.engine.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
         }
 
         public override void Draw()

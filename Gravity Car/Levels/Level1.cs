@@ -89,7 +89,7 @@ namespace Gravity_Car.Levels
             LightingTechnique.SetEnvironmentLight(light);
             ShadowTechnique.Enable();
 
-            Utilities.window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
 
         void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -151,7 +151,7 @@ namespace Gravity_Car.Levels
 
             //Create a camera matrix
             //Matrix4 shadowmat = Matrix4.LookAt(Pos - (Angle * 70), Pos + Angle - (Angle * 70), Vector3.UnitY);
-            //Utilities.window.shadows.SetLightMatrix(shadowmat);
+            //Utilities.engine.shadows.SetLightMatrix(shadowmat);
         }
 
         public override void Draw(FrameEventArgs e)

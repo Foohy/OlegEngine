@@ -59,7 +59,7 @@ namespace Gravity_Car.Entity
             //Create the sound effect for the physics of our ball
             phys_hit = Audio.LoadSong("Resources/Audio/Physics/rock_hit_hard.wav", false);
 
-            Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            Utilities.engine.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
             this.SetMode(PlayerMode.NOCLIP);
         }
 
@@ -125,24 +125,24 @@ namespace Gravity_Car.Entity
             crZoom += (Zoom - crZoom) / 4;
 
             float multiplier = 1;
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.ShiftLeft])
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.ShiftLeft])
             {
                 multiplier = 4;
 
-                if (Utilities.window.Keyboard[OpenTK.Input.Key.W])
+                if (Utilities.engine.Keyboard[OpenTK.Input.Key.W])
                 {
                     this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(0, multiplier * 100));
                 }
                 
             }
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.A])
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.A])
             {
                 this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(-5.0f, 0.0f));
                 float amt = 70 * radius * multiplier;
                 if (this.Physics.Body.AngularVelocity < 0) amt = amt * 4 * multiplier;
                 this.Physics.Body.ApplyTorque(amt);
             }
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.D])
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.D])
             {
                 this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(5.0f, 0.0f));
                 float amt = -70 * radius * multiplier;
@@ -158,7 +158,7 @@ namespace Gravity_Car.Entity
             //RayCastOutput output;
             //this.Physics.RayCast( out output, ref input, 0 );
             //Console.WriteLine("{0}, {1}", Normal, Fraction );
-            if (Utilities.window.Keyboard[OpenTK.Input.Key.Space] && Fraction < 0.001f)
+            if (Utilities.engine.Keyboard[OpenTK.Input.Key.Space] && Fraction < 0.001f)
             {
                 this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(0, 200.0f));
             }
@@ -174,7 +174,7 @@ namespace Gravity_Car.Entity
 
         public void CalcView()
         {
-            GameWindow window = Utilities.window;
+            GameWindow window = Utilities.engine;
 
             float multiplier = 8;
             if (window.Keyboard[Key.LShift])

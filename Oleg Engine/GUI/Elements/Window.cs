@@ -105,15 +105,15 @@ namespace OlegEngine.GUI
         {
             if (dragging)
             {
-                this.Title.SetPos( new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y - Title.Height) - Offset);
-                this.SetPos( new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y) - Offset );
+                this.Title.SetPos(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y - Title.Height) - Offset);
+                this.SetPos(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y) - Offset);
             }
         }
 
         void Title_OnMouseDown(Panel sender, OpenTK.Input.MouseButtonEventArgs e)
         {
             this.dragging = true;
-            Offset = new Vector2(Utilities.window.Mouse.X - this.Position.X, Utilities.window.Mouse.Y - this.Position.Y);
+            Offset = new Vector2(Utilities.engine.Mouse.X - this.Position.X, Utilities.engine.Mouse.Y - this.Position.Y);
             this.SendToFront();
             Title.SendToFront();
         }
@@ -121,7 +121,7 @@ namespace OlegEngine.GUI
         public override void MouseDown(OpenTK.Input.MouseButtonEventArgs e)
         {
             base.MouseDown(e);
-            Offset = new Vector2(Utilities.window.Mouse.X - this.Position.X, Utilities.window.Mouse.Y - this.Position.Y);
+            Offset = new Vector2(Utilities.engine.Mouse.X - this.Position.X, Utilities.engine.Mouse.Y - this.Position.Y);
             this.SendToFront();
             Title.SendToFront();
 
@@ -251,7 +251,7 @@ namespace OlegEngine.GUI
         {
             if (this.IsMouseOver())
             {
-                if ((this.GetScreenPos().Y + this.Height) - Utilities.window.Mouse.Y < size)
+                if ((this.GetScreenPos().Y + this.Height) - Utilities.engine.Mouse.Y < size)
                 {
                     return true;
                 }
@@ -264,7 +264,7 @@ namespace OlegEngine.GUI
         {
             if (this.IsMouseOver())
             {
-                if ((this.GetScreenPos().X + this.Width) - Utilities.window.Mouse.X < size)
+                if ((this.GetScreenPos().X + this.Width) - Utilities.engine.Mouse.X < size)
                 {
                     return true;
                 }
@@ -277,7 +277,7 @@ namespace OlegEngine.GUI
         {
             if (this.IsMouseOver())
             {
-                if ((Utilities.window.Mouse.Y - this.GetScreenPos().Y)  < size)
+                if ((Utilities.engine.Mouse.Y - this.GetScreenPos().Y) < size)
                 {
                     return true;
                 }
@@ -290,7 +290,7 @@ namespace OlegEngine.GUI
         {
             if (this.IsMouseOver())
             {
-                if ((Utilities.window.Mouse.X - this.GetScreenPos().X) < size)
+                if ((Utilities.engine.Mouse.X - this.GetScreenPos().X) < size)
                 {
                     return true;
                 }
@@ -309,31 +309,31 @@ namespace OlegEngine.GUI
             CurrentResizeMode == ResizeMode.Left ||
             CurrentResizeMode == ResizeMode.BottomLeft)
             {
-                float NewWidth = (this.Position.X + this.Width) - (Utilities.window.Mouse.X - Offset.X);
+                float NewWidth = (this.Position.X + this.Width) - (Utilities.engine.Mouse.X - Offset.X);
                 this.SetWidth(NewWidth);
                 float Delta = NewWidth - this.MinimumSize.X;
-                this.SetPos(Utilities.window.Mouse.X - Offset.X + (Delta < 0 ? Delta : 0), this.Position.Y);
+                this.SetPos(Utilities.engine.Mouse.X - Offset.X + (Delta < 0 ? Delta : 0), this.Position.Y);
             }
 
             if (CurrentResizeMode == ResizeMode.TopRight ||
             CurrentResizeMode == ResizeMode.Right ||
             CurrentResizeMode == ResizeMode.BottomRight)
             {
-                this.SetWidth(Utilities.window.Mouse.X - Screenpos.X);
+                this.SetWidth(Utilities.engine.Mouse.X - Screenpos.X);
             }
 
             if (CurrentResizeMode == ResizeMode.TopLeft ||
             CurrentResizeMode == ResizeMode.Top ||
             CurrentResizeMode == ResizeMode.TopRight)
             {
-                this.SetPos(this.Position.Y, Utilities.window.Mouse.Y);
+                this.SetPos(this.Position.Y, Utilities.engine.Mouse.Y);
             }
 
             if (CurrentResizeMode == ResizeMode.BottomLeft ||
             CurrentResizeMode == ResizeMode.Bottom ||
             CurrentResizeMode == ResizeMode.BottomRight)
             {
-                this.SetHeight(Utilities.window.Mouse.Y - Screenpos.Y);
+                this.SetHeight(Utilities.engine.Mouse.Y - Screenpos.Y);
             }
         }
     }

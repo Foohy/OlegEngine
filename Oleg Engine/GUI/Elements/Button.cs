@@ -119,7 +119,7 @@ namespace OlegEngine.GUI
 
         private bool IsClickable()
         {
-            return this.Enabled && this.IsMouseOver() && this.CurrentState != State.Pressed && !this.ShouldPassInput && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y), this);
+            return this.Enabled && this.IsMouseOver() && this.CurrentState != State.Pressed && !this.ShouldPassInput && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y), this);
         }
 
         private void CheckButtonState()

@@ -44,11 +44,11 @@ namespace Balance.Entity
             //Not an innuendo
             if (this.BalanceEnt != null)
             {
-                if (Utilities.window.Keyboard[Key.A])
+                if (Utilities.engine.Keyboard[Key.A])
                 {
                     this.BalanceEnt.Physics.Body.ApplyTorque(PushForce);
                 }
-                if (Utilities.window.Keyboard[Key.D])
+                if (Utilities.engine.Keyboard[Key.D])
                 {
                     this.BalanceEnt.Physics.Body.ApplyTorque(-PushForce);
                 }
@@ -58,11 +58,11 @@ namespace Balance.Entity
         float RectWidthPerc = 0.4f;
         void GUIManager_PostDrawHUD(EventArgs e)
         {
-            Vector2 pos = new Vector2(Utilities.window.Width * RectWidthPerc, 0);
-            Vector2 dimensions = new Vector2(Utilities.window.Width * (1 - (2 * RectWidthPerc)), 20);
+            Vector2 pos = new Vector2(Utilities.engine.Width * RectWidthPerc, 0);
+            Vector2 dimensions = new Vector2(Utilities.engine.Width * (1 - (2 * RectWidthPerc)), 20);
             Surface.DrawRect(pos, dimensions );
 
-            StateText.SetPos(((Utilities.window.Width) / 2) - (StateText.GetTextLength() / 2), pos.Y);
+            StateText.SetPos(((Utilities.engine.Width) / 2) - (StateText.GetTextLength() / 2), pos.Y);
             StateText.Draw();
         }
 
@@ -75,7 +75,7 @@ namespace Balance.Entity
                 return;
             }
 
-            GameWindow window = Utilities.window;
+            GameWindow window = Utilities.engine;
 
             float multiplier = 8;
             if (window.Keyboard[Key.LShift])

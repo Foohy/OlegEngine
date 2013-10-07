@@ -23,9 +23,8 @@ namespace OlegEngine
     }
 
 
-    public class Engine
+    public class Engine : GameWindow 
     {
-        public GameWindow WindowContext;
         public FBO shadowFBO;
         public event Action<FrameEventArgs> OnRenderSceneOpaque;
         public event Action<FrameEventArgs> OnRenderSceneTranslucent;
@@ -36,16 +35,75 @@ namespace OlegEngine
 
         private DropOutStack<double> AveragedFrametimes = new DropOutStack<double>( 30 );
 
-        public Engine(GameWindow window)
+        public Engine()
+            : base( 1024, 768, new GraphicsMode(32, 24, 0, 4), typeof( Engine ).Assembly.GetName().Name, GameWindowFlags.Default )
         {
-            this.WindowContext = window;
-            if (Utilities.EngineSettings == null) Utilities.EngineSettings = new Settings();
+            var settings = new Settings();
+            settings.Width = this.Width;
+            settings.Height = this.Height;
+            settings.Samples = this.Context.GraphicsMode.Samples;
+            settings.WindowMode = this.WindowState;
+
+            _engineInit(settings);
+        }
+
+        public Engine(Settings engineSettings)
+            : base(engineSettings.Width, engineSettings.Height, new GraphicsMode(32, 24, 0, engineSettings.Samples), typeof(Engine).Assembly.GetName().Name, engineSettings.WindowMode == WindowState.Fullscreen && engineSettings.NoBorder ? GameWindowFlags.Fullscreen : GameWindowFlags.Default)
+        {
+            _engineInit(engineSettings);
+        }
+
+        public Engine(Settings engineSettings, string title)
+            : base(engineSettings.Width, engineSettings.Height, new GraphicsMode(32, 24, 0, engineSettings.Samples), title, engineSettings.WindowMode == WindowState.Fullscreen && engineSettings.NoBorder ? GameWindowFlags.Fullscreen : GameWindowFlags.Default)
+        {
+            _engineInit(engineSettings);
+        }
+
+        private void _engineInit(Settings engineSettings)
+        {
+            Utilities.Print("==================================", Utilities.PrintCode.INFO);
+            Utilities.Print("ENGINE STARTUP", Utilities.PrintCode.INFO);
+            Utilities.Print("==================================\n", Utilities.PrintCode.INFO);
+
+            //Store the current settings
+            Utilities.EngineSettings = engineSettings;
+
+            //Toggle VSync
+            this.VSync = engineSettings.VSync;
+
+            //Noborder if applicable
+            if (engineSettings.NoBorder)
+                this.WindowBorder = OpenTK.WindowBorder.Hidden;
+
+            //If we don't want noborder and we're set to fullscreen, change our windowmode to whatever
+            if (!engineSettings.NoBorder && engineSettings.WindowMode == OpenTK.WindowState.Fullscreen)
+                this.WindowState = engineSettings.WindowMode;
+            //BUT if we're set to noborder, require the windowstate is 'normal'
+            else if (engineSettings.NoBorder)
+                this.WindowState = OpenTK.WindowState.Normal;
+
+            //Hook into some engine callbacks
+            //this.OnRenderSceneOpaque += new Action<FrameEventArgs>(RenderSceneOpaque);
+            //this.OnRenderSceneTranslucent += new Action<FrameEventArgs>(RenderSceneTranslucent);
+
+            //Make a furious attempt to change the window's icon
+            try { this.Icon = System.Drawing.Icon.ExtractAssociatedIcon(typeof(Engine).Assembly.GetName().Name + ".exe"); }
+            catch (Exception e) { Utilities.Print("Failed to load icon! {0}", Utilities.PrintCode.WARNING, e.Message); }
+
+            //Hide the console if we want
+            if (!engineSettings.ShowConsole)
+                ConsoleManager.ShowWindow(ConsoleManager.GetConsoleWindow(), ConsoleManager.SW_HIDE);
         }
 
         /// <summary>Load resources here.</summary>
         /// <param name="e">Not used.</param>
-        public void OnLoad(EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
+            //Base
+            base.OnLoad(e);
+
+            if (Utilities.EngineSettings == null) Utilities.EngineSettings = new Settings();
+
             //Print useful information about the card
             Console.WriteLine("==================================");
             Console.WriteLine("Vendor: {0}", GL.GetString(StringName.Vendor));
@@ -62,7 +120,7 @@ namespace OlegEngine
             }
             Console.WriteLine("==================================");
 
-            Utilities.Init(this.WindowContext, this);
+            Utilities.Init(this);
             Audio.Init();
 
             float[] fogColor = { 0.18431f, 0.1764f, 0.22745f };//0.18431372549019607843137254901961
@@ -139,16 +197,18 @@ namespace OlegEngine
         /// along when the aspect ratio of your window).
         /// </summary>
         /// <param name="e">Not used.</param>
-        public void OnResize(EventArgs e)
+        protected override void OnResize(EventArgs e)
         {
-            
-            float FOV = (float)Math.PI / 4;
-            float Ratio = this.WindowContext.Width / (float)this.WindowContext.Height;
+            //Base
+            base.OnResize(e);
 
-            GL.Viewport(this.WindowContext.ClientRectangle.X, this.WindowContext.ClientRectangle.Y, this.WindowContext.ClientRectangle.Width, this.WindowContext.ClientRectangle.Height);
+            float FOV = (float)Math.PI / 4;
+            float Ratio = this.Width / (float)this.Height;
+
+            GL.Viewport(this.ClientRectangle.X, this.ClientRectangle.Y, this.ClientRectangle.Width, this.ClientRectangle.Height);
             defaultViewMatrix = Matrix4.CreatePerspectiveFieldOfView(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
             //defaultOrthoMatrix = Matrix4.CreateOrthographic(Width, Height, 1.0f, 256.0f);
-            defaultOrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, this.WindowContext.Width, this.WindowContext.Height, 0, Utilities.NearClip, Utilities.FarClip);
+            defaultOrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, Utilities.NearClip, Utilities.FarClip);
             Utilities.ViewMatrix = defaultViewMatrix;
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref defaultViewMatrix);
@@ -163,11 +223,14 @@ namespace OlegEngine
         /// Called when it is time to setup the next frame. Add you game logic here.
         /// </summary>
         /// <param name="e">Contains timing information for framerate independent logic.</param>
-        public void OnUpdateFrame(FrameEventArgs e)
+        protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            //Base
+            base.OnUpdateFrame(e);
+
             Utilities.Think(e);
 
-            Input.Think(this.WindowContext, e);
+            Input.Think(this, e);
             Audio.Think(e);
 
             //Update the player's view so we know where to render
@@ -182,10 +245,13 @@ namespace OlegEngine
         /// Called when it is time to render the next frame. Add your rendering code here.
         /// </summary>
         /// <param name="e">Contains timing information.</param>
-        public void OnRenderFrame(FrameEventArgs e)
+        protected override void OnRenderFrame(FrameEventArgs e)
         {
+            //Base
+            base.OnRenderFrame(e);
+
             //Slow the heck down when we're not in focus
-            if (!WindowContext.Focused) System.Threading.Thread.Sleep(33);
+            if (!this.Focused) System.Threading.Thread.Sleep(33);
 
             //Update timing information
             Utilities.Draw(e);
@@ -256,7 +322,7 @@ namespace OlegEngine
             GUI.GUIManager.Draw();
         }
 
-        private void RenderSceneOpaque(FrameEventArgs e)
+        protected virtual void RenderSceneOpaque(FrameEventArgs e)
         {
             if (this.OnRenderSceneOpaque != null)
             {
@@ -264,7 +330,7 @@ namespace OlegEngine
             }
         }
 
-        private void RenderSceneTranslucent(FrameEventArgs e)
+        protected virtual void RenderSceneTranslucent(FrameEventArgs e)
         {
             if (this.OnRenderSceneTranslucent != null)
             {

@@ -34,7 +34,7 @@ namespace OlegEngine.GUI
             Grip.OnMouseDown += new Action<Panel,OpenTK.Input.MouseButtonEventArgs>(Grip_OnMouseDown);
             this.OnMouseMove += new Action<Panel,OpenTK.Input.MouseMoveEventArgs>(ScrollBar_OnMouseMove);
 
-            Utilities.window.Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
+            Utilities.engine.Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
         }
 
         void Mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs e)

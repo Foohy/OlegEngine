@@ -39,8 +39,8 @@ namespace OlegEngine.GUI
             TextLabel.Dock(DockStyle.FILL);
             TextLabel.SetAlignment(Label.TextAlign.MiddleLeft);
 
-            Utilities.window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
-            Utilities.window.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            Utilities.engine.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.engine.Keyboard.KeyDown += new EventHandler<KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
 
         void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
@@ -61,7 +61,7 @@ namespace OlegEngine.GUI
                 delete();
             }
             //Paste
-            else if (e.Key == Key.V && (Utilities.window.Keyboard[Key.ControlLeft] || Utilities.window.Keyboard[Key.ControlRight]))
+            else if (e.Key == Key.V && (Utilities.engine.Keyboard[Key.ControlLeft] || Utilities.engine.Keyboard[Key.ControlRight]))
             {
                 if (System.Windows.Clipboard.ContainsText())
                 {
@@ -84,7 +84,7 @@ namespace OlegEngine.GUI
         {
             base.MouseMove(e);
 
-            if (this.Enabled && this.IsMouseOver() && !this.ShouldPassInput && this.ShouldDraw && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y), this) )
+            if (this.Enabled && this.IsMouseOver() && !this.ShouldPassInput && this.ShouldDraw && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y), this))
             {
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.IBeam;
             }
@@ -215,7 +215,7 @@ namespace OlegEngine.GUI
         public override void Remove()
         {
             base.Remove();
-            Utilities.window.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
+            Utilities.engine.Mouse.ButtonDown -= new EventHandler<MouseButtonEventArgs>(Mouse_ButtonDown);
         }
     }
 }

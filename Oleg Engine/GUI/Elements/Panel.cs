@@ -226,7 +226,7 @@ namespace OlegEngine.GUI
             }
             else
             {
-                this.Position = new Vector2(Utilities.window.X - (this.Width + offset), this.Position.Y);
+                this.Position = new Vector2(Utilities.engine.X - (this.Width + offset), this.Position.Y);
             }
         }
 
@@ -426,7 +426,7 @@ namespace OlegEngine.GUI
         /// <returns>True - Mouse is over the panel, False - the mouse is not</returns>
         public bool IsMouseOver()
         {
-            return IsPointOver( new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y ));
+            return IsPointOver(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y));
         }
 
         /// <summary>
@@ -588,7 +588,7 @@ namespace OlegEngine.GUI
             if (!this.Enabled) return;
 
             //Someone call this child's parents, it's soooo highhh
-            Panel highestChild = GetHighestChildAtPos(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y));
+            Panel highestChild = GetHighestChildAtPos(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y));
 
             if (highestChild) highestChild.MouseDown(e);
 
@@ -604,7 +604,7 @@ namespace OlegEngine.GUI
             if (!this.Enabled) return;
 
             //Someone call this child's parents, it's soooo highhh
-            Panel highestChild = GetHighestChildAtPos(new Vector2(Utilities.window.Mouse.X, Utilities.window.Mouse.Y));
+            Panel highestChild = GetHighestChildAtPos(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y));
 
             if (highestChild) highestChild.MouseUp(e);
 
@@ -735,7 +735,7 @@ namespace OlegEngine.GUI
                 clipper = clipper.Parent;
             }
 
-            Y = Utilities.window.Height - Y - H;
+            Y = Utilities.engine.Height - Y - H;
 
             return true;
         }

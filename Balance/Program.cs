@@ -12,16 +12,32 @@ using OlegEngine;
 
 namespace Balance
 {
-    class Program : GameWindow
+    class Program : Engine
     {
-        public Engine engine;
-        public Program()
-            : base(1350, 680, new GraphicsMode(32, 24, 0, 4), "Balance the ball! (Wowzers)", GameWindowFlags.Default)
+        public const string SettingsFile = "settings.cfg";
+
+        [STAThread]
+        static void Main(string[] args)
         {
-            VSync = VSyncMode.Adaptive;
-            engine = new Engine(this); //Create the engine class that'll do all the heavy lifting
-            engine.OnRenderSceneOpaque += new Action<FrameEventArgs>(RenderSceneOpaque);
-            engine.OnRenderSceneTranslucent += new Action<FrameEventArgs>(RenderSceneTranslucent);
+            using (Program game = new Program(new Settings(SettingsFile)))
+            {
+                game.Run(60.0);
+            }
+        }
+
+        public Program()
+            : base()
+        {
+        }
+
+        public Program(Settings settings)
+            : base(settings)
+        {
+        }
+
+        public Program(Settings settings, string title)
+            : base(settings, title)
+        {
         }
 
         /// <summary>Load resources here.</summary>
@@ -29,22 +45,10 @@ namespace Balance
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            engine.OnLoad(e);
 
             BalanceLevel.Initialize();
         }
 
-        /// <summary>
-        /// Called when your window is resized. Set your viewport here. It is also
-        /// a good place to set up your projection matrix (which probably changes
-        /// along when the aspect ratio of your window).
-        /// </summary>
-        /// <param name="e">Not used.</param>
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
-            engine.OnResize(e);
-        }
 
         /// <summary>
         /// Called when it is time to setup the next frame. Add you game logic here.
@@ -53,9 +57,8 @@ namespace Balance
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
-            engine.OnUpdateFrame(e);
-            BalanceLevel.Think();
 
+            BalanceLevel.Think();
             if (this.Keyboard[Key.Escape]) this.Exit();
         }
 
@@ -66,7 +69,6 @@ namespace Balance
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
-            engine.OnRenderFrame(e);
 
             SwapBuffers();
         }
@@ -75,11 +77,14 @@ namespace Balance
         /// Called by the engine when it is time to render opaque renderables
         /// </summary>
         /// <param name="e"></param>
-        private void RenderSceneOpaque(FrameEventArgs e)
+        protected override void RenderSceneOpaque(FrameEventArgs e)
         {
             //Draw opaque geometry
             BalanceLevel.Draw();
             OlegEngine.Entity.EntManager.DrawOpaque(e);
+
+            //Call into the engine so it can do it's thing
+            base.RenderSceneOpaque(e);
 
             //Draw debug stuff
             Graphics.DrawDebug();
@@ -89,21 +94,16 @@ namespace Balance
         /// Called by the engine when it is time to render potentially-translucent renderables
         /// </summary>
         /// <param name="e"></param>
-        void RenderSceneTranslucent(FrameEventArgs e)
+        protected override void RenderSceneTranslucent(FrameEventArgs e)
         {
             //Now draw geometry that is potentially transcluent
             Graphics.EnableBlending(true);
             OlegEngine.Entity.EntManager.DrawTranslucent(e);
-            Graphics.EnableBlending(false);
-        }
 
-        [STAThread]
-        static void Main(string[] args)
-        {
-            using (Program game = new Program())
-            {
-                game.Run(60.0);
-            }
+            //Call into the engine so it can do it's thing
+            base.RenderSceneTranslucent(e);
+
+            Graphics.EnableBlending(false);
         }
     }
 }

@@ -50,7 +50,6 @@ namespace OlegEngine
         public static int ScreenTex { get; set; }
         public static Material ErrorMat { get; set; }
         public static Material NormalMat { get; set; }
-        public static GameWindow window { get; set; }
         public static Matrix4 ProjectionMatrix { get; set; }
         public static Matrix4 ViewMatrix { get; set; }
         public static int CurrentPass = 1; //What stage of rendering we're at
@@ -81,9 +80,8 @@ namespace OlegEngine
         }
         #endregion
 
-        public static void Init(GameWindow win, Engine eng)
+        public static void Init(Engine eng)
         {
-            window = win;
             engine = eng;
 
             //Create engine-specific resources (debug models/materials, etc.)
@@ -783,7 +781,7 @@ namespace OlegEngine
 
             // get depth of clicked pixel
             float[] t = new float[1];
-            GL.ReadPixels(x, Utilities.window.Height - y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, PixelType.Float, t);
+            GL.ReadPixels(x, Utilities.engine.Height - y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, PixelType.Float, t);
 
             return UnProject(new Vector3(x, viewport[3] - y, t[0]), modelviewMatrix, projectionMatrix, viewport);
         }
@@ -820,7 +818,7 @@ namespace OlegEngine
         /// <returns>2D position relative to the screen of a world positon</returns>
         public static Vector2 Get3Dto2D(Vector3 position)
         {
-            return Get3Dto2D(position, View.CameraMatrix, Utilities.engine.defaultViewMatrix, Utilities.window.Width, Utilities.window.Height);
+            return Get3Dto2D(position, View.CameraMatrix, Utilities.engine.defaultViewMatrix, Utilities.engine.Width, Utilities.engine.Height);
         }
 
         /// <summary>
