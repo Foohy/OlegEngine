@@ -82,6 +82,7 @@
     <Compile Include="GUI\Elements\Button.cs" />
     <Compile Include="GUI\Elements\ButtonDropDown.cs" />
     <Compile Include="GUI\Elements\CheckBox.cs" />
+    <Compile Include="GUI\Elements\ContextMenu.cs" />
     <Compile Include="GUI\Elements\ListView.cs" />
     <Compile Include="GUI\Elements\ListViewItem.cs" />
     <Compile Include="GUI\Elements\ScrollBar.cs" />

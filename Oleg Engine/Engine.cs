@@ -62,7 +62,7 @@ namespace OlegEngine
         private void _engineInit(Settings engineSettings)
         {
             Utilities.Print("==================================", Utilities.PrintCode.INFO);
-            Utilities.Print("ENGINE STARTUP", Utilities.PrintCode.INFO);
+            Utilities.Print("OLEG ENGINE \n{0}", Utilities.PrintCode.INFO, typeof(Engine).Assembly.GetName().Version.ToString());
             Utilities.Print("==================================\n", Utilities.PrintCode.INFO);
 
             //Store the current settings
