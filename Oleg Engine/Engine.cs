@@ -87,7 +87,7 @@ namespace OlegEngine
             //this.OnRenderSceneTranslucent += new Action<FrameEventArgs>(RenderSceneTranslucent);
 
             //Make a furious attempt to change the window's icon
-            try { this.Icon = System.Drawing.Icon.ExtractAssociatedIcon(typeof(Engine).Assembly.GetName().Name + ".exe"); }
+            try { this.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.AppDomain.CurrentDomain.FriendlyName); }
             catch (Exception e) { Utilities.Print("Failed to load icon! {0}", Utilities.PrintCode.WARNING, e.Message); }
 
             //Hide the console if we want
