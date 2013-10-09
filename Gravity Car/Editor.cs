@@ -71,10 +71,10 @@ namespace OlegEngine
                 TopControl.SetWidth(Utilities.engine.Width);
 
                 ContextMenu dd = TopControl.AddButtonDropDown("File");
-                Button add = dd.AddButton("Load");
-                Button save = dd.AddButton("Save");
-                Button exit = dd.AddButton("Exit");
-                exit.OnButtonPress += new Button.OnButtonPressDel(exit_OnButtonPress);
+                dd.AddButton("Load");
+                dd.AddButton("Save").SetEnabled(false);
+                dd.AddButton("Exit").OnButtonPress += new Button.OnButtonPressDel(exit_OnButtonPress);
+
 
                 TopControl.AddButton("Edit");
                 Button help = TopControl.AddButton("Help...");
@@ -85,7 +85,7 @@ namespace OlegEngine
 
             }
 
-            TopControl.ShouldDraw = true;
+            TopControl.IsVisible = true;
         }
 
         static void tests_OnButtonPress(Panel sender)
@@ -97,18 +97,18 @@ namespace OlegEngine
             mainwin.SetTitle(Utilities.Time.ToString());
 
             Window subWin = GUIManager.Create<Window>(mainwin);
-            subWin.SetPos(10, 10);
+            subWin.SetPos(20, 30);
             subWin.SetWidth(330);
             subWin.SetTitle("I'm a window within a window!");
 
             subWin = GUIManager.Create<Window>(subWin);
-            subWin.SetPos(10, 10);
+            subWin.SetPos(20, 30);
             subWin.SetHeight(180);
             subWin.SetWidth(120);
             subWin.SetTitle("I'm another!");
 
             subWin = GUIManager.Create<Window>(subWin);
-            subWin.SetPos(10, 10);
+            subWin.SetPos(20, 30);
             subWin.SetHeight(40);
             subWin.SetWidth(80);
             subWin.SetTitle("Budding!");
@@ -163,23 +163,24 @@ namespace OlegEngine
             Window w = GUIManager.Create<Window>();
             w.SetTitle("So you need help?");
             w.ClipChildren = true;
+            w.SetHeight(200);
 
             Button button = GUIManager.Create<Button>();
             button.SetText("Clip test!");
             button.SizeToText(15);
-            //button.TexPressed = Resource.GetTexture("gui/toolbar_pressed.png");
-            //button.TexIdle = Resource.GetTexture("gui/toolbar.png");
-            //button.TexHovered = Resource.GetTexture("gui/toolbar_hover.png");
             button.SetParent(w);
             button.SetPos(new Vector2((w.Width / 2) - (button.Width / 2), w.Height - 50));
             button.DockPadding(20, 20, 20, 20);
             button.SetHeight(70);
             button.Dock(Panel.DockStyle.TOP);
 
-            //Label label = GUIManager.Create<Label>();
-            //label.SetText("Howdy!");
-            //label.SetParent(w);
-            //label.Position = new Vector2(10, 30);
+            Button disabled = GUIManager.Create<Button>(w);
+            disabled.SetText("I'm disabled :(");
+            disabled.SetWidthHeight(button.Width, button.Height);
+            disabled.Below(button, 5);
+            disabled.DockPadding(20, 20, 20, 20);
+            disabled.Dock(Panel.DockStyle.BOTTOM);
+            disabled.SetEnabled(false);
         }
 
         static void GUIManager_PostDrawHUD(EventArgs e)
@@ -367,7 +368,7 @@ namespace OlegEngine
             View.CalcView -= new Action(View_CalcView);
 
 
-            TopControl.ShouldDraw = false;
+            TopControl.IsVisible = false;
         }
 
 

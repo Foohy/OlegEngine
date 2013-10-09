@@ -33,11 +33,13 @@ namespace OlegEngine.GUI
         public Button()
         {
             this.SetColor(33, 36, 45);
+            this.SetDisabledColor(33/2, 36/2, 45/2);
             this.SetImage( Utilities.White);
             this.OnEnableChange += new Action<Panel, bool>(Button_OnEnableChange);
 
             TextLabel = GUIManager.Create<Label>();
             TextLabel.SetColor(255, 255, 255);
+            TextLabel.SetDisabledColor(100, 100, 100);
             TextLabel.SetParent(this);
             TextLabel.Autosize = false;
             TextLabel.Dock(DockStyle.FILL);
@@ -47,6 +49,8 @@ namespace OlegEngine.GUI
         void Button_OnEnableChange(Panel panel, bool enabled)
         {
             CheckButtonState();
+              
+            TextLabel.SetEnabled(this.Enabled);
         }
 
         public override void Init()
