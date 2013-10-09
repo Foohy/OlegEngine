@@ -38,6 +38,7 @@ namespace OlegEngine.GUI
             this.ShouldPassInput = true;
             this.Autosize = false;
             this.SetColor(255, 255, 255);
+            this.SetDisabledColor(100, 100, 100);
 
             this.Alignment = TextAlign.MiddleLeft;
         }
@@ -156,7 +157,7 @@ namespace OlegEngine.GUI
         {
             Vector2 truePos = this.GetScreenPos();
             DrawText.SetPos(truePos.X + PosOffset.X, truePos.Y + PosOffset.Y);//TODO: handle aligning to right/center
-            DrawText.Color = this.Color;
+            DrawText.Color = this.Enabled ? this.Color : this.DisabledColor;
 
             int X, Y, W, H;
             bool clipping = ConstructClip(truePos, out X, out Y, out W, out H);
