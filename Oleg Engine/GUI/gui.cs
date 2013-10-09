@@ -23,8 +23,7 @@ namespace OlegEngine.GUI
         public static T Create<T>() where T : Panel, new()
         {
             T panel = new T();
-            panel.ShouldDraw = true;
-            panel.ShouldDrawChildren = true;
+            panel.IsVisible = true;
             panel.Init();
 
             elements.Add(panel);
@@ -34,8 +33,6 @@ namespace OlegEngine.GUI
         public static T Create<T>( Panel p) where T : Panel, new()
         {
             T panel = new T();
-            panel.ShouldDraw = true;
-            panel.ShouldDrawChildren = true;
             panel.SetParent(p);
             panel.Init();
 
@@ -91,14 +88,17 @@ namespace OlegEngine.GUI
             {
                 Panel p = elements[i];
                 //If the mouse is over the element
-                if (p.Enabled &&  p.IsMouseOver())
+                if (p.IsVisible && p.IsMouseOver())
                 {
                     if (!p.Parent)
                         p.MouseDown(e);
-                    else p.TopParent.MouseDown(e);
+                    else if (p.TopParent.Enabled && p.TopParent.IsVisible ) p.TopParent.MouseDown(e);
+
+                    //The following tests will function on the top parent, so to save a variable we'll set 'p' to be either the panel or the top parent
+                    p = p.TopParent ? p.TopParent : p;
 
                     //If the element shouldn't let input pass through or we're not drawing the element stop now
-                    if (!p.ShouldPassInput || !p.ShouldDraw)
+                    if (!p.ShouldPassInput || p.IsVisible)
                     {
                         break;
                     }
@@ -137,7 +137,7 @@ namespace OlegEngine.GUI
             for (int i = elements.Count - 1; i >= 0; i--)
             {
                 Panel panel = elements[i];
-                if (panel.Parent == null && panel.IsPointOver(pos) && !panel.ShouldPassInput && panel.ShouldDraw)
+                if (panel.Parent == null && !panel.ShouldPassInput && panel.IsVisible && panel.IsPointOver(pos) )
                 {
                     if (panel == p || p.IsParent(panel))
                     {

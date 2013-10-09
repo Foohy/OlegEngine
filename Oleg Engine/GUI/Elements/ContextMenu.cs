@@ -14,19 +14,18 @@ namespace OlegEngine.GUI
 
         public ContextMenu()
         {
-            Utilities.engine.Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
             DefaultItemHeight = 20;
             ItemPadding = 0;
 
             this.SetColor(33, 36, 45);
         }
 
-        void Mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs e)
+
+        public override void MouseUp(OpenTK.Input.MouseButtonEventArgs e)
         {
-            if (!this.IsMouseOver())
-            {
-                this.Hide();
-            }
+            base.MouseUp(e);
+
+            this.Hide();
         }
 
         public void AddPanel(Panel panel)
@@ -72,8 +71,9 @@ namespace OlegEngine.GUI
 
         private void setHiddenProps()
         {
-            this.SetEnabled(!this.IsHidden, true);
-            this.ShouldDraw = this.ShouldDrawChildren = !this.IsHidden;
+            this.SetEnabled(!this.IsHidden, false);
+            this.IsVisible = !this.IsHidden;
+            this.ShouldPassInput = this.IsHidden;
         }
 
         /// <summary>
