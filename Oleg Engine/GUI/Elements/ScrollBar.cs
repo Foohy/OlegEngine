@@ -30,7 +30,7 @@ namespace OlegEngine.GUI
             Grip.SetColor(200, 201, 200);
             Grip.SetWidth(20);
             Grip.Dock(DockStyle.RIGHT);
-            Grip.ShouldDraw = false; //We'll be drawing it manually
+            Grip.IsVisible = false; //We'll be drawing it manually
             Grip.OnMouseDown += new Action<Panel,OpenTK.Input.MouseButtonEventArgs>(Grip_OnMouseDown);
             this.OnMouseMove += new Action<Panel,OpenTK.Input.MouseMoveEventArgs>(ScrollBar_OnMouseMove);
 
@@ -95,9 +95,9 @@ namespace OlegEngine.GUI
                 Surface.SetDrawColor(33, 36, 45);
                 Surface.DrawRect(realPos.X + Grip.Position.X, realPos.Y, Grip.Width, this.Height);
 
-                Grip.ShouldDraw = true;
+                Grip.IsVisible = true;
                 Grip.Draw();
-                Grip.ShouldDraw = false;
+                Grip.IsVisible = false;
             }
         }
 

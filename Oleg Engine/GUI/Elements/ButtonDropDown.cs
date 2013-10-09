@@ -42,8 +42,6 @@ namespace OlegEngine.GUI
             contextPanel.SetWidth(150);
             contextPanel.SetPos(this.Position.X, this.Position.Y + this.Height);
 
-            this.ShouldDrawChildren = false;
-
             //Create our text label
             TextLabel = GUIManager.Create<Label>();
             TextLabel.SetParent(this);
@@ -231,14 +229,7 @@ namespace OlegEngine.GUI
             this.TextLabel.Draw();
 
             //Draw the context panel
-            if (this.CurrentState == State.Pressed)
-            {
-                contextPanel.ShouldDraw = true;
-            }
-            else
-            {
-                contextPanel.ShouldDraw = false;
-            }
+            contextPanel.IsVisible = this.CurrentState == State.Pressed;
         }
     }
 }

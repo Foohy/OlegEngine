@@ -84,7 +84,7 @@ namespace OlegEngine.GUI
         {
             base.MouseMove(e);
 
-            if (this.Enabled && this.IsMouseOver() && !this.ShouldPassInput && this.ShouldDraw && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y), this))
+            if (this.Enabled && this.IsMouseOver() && !this.ShouldPassInput && this.IsVisible && !GUIManager.IsPanelAbovePoint(new Vector2(Utilities.engine.Mouse.X, Utilities.engine.Mouse.Y), this))
             {
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.IBeam;
             }

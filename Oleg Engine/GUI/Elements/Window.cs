@@ -232,8 +232,7 @@ namespace OlegEngine.GUI
         public void SetEnableCloseButton(bool enabled)
         {
             this.closeButton.SetEnabled( enabled );
-            this.closeButton.ShouldDraw = enabled;
-            this.closeButton.ShouldDrawChildren = enabled;
+            this.closeButton.IsVisible = enabled;
         }
 
         private static int size = 10; //must be within a box of this many pixels wide

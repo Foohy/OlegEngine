@@ -33,18 +33,28 @@ namespace OlegEngine.GUI
 
         public float Width { get; protected set; }
         public float Height { get; protected set; }
-        public bool ShouldDraw { get; set; }
+        public bool IsVisible { get; set; }
         public bool Enabled { get; protected set; }
 
+        /// <summary>
+        /// Define whether the panel should be rendered with alpha blending
+        /// </summary>
         public bool AlphaBlendmode { get; set; }
-        public bool ShouldDrawChildren { get; set; }
-        public bool ShouldPassInput { get; set; } //Clicks should pass 'through' this panel to underlying panels
-        public bool ClipChildren { get; set; } //Should the panel clip child panels when they go off the edge?
+
+        /// <summary>
+        /// Whether the panel should pass input 'through' this panel to another panel of a DIFFERENT parent
+        /// </summary>
+        public bool ShouldPassInput { get; set; }
+        /// <summary>
+        /// Define if the panel should clip the rendering of its children at its edges
+        /// </summary>
+        public bool ClipChildren { get; set; }
 
         public bool ShouldAnchor { get; set; } //Control which style should be used: Docking, or anchor style
         public DockStyle DockingStyle { get; protected set; }
         public Anchors AnchorStyle { get; protected set; }
         public Vector3 Color { get; set; }
+        public Vector3 DisabledColor { get; set; }
         public Vector2 Position { get; protected set; }
         public string Name { get; set; }
 
@@ -95,8 +105,15 @@ namespace OlegEngine.GUI
         {
             this.ClipChildren = true;
             this.Enabled = true;
+            this.DisabledColor = this.Color;
+            this.IsVisible = true;
         }
 
+        /// <summary>
+        /// If the panel is not null and is valid
+        /// </summary>
+        /// <param name="p">The panel to test</param>
+        /// <returns>Whether the panel is valid</returns>
         public static implicit operator bool(Panel p)
         {
             return p != null;
@@ -142,7 +159,7 @@ namespace OlegEngine.GUI
         {
             if (parent)
                 parent.Children.Add(this);
-            else if (this.Parent) //If the parent we're being set to and we have a parent, remove us from its list of children
+            if (this.Parent) //If the parent we're being set to and we have a parent, remove us from its list of children
                 this.Parent.Children.Remove(this);
 
             this.Parent = parent;
@@ -170,7 +187,18 @@ namespace OlegEngine.GUI
             {
                 p = p.Parent ? p.Parent : p;
             }
-            TopParent = p;
+            this.TopParent = p;
+
+            //Tell each of our children who the new top parent is
+            foreach (Panel child in Children) child.SetTopParent(this.TopParent);
+        }
+
+        public void SetTopParent(Panel parent)
+        {
+            this.TopParent = parent;
+
+            //Tell each of our children who the new top parent is
+            foreach (Panel child in Children) child.SetTopParent(this.TopParent);
         }
 
         /// <summary>
@@ -280,6 +308,10 @@ namespace OlegEngine.GUI
         #endregion
 
         #region Sizing Functions
+        /// <summary>
+        /// Set the width of the panel
+        /// </summary>
+        /// <param name="width">How many pixels wide the panel should be</param>
         public void SetWidth(float width)
         {
             float oldW = this.Width;
@@ -287,6 +319,10 @@ namespace OlegEngine.GUI
             this.Resize(oldW, this.Height, this.Width, this.Height);
         }
 
+        /// <summary>
+        /// Set the height of the panel
+        /// </summary>
+        /// <param name="height">How many pixels tall the panel should be</param>
         public void SetHeight(float height)
         {
             float oldH = this.Height;
@@ -294,6 +330,11 @@ namespace OlegEngine.GUI
             this.Resize(this.Width, oldH, this.Width, this.Height);
         }
 
+        /// <summary>
+        /// Set both the width and the height
+        /// </summary>
+        /// <param name="width">How wide the panel should be</param>
+        /// <param name="height">How tall the panel should be</param>
         public void SetWidthHeight(float width, float height)
         {
             float oldH = this.Height;
@@ -303,6 +344,11 @@ namespace OlegEngine.GUI
             this.Resize(oldW, oldH, this.Width, this.Height);
         }
 
+        /// <summary>
+        /// Dock the panel to its parent with a given <code>DockStyle</code>
+        /// This is incompatible with anchoring
+        /// </summary>
+        /// <param name="style">What parts of the panel should be docked.</param>
         public void Dock(DockStyle style)
         {
             this.DockingStyle = style;
@@ -310,6 +356,13 @@ namespace OlegEngine.GUI
             this.ShouldAnchor = false;
         }
 
+        /// <summary>
+        /// When docking the panel, this sets the amount of 'padding' the panel's sides should be moved away from the parent
+        /// </summary>
+        /// <param name="left">Left padding</param>
+        /// <param name="right">Right padding</param>
+        /// <param name="top">Top padding</param>
+        /// <param name="bottom">Bottom padding</param>
         public void DockPadding(float left, float right, float top, float bottom)
         {
             this.PaddingLeft = left;
@@ -320,10 +373,46 @@ namespace OlegEngine.GUI
             this.ParentResized(this.Width, this.Height, this.Width, this.Height);
         }
 
+        /// <summary>
+        /// Set the panel's anchor style with specific <code>Anchors</code>
+        /// This is incompatible with docking
+        /// </summary>
+        /// <param name="anchors">The <code>Anchors</code> enum that defines which sides the panel should be anchored to the parent panel</param>
         public void SetAnchorStyle(Anchors anchors)
         {
             this.AnchorStyle = anchors;
             this.ShouldAnchor = true;
+        }
+
+        /// <summary>
+        /// Center the panel's width to its parent
+        /// </summary>
+        public void CenterWidth()
+        {
+            if (this.Parent)
+                this.SetPos(this.Parent.Width / 2 - this.Width / 2, this.Position.Y);
+            else
+                this.SetPos(Utilities.engine.Width / 2 - this.Width / 2, this.Position.Y );
+        }
+        /// <summary>
+        /// Center the panel's height to its parent
+        /// </summary>
+        public void CenterHeight()
+        {
+            if (this.Parent)
+                this.SetPos(this.Position.X, this.Parent.Height / 2 - this.Height / 2);
+            else
+                this.SetPos(this.Position.X, Utilities.engine.Height / 2 - this.Height / 2);
+        }
+        /// <summary>
+        /// Center both the width and height of the panel to its parent
+        /// </summary>
+        public void Center()
+        {
+            if (this.Parent)
+                this.SetPos(this.Parent.Width / 2 - this.Width / 2, this.Parent.Height / 2 - this.Height / 2);
+            else
+                this.SetPos(Utilities.engine.Width / 2 - this.Width / 2, Utilities.engine.Height / 2 - this.Height / 2);
         }
 
         private void HandleDocking()
@@ -456,13 +545,18 @@ namespace OlegEngine.GUI
             return GUIManager.GetHigherPanel(this, p) == this;
         }
 
-        public void SetEnabled(bool enabled, bool enableChildren = false)
+        /// <summary>
+        /// Set whether this panel is enabled, optionally setting all of its children as well
+        /// </summary>
+        /// <param name="enabled">The state in which it should be enabled/disabled</param>
+        /// <param name="setChildren">Whether to set this panel's children as well</param>
+        public void SetEnabled(bool enabled, bool setChildren = false)
         {
-            if (this.Enabled == enabled && !enableChildren ) return;
+            if (this.Enabled == enabled && !setChildren) return;
 
             this.Enabled = enabled;
 
-            if (enableChildren)
+            if (setChildren)
             {
                 foreach (Panel child in this.Children) child.SetEnabled(enabled);
             }
@@ -537,6 +631,35 @@ namespace OlegEngine.GUI
         public void SetColor(System.Drawing.Color color)
         {
             this.Color = new Vector3(color.R / (float)255, color.G / (float)255, color.B / (float)255);
+        }
+
+        /// <summary>
+        /// Set the color of the panel
+        /// </summary>
+        /// <param name="x">Red component, 0-1</param>
+        /// <param name="y">Green component, 0-1</param>
+        /// <param name="z">Blue component, 0-1</param>
+        public void SetDisabledColorVector(float x, float y, float z)
+        {
+            this.DisabledColor = new Vector3(x, y, z);
+        }
+        /// <summary>
+        /// Set the color of the panel
+        /// </summary>
+        /// <param name="r">Red component 0-255</param>
+        /// <param name="g">Green component 0-255</param>
+        /// <param name="b">Blue component 0-255</param>
+        public void SetDisabledColor(float r, float g, float b)
+        {
+            this.DisabledColor = new Vector3(r / 255, g / 255, b / 255);
+        }
+        /// <summary>
+        /// Set the color of a panel
+        /// </summary>
+        /// <param name="color">Color</param>
+        public void SetDisabledColor(System.Drawing.Color color)
+        {
+            this.DisabledColor = new Vector3(color.R / (float)255, color.G / (float)255, color.B / (float)255);
         }
 
         public Panel GetChildByName(string name, bool recursive = false)
@@ -660,13 +783,13 @@ namespace OlegEngine.GUI
 
             this.Position = new Vector2(0, 0);
 
-            ShouldDraw = true;
-            AlphaBlendmode = true;
+            this.IsVisible = true;
+            this.AlphaBlendmode = true;
         }
 
         public virtual void Draw()
         {
-            if (!ShouldDraw && !ShouldDrawChildren) { return; }
+            if (!this.IsVisible) { return; }
 
             Vector2 posOffset = this.GetScreenPos();
 
@@ -678,35 +801,30 @@ namespace OlegEngine.GUI
                 GL.Scissor( X, Y, W, H);
             }
 
-            if (this.ShouldDraw)
-            {
-                if (this.PreDraw != null) { this.PreDraw(this, posOffset); }
-                if (!AlphaBlendmode) { Graphics.EnableBlending(false); }
+            if (this.PreDraw != null) { this.PreDraw(this, posOffset); }
+            if (!AlphaBlendmode) { Graphics.EnableBlending(false); }
 
-                panelMesh.mat = Mat;
-                modelview = Matrix4.CreateTranslation(Vector3.Zero);
-                modelview *= Matrix4.Scale((int)Width, (int)Height, 1.0f);
-                modelview *= Matrix4.CreateTranslation((int)posOffset.X, (int)posOffset.Y, 3.0f);
+            panelMesh.mat = Mat;
+            modelview = Matrix4.CreateTranslation(Vector3.Zero);
+            modelview *= Matrix4.Scale((int)Width, (int)Height, 1.0f);
+            modelview *= Matrix4.CreateTranslation((int)posOffset.X, (int)posOffset.Y, 3.0f);
 
 
-                this.panelMesh.Color = this.Color;
-                panelMesh.DrawSimple(modelview);
-                if (this.PostDraw != null) { this.PostDraw(this, posOffset); }
+            this.panelMesh.Color = this.Enabled ? this.Color : this.DisabledColor;
+            panelMesh.DrawSimple(modelview);
+            if (this.PostDraw != null) { this.PostDraw(this, posOffset); }
 
 
-                if (!AlphaBlendmode) { Graphics.EnableBlending( true ); }
-            }
-            
+            if (!AlphaBlendmode) { Graphics.EnableBlending( true ); }
+
             if (clipping)
             {
                 GL.Disable(EnableCap.ScissorTest);
             }
 
             //Draw our children
-            if (ShouldDrawChildren)
-            {
-                DrawChildren();
-            }
+            DrawChildren();
+
         }
 
         protected bool ConstructClip( Vector2 PosOffset, out int X, out int Y, out int W, out int H )

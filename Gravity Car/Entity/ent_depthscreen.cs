@@ -38,7 +38,7 @@ namespace Gravity_Car.Entity
             if (e.Key == OpenTK.Input.Key.F1)
             {
                 shouldDraw = !shouldDraw;
-                DepthScreen.ShouldDraw = shouldDraw;
+                DepthScreen.IsVisible = shouldDraw;
             }
         }
 
