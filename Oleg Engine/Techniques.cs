@@ -270,87 +270,14 @@ namespace OlegEngine
 
         static Mesh skymodel;
 
-        static int v3CameraPosLocation;
-        static int v3LightPosLocation;
-        static int v3InvWavelengthLocation;
-        static int fCameraHeightLocation;
-        static int fCameraHeight2Location;
-        static int fOuterRadiusLocation;
-        static int fOuterRadius2Location;
-        static int fInnerRadiusLocation;
-        static int fInnerRadius2Location;
-        static int fKrESunLocation;
-        static int fKmESunLocation;
-        static int fKr4PILocation;
-        static int fKm4PILocation;
-        static int fScaleLocation;
-        static int fScaleDepthLocation;
-        static int fScaleOverScaleDepthLocation;
-
-        static int gLocation;
-        static int g2Location;
-
-
-
-
-        static float[] fWavelength = new float[3];
-        static float[] fWavelength4 = new float[3];
-
-        static int nSamples = 3;		// Number of sample rays to use in integral equation
-        static float Kr = 0.0025f;		// Rayleigh scattering constant
-        static float Kr4PI;
-        static float Km = 0.0010f;		// Mie scattering constant
-        static float Km4PI;
-        static float ESun = 20.0f;		// Sun brightness constant
-        static float g = -0.990f;		// The Mie phase asymmetry factor
-        static float fInnerRadius = 10.0f;
-        static float fOuterRadius = 10.25f;
-        static float fScale;
-        static float fRayleighScaleDepth = 0.25f;
-        static float fMieScaleDepth = 0.1f;
-        static Vector3 vLight = new Vector3(200, 100, -5);
-        static Vector3 v3LightDirection;
-
         public static bool Init()
         {
-            fWavelength[0] = 0.650f;		// 650 nm for red
-            fWavelength[1] = 0.570f;		// 570 nm for green
-            fWavelength[2] = 0.475f;		// 475 nm for blue
-            fWavelength4[0] = (float)Math.Pow(fWavelength[0], 4.0f);
-            fWavelength4[1] = (float)Math.Pow(fWavelength[1], 4.0f);
-            fWavelength4[2] = (float)Math.Pow(fWavelength[2], 4.0f);
-
-            Kr4PI = Kr * 4.0f * (float)Math.PI;
-            Km4PI = Km * 4.0f * (float)Math.PI;
-            fScale = 1 / (fInnerRadius - fOuterRadius);
-            v3LightDirection = vLight / vLight.Length;
-
-            skymodel = Resource.GetMesh("skybox.obj");
-            skymodel.mat = new Material(Utilities.White, "skybox2");
+            skymodel = Resource.GetMesh("engine/skybox.obj");
+            skymodel.mat = new Material(Utilities.White, "skybox");
             skymodel.ShouldDrawDebugInfo = false;
 
-            int prog = Resource.GetProgram("skybox2");
+            int prog = Resource.GetProgram("skybox");
             GL.UseProgram(prog);
-
-            v3CameraPosLocation = GL.GetUniformLocation(prog, "v3CameraPos");
-            v3LightPosLocation = GL.GetUniformLocation(prog, "v3LightPos");
-            v3InvWavelengthLocation = GL.GetUniformLocation(prog, "v3InvWavelength");
-            fCameraHeightLocation = GL.GetUniformLocation(prog, "fCameraHeight");
-            fCameraHeight2Location = GL.GetUniformLocation(prog, "fCameraHeight2");//////////
-            fOuterRadiusLocation = GL.GetUniformLocation(prog, "fOuterRadius");////////
-            fOuterRadius2Location = GL.GetUniformLocation(prog, "fOuterRadius2");///////////
-            fInnerRadiusLocation = GL.GetUniformLocation(prog, "fInnerRadius");
-            fInnerRadius2Location = GL.GetUniformLocation(prog, "fInnerRadius2");/////////////
-            fKrESunLocation = GL.GetUniformLocation(prog, "fKrESun");
-            fKmESunLocation = GL.GetUniformLocation(prog, "fKmESun");
-            fKr4PILocation = GL.GetUniformLocation(prog, "fKr4PI");
-            fKm4PILocation = GL.GetUniformLocation(prog, "fKm4PI");
-            fScaleLocation = GL.GetUniformLocation(prog, "fScale");
-            fScaleDepthLocation = GL.GetUniformLocation(prog, "fScaleDepth");
-            fScaleOverScaleDepthLocation = GL.GetUniformLocation(prog, "fScaleOverScaleDepth");
-
-            gLocation = GL.GetUniformLocation(prog, "g");
-            g2Location = GL.GetUniformLocation(prog, "g2");
 
             Program = prog;
 
@@ -359,46 +286,16 @@ namespace OlegEngine
 
         public static void Render()
         {
-            setUniforms();
-
             GL.CullFace(CullFaceMode.Front);
             GL.DepthFunc(DepthFunction.Lequal );
 
             Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
-            modelview *= Matrix4.Scale(1.5f);
             modelview *= Matrix4.CreateTranslation(View.Position);
 
             skymodel.DrawSimple(modelview);
 
             GL.CullFace(CullFaceMode.Back);
             GL.DepthFunc(DepthFunction.Less);
-        }
-
-        private static void setUniforms()
-        {
-            GL.UseProgram(Program);
-
-            GL.Uniform3(v3CameraPosLocation, View.Position);
-            GL.Uniform3(v3LightPosLocation, v3LightDirection);
-            GL.Uniform3(v3InvWavelengthLocation, 1 / fWavelength4[0], 1 / fWavelength4[1], 1 / fWavelength4[2]);
-            GL.Uniform1(fCameraHeightLocation, View.Position.Length);
-            GL.Uniform1(fCameraHeight2Location, View.Position.LengthSquared);
-            GL.Uniform1(fInnerRadiusLocation, fInnerRadius);
-            GL.Uniform1(fInnerRadius2Location, fInnerRadius * fInnerRadius);
-            GL.Uniform1(fOuterRadiusLocation, fOuterRadius);
-            GL.Uniform1(fOuterRadius2Location, fOuterRadius * fOuterRadius);
-            GL.Uniform1(fKrESunLocation, Kr * ESun);
-            GL.Uniform1(fKmESunLocation, Km * ESun);
-            GL.Uniform1(fKr4PILocation, Kr4PI);
-            GL.Uniform1(fKm4PILocation, Km4PI);
-            GL.Uniform1(fScaleLocation, 1.0f / (fOuterRadius - fInnerRadius));
-            GL.Uniform1(fScaleDepthLocation, fRayleighScaleDepth);
-            GL.Uniform1(fScaleOverScaleDepthLocation, (1.0f / (fOuterRadius - fInnerRadius)) / fRayleighScaleDepth);
-            GL.Uniform1(gLocation, g);
-            GL.Uniform1(g2Location, g * g);
-
-            GL.UseProgram(0);
-
         }
     }
     public class ShadowTechnique : Technique

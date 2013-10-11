@@ -56,6 +56,38 @@ f 1//5 3//5 4//5
 f 8//6 7//6 6//6
 f 8//6 6//6 5//6";
 
+        const string Skybox =
+@"v 1.000000 -1.000000 -1.000000
+v 1.000000 -1.000000 1.000000
+v -1.000000 -1.000000 1.000000
+v -1.000000 -1.000000 -1.000000
+v 1.000000 1.000000 -1.000000
+v 1.000000 1.000000 1.000000
+v -1.000000 1.000000 1.000000
+v -1.000000 1.000000 -1.000000
+vt 1.000000 0.000000
+vt 0.000000 0.000000
+vt 0.000000 1.000000
+vt 1.000000 1.000000
+vn 1.000000 0.000000 0.000000
+vn 0.000000 -0.000000 1.000000
+vn -1.000000 0.000000 0.000000
+vn 0.000000 -0.000000 -1.000000
+vn 0.000000 -1.000000 0.000000
+vn 0.000000 1.000000 0.000000
+f 2/1/1 1/2/1 5/3/1
+f 2/1/1 5/3/1 6/4/1
+f 6/3/2 7/4/2 3/1/2
+f 6/3/2 3/1/2 2/2/2
+f 7/4/3 8/3/3 4/2/3
+f 7/4/3 4/2/3 3/1/3
+f 1/2/4 4/1/4 8/4/4
+f 1/2/4 8/4/4 5/3/4
+f 1/2/5 2/3/5 3/4/5
+f 1/2/5 3/4/5 4/1/5
+f 8/1/6 7/4/6 6/3/6
+f 8/1/6 6/3/6 5/2/6";
+
         const string Ball = 
 @"v 0.000000 -1.000000 0.000000
 v 0.723607 -0.447220 0.525725
@@ -537,11 +569,18 @@ f 37/238/80 10/239/80 42/240/80";
 
             Utilities.LoadOBJFromString(Box, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
             Mesh mBox = new Mesh(verts, elements, tangents, normals, lsUV);
+            mBox.BBox = boundingbox;
             Resource.InsertMesh("engine/box.obj", mBox);
 
             Utilities.LoadOBJFromString(Ball, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
             Mesh mBall = new Mesh(verts, elements, tangents, normals, lsUV);
+            mBall.BBox = boundingbox;
             Resource.InsertMesh("engine/ball.obj", mBall);
+
+            Utilities.LoadOBJFromString(Skybox, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
+            Mesh mSkybox = new Mesh(verts, elements, tangents, normals, lsUV);
+            mSkybox.BBox = boundingbox;
+            Resource.InsertMesh("engine/skybox.obj", mSkybox);
 
             #endregion
 
