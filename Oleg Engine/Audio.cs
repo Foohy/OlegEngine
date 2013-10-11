@@ -21,6 +21,8 @@ namespace OlegEngine
         public float Volume { get; private set; }
         public bool Looped { get; private set; }
 
+        public BASS_CHANNELINFO Info;
+
         public Int32 StartLoopPosition { get; private set; }
         public Int32 EndLoopPosition { get; private set; }
 
@@ -34,6 +36,7 @@ namespace OlegEngine
         {
             Handle = handle;
             Filename = filename;
+            Info = Bass.BASS_ChannelGetInfo(handle);
         }
 
         public static void Init()
