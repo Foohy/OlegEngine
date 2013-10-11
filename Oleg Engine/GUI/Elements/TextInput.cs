@@ -14,7 +14,14 @@ namespace OlegEngine.GUI
         //TODO: Text selection/cursor
         public bool Selected { get; private set; }
         public Label TextLabel;
+        /// <summary>
+        /// Called when the panel gains or loses focus (to type into)
+        /// </summary>
         public event Action<Panel, bool> OnSelectedChange;
+        /// <summary>
+        /// Called when the user types a key into the textinput
+        /// </summary>
+        public event Action<Panel, string> OnTextEdit;
         public int CaretPos = 0;
 
         private bool blinkOn = false;
@@ -140,6 +147,9 @@ namespace OlegEngine.GUI
                 this.TextLabel.SetText("");
                 CaretPos = 0;
             }
+
+            if (OnTextEdit != null)
+                OnTextEdit(this, this.TextLabel.Text);
         }
 
         private void delete()
@@ -147,6 +157,9 @@ namespace OlegEngine.GUI
             if (this.TextLabel.Text.Length > 1 && CaretPos != this.TextLabel.Text.Length)
             {
                 this.TextLabel.SetText(this.TextLabel.Text.Remove(CaretPos, 1));
+
+                if (OnTextEdit != null)
+                    OnTextEdit(this, this.TextLabel.Text);
             }
         }
 
@@ -154,6 +167,9 @@ namespace OlegEngine.GUI
         {
             this.TextLabel.SetText(this.TextLabel.Text.Insert(CaretPos, Key));
             CaretPos += Key.Length;
+
+            if (OnTextEdit != null)
+                OnTextEdit(this, this.TextLabel.Text);
         }
 
         /// <summary>
@@ -163,6 +179,9 @@ namespace OlegEngine.GUI
         public void SetText(string str)
         {
             this.TextLabel.SetText(str);
+
+            if (OnTextEdit != null)
+                OnTextEdit(this, this.TextLabel.Text);
         }
 
         public void SizeToText(int offset = 0)
