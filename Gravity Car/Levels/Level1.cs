@@ -89,6 +89,9 @@ namespace Gravity_Car.Levels
             LightingTechnique.SetEnvironmentLight(light);
             ShadowTechnique.Enable();
 
+            //Gimme some skyboxes!
+            SkyboxTechnique.SetSkyMaterial(Resource.GetMaterial("skybox/skybox_default"));
+
             Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
 
