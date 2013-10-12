@@ -7,7 +7,6 @@ namespace OlegEngine.GUI
 {
     public class ListViewItem : Panel 
     {
-        public object Userdata { get; set; }
         public string[] Labels { get; protected set; }
         public bool Selected { get; private set; }
         public event Action<ListViewItem, bool> OnSelectedChange;
