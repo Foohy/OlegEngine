@@ -207,19 +207,36 @@ namespace OlegEngine
                 GL.GetShader(VertexShader, ShaderParameter.CompileStatus, out statV);
                 GL.GetShader(FragmentShader, ShaderParameter.CompileStatus, out statF);
 
+                string ShaderVLog = GL.GetShaderInfoLog(VertexShader);
+                string ShaderFLog = GL.GetShaderInfoLog(FragmentShader);
                 if (statV == 0)
                 {
                     Utilities.Print("{0} failed to compile!", Utilities.PrintCode.ERROR, filenameV);
-                    Utilities.Print(GL.GetShaderInfoLog(VertexShader), Utilities.PrintCode.ERROR);
+                    Utilities.Print(ShaderVLog, Utilities.PrintCode.ERROR);
                 }
+                else if (ShaderVLog.Length > 0 )
+                {
+                    Utilities.Print("{0} has some warnings!", Utilities.PrintCode.WARNING, filenameV);
+                    Utilities.Print(ShaderVLog, Utilities.PrintCode.WARNING);
+                }
+
                 if (statF == 0)
                 {
                     Utilities.Print("{0} failed to compile!", Utilities.PrintCode.ERROR, filenameF);
                     Utilities.Print(GL.GetShaderInfoLog(FragmentShader), Utilities.PrintCode.ERROR);
                 }
+                else if (ShaderFLog.Length > 0)
+                {
+                    Utilities.Print("{0} has some warnings!", Utilities.PrintCode.WARNING, filenameF);
+                    Utilities.Print(ShaderFLog, Utilities.PrintCode.WARNING);
+                }
 
                 //Link them up
                 GL.LinkProgram(program);
+
+                //Detach the shaders
+                GL.DetachShader(program, VertexShader);
+                GL.DetachShader(program, FragmentShader);
 
                 //Once we're done with creating the program, we don't need the shader objects anymore (they'll persist until the program is deleted)
                 GL.DeleteShader(VertexShader);
