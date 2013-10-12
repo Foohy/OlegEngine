@@ -273,8 +273,6 @@ namespace OlegEngine
         public static bool Init()
         {
             skymodel = Resource.GetMesh("engine/skybox.obj");
-            //skymodel.mat = new Material(Utilities.ErrorTex, "skybox");
-            SetSkyMaterial(Resource.GetMaterial("skybox/skybox_default"));
             skymodel.ShouldDrawDebugInfo = false;
 
             int prog = Resource.GetProgram("skybox");
@@ -296,6 +294,8 @@ namespace OlegEngine
 
         public static void Render()
         {
+            if (skymodel.mat == null || skymodel.mat.Properties.TextureType != TextureTarget.TextureCubeMap) return;
+
             GL.CullFace(CullFaceMode.Front);
             GL.DepthFunc(DepthFunction.Lequal );
 
