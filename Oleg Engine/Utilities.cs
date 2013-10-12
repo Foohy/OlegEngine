@@ -44,6 +44,7 @@ namespace OlegEngine
 
         public static int ErrorTex { get; set; }
         public static int White { get; set; }
+        public static int Black { get; set; }
         public static int NormalTex { get; set; }
         public static int AlphaTex { get; set; }
         public static int SpecTex { get; set; }
@@ -355,7 +356,6 @@ namespace OlegEngine
 
             if (!System.IO.File.Exists(filename))
             {
-                Console.WriteLine("Failed to load texture. Couldn't find: " + filename);
                 Utilities.Print("Failed to load texture. Couldn't find: " + filename, PrintCode.ERROR);
                 return null;
             }

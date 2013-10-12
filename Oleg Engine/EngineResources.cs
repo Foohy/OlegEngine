@@ -535,7 +535,8 @@ f 37/238/80 10/239/80 42/240/80";
 
             //Create some useful materials
             Utilities.ErrorTex = GenerateErrorTex();
-            Utilities.White = GenerateWhite();
+            Utilities.White = GenerateColor(Color.White);
+            Utilities.Black = GenerateColor(Color.Black);
             Utilities.NormalTex = GenerateNormalTex();
             Utilities.SpecTex = Utilities.White;
             Utilities.AlphaTex = Utilities.White;
@@ -694,11 +695,11 @@ f 37/238/80 10/239/80 42/240/80";
         /// A completely white texture.
         /// </summary>
         /// <returns>White 1x1 texture</returns>
-        private static int GenerateWhite()
+        private static int GenerateColor( Color col)
         {
             Bitmap tex = new Bitmap(1, 1);
 
-            tex.SetPixel(0, 0, Color.White);
+            tex.SetPixel(0, 0, col);
 
             //Create the opengl texture
             GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
