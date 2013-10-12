@@ -11,6 +11,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace OlegEngine
 {
@@ -66,6 +67,20 @@ namespace OlegEngine
         /// Units to the far clipping plane
         /// </summary>
         public const float FarClip = 256f;
+
+
+        /// <summary>
+        /// An array of cubemap direction targets, to make it easy to loop through 
+        /// </summary>
+        private static TextureTarget[] cubemaptargets = new TextureTarget[]
+        {
+            TextureTarget.TextureCubeMapPositiveX, //right
+            TextureTarget.TextureCubeMapPositiveZ, //front
+            TextureTarget.TextureCubeMapNegativeX, //left
+            TextureTarget.TextureCubeMapNegativeZ, //back
+            TextureTarget.TextureCubeMapPositiveY, //up
+            TextureTarget.TextureCubeMapNegativeY, //down
+        };
 
         #region Timing information
         public static void Think(FrameEventArgs e)
@@ -134,6 +149,8 @@ namespace OlegEngine
         private const string MAT_ISANIMATED     = "isanimated";
         private const string MAT_FRAMELENGTH    = "framelength";
 
+        private const string MAT_SKYBOX         = "skybox";
+
         public static Material LoadMaterial(string filename)
         {
             string Name = filename;
@@ -154,10 +171,10 @@ namespace OlegEngine
             string jsonString = File.ReadAllText(filename);
             MaterialProperties properties = new MaterialProperties();
 
-            Newtonsoft.Json.Linq.JObject infObj = null;
+            JObject infObj = null;
             try
             {
-                infObj = Newtonsoft.Json.Linq.JObject.Parse(jsonString);
+                infObj = JObject.Parse(jsonString);
             }
             catch (Exception e)
             {
@@ -221,8 +238,61 @@ namespace OlegEngine
                 }
             }
 
+            if (infObj[MAT_SKYBOX] != null)
+            {
+                List<string> skybox_tex = new List<string>();
+                foreach (var obj in infObj[MAT_SKYBOX].Children())
+                {
+                    skybox_tex.Add(obj.ToString());
+                }
+
+                //let's just use this
+                properties.BaseTexture = LoadSkyTextures(skybox_tex.ToArray());
+                properties.TextureType = TextureTarget.TextureCubeMap;
+            }
+
 
             return new Material(properties, Name);
+        }
+
+        public static int LoadSkyTextures(string[] filenames)
+        {
+            int tex = ErrorTex;
+
+            //Generate the opengl texture
+            GL.ActiveTexture(TextureUnit.Texture6);
+            tex = GL.GenTexture();
+            GL.BindTexture(TextureTarget.TextureCubeMap, tex);
+
+            for (int i = 0; i < cubemaptargets.Length; i++)
+            {
+                Bitmap bmp = null;
+                if (i < filenames.Length)
+                    bmp = LoadBitmap(filenames[i]);
+
+                if (bmp == null)
+                {
+                    //alright fine whatever jerk
+                    return ErrorTex;
+                }
+
+                //Load the data into it
+                System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                GL.TexImage2D(cubemaptargets[i], 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                    PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+                bmp.UnlockBits(bmp_data);
+            }
+
+            //Add some parameters
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
+
+            return tex;
         }
 
         public static int LoadTexture(Bitmap bmp)
@@ -264,25 +334,31 @@ namespace OlegEngine
 
         public static int LoadTexture(string filename)
         {
+            Bitmap bmp = LoadBitmap(filename);
+
+            if (bmp == null)
+                return ErrorTex;
+
+            int Tex = LoadTexture(bmp);
+            bmp.Dispose();
+            return Tex;
+        }
+
+        public static Bitmap LoadBitmap(string filename)
+        {
             filename = Resource.TextureDir + filename;
             if (String.IsNullOrEmpty(filename))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Failed to load texture. Filename is empty!");
-                Console.ResetColor();
-                return ErrorTex;
+                Utilities.Print("Failed to load texture. Filename is empty!", PrintCode.ERROR);
+                return null;
             }
 
             if (!System.IO.File.Exists(filename))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Failed to load texture. Couldn't find: " + filename);
-                Console.ResetColor();
-                return ErrorTex;
+                Utilities.Print("Failed to load texture. Couldn't find: " + filename, PrintCode.ERROR);
+                return null;
             }
-            GL.ActiveTexture(TextureUnit.Texture6);//Something farish away
-            int id = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, id);
 
             Bitmap bmp;
             if (Path.GetExtension(filename) == ".tga")
@@ -294,9 +370,7 @@ namespace OlegEngine
                 bmp = new Bitmap(filename);
             }
 
-            int Tex = LoadTexture(bmp);
-            bmp.Dispose();
-            return Tex;
+            return bmp;
         }
 
         public static int[] LoadAnimatedTexture(string filename)

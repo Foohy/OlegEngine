@@ -273,7 +273,8 @@ namespace OlegEngine
         public static bool Init()
         {
             skymodel = Resource.GetMesh("engine/skybox.obj");
-            skymodel.mat = new Material(Utilities.White, "skybox");
+            //skymodel.mat = new Material(Utilities.ErrorTex, "skybox");
+            SetSkyMaterial(Resource.GetMaterial("skybox/skybox_default"));
             skymodel.ShouldDrawDebugInfo = false;
 
             int prog = Resource.GetProgram("skybox");
@@ -282,6 +283,15 @@ namespace OlegEngine
             Program = prog;
 
             return true;
+        }
+
+        /// <summary>
+        /// Set the material of the sky being drawn around the player. This should probably be using the <code>skybox</code> shader if you don't want it to break horribly.
+        /// </summary>
+        /// <param name="mat">The material to set the skybox model to</param>
+        public static void SetSkyMaterial(Material mat)
+        {
+            skymodel.mat = mat;
         }
 
         public static void Render()
