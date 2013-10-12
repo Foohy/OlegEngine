@@ -896,7 +896,7 @@ namespace OlegEngine
             //Bind the base texture
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.Enable(EnableCap.Texture2D);
-            GL.BindTexture(TextureTarget.Texture2D, this.GetCurrentTexture());
+            GL.BindTexture(this.Properties.TextureType, this.GetCurrentTexture());
 
             //Bind the normal map, if it exists
             GL.ActiveTexture(TextureUnit.Texture1);
@@ -944,6 +944,7 @@ namespace OlegEngine
 
     public class MaterialProperties
     {
+        public TextureTarget TextureType;
         public int ShaderProgram;
         public int BaseTexture;
         public int[] BaseTextures; //For animated textures
@@ -966,6 +967,7 @@ namespace OlegEngine
             Color = Vector3.One;
             Alpha = 1.0f;
             AlphaTest = false;
+            TextureType = TextureTarget.Texture2D;
         }
     }
 
