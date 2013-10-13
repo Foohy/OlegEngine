@@ -63,12 +63,35 @@ namespace OlegEngine
         /// <summary>
         /// Units to the near clipping plane
         /// </summary>
-        public const float NearClip = 1.0f;
+        public static float NearClip
+        {
+            get
+            {
+                return _nearClip;
+            }
+            set
+            {
+                _nearClip = Clamp( value, _farClip, float.Epsilon );
+                View.UpdateViewOrthoMatrices();
+            }
+        }
+        private static float _nearClip = 1.0f;
         /// <summary>
         /// Units to the far clipping plane
         /// </summary>
-        public const float FarClip = 256f;
-
+        public static float FarClip 
+        {
+            get
+            {
+                return _farClip;
+            }
+            set
+            {
+                _farClip = Clamp(value, float.MaxValue, _nearClip + 0.001f );
+                View.UpdateViewOrthoMatrices();
+            }
+        }
+        private static float _farClip = 256f;
 
         /// <summary>
         /// An array of cubemap direction targets, to make it easy to loop through 
@@ -892,7 +915,7 @@ namespace OlegEngine
         /// <returns>2D position relative to the screen of a world positon</returns>
         public static Vector2 Get3Dto2D(Vector3 position)
         {
-            return Get3Dto2D(position, View.CameraMatrix, Utilities.engine.defaultViewMatrix, Utilities.engine.Width, Utilities.engine.Height);
+            return Get3Dto2D(position, View.CameraMatrix, View.ViewMatrix, Utilities.engine.Width, Utilities.engine.Height);
         }
 
         /// <summary>

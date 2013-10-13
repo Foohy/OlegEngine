@@ -30,9 +30,6 @@ namespace OlegEngine
         public event Action<FrameEventArgs> OnRenderSceneTranslucent;
         public event Action OnSceneResize;
 
-        public Matrix4 defaultViewMatrix = Matrix4.Identity;
-        public Matrix4 defaultOrthoMatrix = Matrix4.Identity;
-
         private DropOutStack<double> AveragedFrametimes = new DropOutStack<double>( 30 );
 
         public Engine()
@@ -207,18 +204,7 @@ namespace OlegEngine
             //Base
             base.OnResize(e);
 
-            float FOV = (float)Math.PI / 4;
-            float Ratio = this.Width / (float)this.Height;
-
-            GL.Viewport(this.ClientRectangle.X, this.ClientRectangle.Y, this.ClientRectangle.Width, this.ClientRectangle.Height);
-            defaultViewMatrix = Matrix4.CreatePerspectiveFieldOfView(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
-            //defaultOrthoMatrix = Matrix4.CreateOrthographic(Width, Height, 1.0f, 256.0f);
-            defaultOrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, Utilities.NearClip, Utilities.FarClip);
-            Utilities.ViewMatrix = defaultViewMatrix;
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref defaultViewMatrix);
-
-            Graphics.ViewFrustum.SetCamInternals(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
+            View.UpdateViewOrthoMatrices();
 
             if (OnSceneResize != null)
                 OnSceneResize();
@@ -262,7 +248,7 @@ namespace OlegEngine
             Utilities.Draw(e);
 
             //Reset the view matrix, just in case it's been altered
-            Utilities.ViewMatrix = defaultViewMatrix;
+            Utilities.ViewMatrix = View.ViewMatrix;
 
             //Get the positions for all the light positions that'll cast fancyshadows
             ShadowTechnique.UpdateLightPositions();
@@ -275,7 +261,7 @@ namespace OlegEngine
             if (ShadowTechnique.Enabled && shadowFBO.Loaded && ShadowTechnique._lights.Count > 0 && Utilities.EngineSettings.EnableShadows)
             {
                 Utilities.ProjectionMatrix = info.matrix;
-                Utilities.ViewMatrix = defaultViewMatrix;
+                Utilities.ViewMatrix = View.ViewMatrix;
 
                 //Pass 1, render in the view of the light
                 Utilities.CurrentPass = 1;
@@ -303,7 +289,7 @@ namespace OlegEngine
 
             //Set the view to the normal camera
             Utilities.ProjectionMatrix = View.CameraMatrix;
-            Utilities.ViewMatrix = defaultViewMatrix;
+            Utilities.ViewMatrix = View.ViewMatrix;
 
             //Second pass, render normally
             Utilities.CurrentPass = 2;
@@ -321,7 +307,7 @@ namespace OlegEngine
             RenderSceneTranslucent(e);
 
             //Draw surface stuff
-            Utilities.ViewMatrix = defaultOrthoMatrix;
+            Utilities.ViewMatrix = View.OrthoMatrix;
             Utilities.ProjectionMatrix = Matrix4.Identity;
 
             GUI.GUIManager.Draw();

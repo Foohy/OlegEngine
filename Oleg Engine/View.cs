@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace OlegEngine
 {
@@ -12,6 +14,15 @@ namespace OlegEngine
         public static Angle Angles { get; private set; }
         public static Vector3 ViewNormal { get; private set; }
         public static Matrix4 CameraMatrix { get; private set; }
+
+        /// <summary>
+        /// The default view matrix for use in 3D projection based rendering
+        /// </summary>
+        public static Matrix4 ViewMatrix = Matrix4.Identity;
+        /// <summary>
+        /// The default view for 2D 'orthographic' rendering
+        /// </summary>
+        public static Matrix4 OrthoMatrix = Matrix4.Identity;
 
         public static Entity.BaseEntity Player { get; private set; }
 
@@ -83,6 +94,23 @@ namespace OlegEngine
                 Player = ply;
                 PlyCalcView = inf;
             }
+        }
+
+        public static void UpdateViewOrthoMatrices()
+        {
+            float FOV = (float)Math.PI / 4;
+            float Ratio = Utilities.engine.Width / (float)Utilities.engine.Height;
+
+            var clientRec = Utilities.engine.ClientRectangle;
+
+            GL.Viewport(clientRec.X, clientRec.Y, clientRec.Width, clientRec.Height);
+            ViewMatrix = Matrix4.CreatePerspectiveFieldOfView(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
+            OrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, Utilities.engine.Width, Utilities.engine.Height, 0, Utilities.NearClip, Utilities.FarClip);
+            Utilities.ViewMatrix = ViewMatrix;
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadMatrix(ref ViewMatrix);
+
+            Graphics.ViewFrustum.SetCamInternals(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
         }
 
         private static System.Reflection.MethodInfo GetMethod(object obj, string methodname)
