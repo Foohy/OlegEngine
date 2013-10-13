@@ -92,15 +92,18 @@ uniform int gCheap = 0;
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
 uniform float gAlpha = 1.0;
+uniform vec2 gShadowMapSize = vec2( 1024, 1024 );
 uniform vec3 gEyeWorldPos;
 uniform vec3 _color = vec3( 1.0, 1.0, 1.0);
 
 uniform sampler2D sampler;
 uniform sampler2D sampler_normal;
-uniform sampler2D sampler_shadow;
-uniform sampler2D sampler_shadow_tex;
 uniform sampler2D sampler_spec;
 uniform sampler2D sampler_alpha;
+uniform sampler2D sampler_shadow_tex;
+uniform sampler2DShadow sampler_shadow;
+
+#define EPSILON 0.00001
 
 // Returns a random number based on a vec3 and an int.
 float random(vec3 seed, int i){
@@ -116,20 +119,24 @@ float CalcShadowFactor(vec4 LightSpacePos)
     UVCoords.x = 0.5 * ProjCoords.x + 0.5;
     UVCoords.y = 0.5 * ProjCoords.y + 0.5;
     float z = 0.5 * ProjCoords.z + 0.5;
+	
+	
+    float xOffset = 1.0/gShadowMapSize.x;
+    float yOffset = 1.0/gShadowMapSize.y;
 
-	float visibility = 1.0;
+    float Factor = 0.0;
 
-	for (int i=0;i<4;i++)
+    for (int y = -1 ; y <= 1 ; y++) 
 	{
-		int index = int(16.0*random(gl_FragCoord.xyy, i))%16;
-		float Depth = texture2D(sampler_shadow, UVCoords + poissonDisk[index]/900.0).x;
-		if ( Depth < z + 0.00000001)
+        for (int x = -1 ; x <= 1 ; x++) 
 		{
-			visibility -= 0.25;
-		}
-	}
+            vec2 Offsets = vec2(x * xOffset, y * yOffset);
+            vec3 UVC = vec3(UVCoords + Offsets, z + EPSILON);
+            Factor += texture(sampler_shadow, UVC);
+        }
+    }
 
-	return visibility;
+    return (Factor / 9.0);
 } 
 
 vec4 CalcLightInternal( BaseLight Light, vec3 LightDirection, vec3 Normal, float ShadowFactor)

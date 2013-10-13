@@ -335,6 +335,7 @@ namespace OlegEngine
         static int shadowTextureLocation;
         static int numShadowCastersLocation;
         static int shadowCheapDraw;
+        static int shadowMapSize;
 
         static ShadowCasterLocations[] shadowcasterLocations = new ShadowCasterLocations[MAX_SHADOWCASTERS];
 
@@ -348,6 +349,7 @@ namespace OlegEngine
             shadowTextureLocation = GL.GetUniformLocation(prog, "sampler_shadow_tex");
             numShadowCastersLocation = GL.GetUniformLocation(prog, "gNumShadowCasters");
             shadowCheapDraw = GL.GetUniformLocation(prog, "gCheap");
+            shadowMapSize = GL.GetUniformLocation(prog, "gShadowMapSize");
 
             for (int i = 0; i < shadowcasterLocations.Length; i++)
             {
@@ -388,7 +390,7 @@ namespace OlegEngine
             Matrix4 mat = info.matrix;
             GL.UniformMatrix4(lightWVPLocation, false, ref mat);
             GL.Uniform1(shadowTextureLocation, info.texture);
-
+            GL.Uniform2(shadowMapSize, Vector2.One * Utilities.EngineSettings.ShadowMapSize);
         }
 
         public static ShadowInfo GetShadowInfo()

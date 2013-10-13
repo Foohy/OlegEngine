@@ -1004,8 +1004,12 @@ namespace OlegEngine
             }
         }
 
+        /// <summary>
+        /// The actual render texture, without having a fallback texture.
+        /// Use this if you want to set specific texture parameters
+        /// </summary>
+        public int _RT = 0;
         private int fbo = 0;
-        private int _RT = 0;
 
         /// <summary>
         /// Create a new framebuffer
@@ -1055,8 +1059,6 @@ namespace OlegEngine
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)TextureCompareMode.None);
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
 
             //Create our shadow framebuffer
             GL.GenFramebuffers(1, out fbo);

@@ -145,6 +145,11 @@ namespace OlegEngine
 
             //Initialize our shadow FBO
             shadowFBO = new FBO(Utilities.EngineSettings.ShadowMapSize, Utilities.EngineSettings.ShadowMapSize);
+            //Change some specific texture parameters
+            GL.BindTexture(TextureTarget.Texture2D, shadowFBO._RT);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)TextureCompareMode.CompareRefToTexture);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareFunc, (int)All.Lequal);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
 
             //Bind some textures to our default framebuffer
             //Utilities.ScreenDepthTex = FBO.BindTextureToFBO(0, this.WindowContext.Width, this.WindowContext.Height, PixelInternalFormat.DepthComponent, PixelFormat.DepthComponent, FramebufferAttachment.DepthAttachment);
