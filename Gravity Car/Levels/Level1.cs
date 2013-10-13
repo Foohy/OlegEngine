@@ -162,7 +162,7 @@ namespace Gravity_Car.Levels
                 spotlight.SetPos( View.Player.Position );
             }
 
-            FogTechnique.SetEnd((float)Math.Sin(Utilities.Time) * 100 + 130);
+            FogTechnique.SetEnd((float)Math.Sin(Utilities.Time / 100f) * 70 + 130);
 
             //Create a camera matrix
             //Matrix4 shadowmat = Matrix4.LookAt(Pos - (Angle * 70), Pos + Angle - (Angle * 70), Vector3.UnitY);
