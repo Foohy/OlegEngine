@@ -82,6 +82,16 @@ uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform ShadowCaster gShadowCasters[MAX_SHADOW_CASTERS];
 uniform DirectionalLight gDirectionalLight;
 
+uniform struct FogParameters
+{
+	vec3 Color;
+	
+	float Start;
+	float End;
+	float Density;
+	int FogType; //0 = Linear, 1 = Exp, 2 = Exp2
+} gFogParams;
+
 uniform mat4 _pmatrix;
 uniform mat4 _vmatrix;
 uniform float _time;
@@ -264,6 +274,35 @@ vec3 CalcBumpedNormal()
     return NewNormal;
 }
 
+float CalcFogLinear( float fogStart, float fogEnd, float fogCoord )
+{
+	return clamp( (fogEnd-fogCoord)/(fogEnd-fogStart), 0.0, 1.0);
+}
+
+float CalcFogExp( float fogDensity, float fogCoord )
+{
+	return clamp( exp(-fogDensity*fogCoord), 0.0, 1.0);
+}
+
+float CalcFogExp2( float fogDensity, float fogCoord )
+{
+	return clamp(exp(-pow(fogDensity*fogCoord, 2.0)), 0.0, 1.0);
+}
+
+vec4 CalcFog(vec4 pixelColor)
+{
+	float z = (gl_FragCoord.z / gl_FragCoord.w);
+	
+	if (gFogParams.FogType == 0) 
+		return mix( vec4( gFogParams.Color, 0), pixelColor, CalcFogLinear( gFogParams.Start, gFogParams.End, z ) );
+	else if (gFogParams.FogType == 1)
+		return mix( vec4( gFogParams.Color, 0), pixelColor, CalcFogExp(gFogParams.Density, z ) ); 
+	else if (gFogParams.FogType == 2)
+		return mix( vec4( gFogParams.Color, 0), pixelColor, CalcFogExp2(gFogParams.Density, z ) ); 
+	
+	return pixelColor;
+}
+
 void main()
 {
 	vec3 Normal = CalcBumpedNormal();
@@ -283,6 +322,8 @@ void main()
 	{
 		TotalLight += CalcShadowSpotLight(gShadowCasters[i], Normal, ex_LightSpacePos );
 	}
-
-	ex_FragColor = vec4(texture2D( sampler, ex_UV.st).rgb, gAlpha * texture2D( sampler, ex_UV.st).a * texture(sampler_alpha, ex_UV.st) ) * vec4(_color * TotalLight.rgb, 1.0 );
+	
+	vec4 fragment = vec4(texture2D( sampler, ex_UV.st).rgb, gAlpha * texture2D( sampler, ex_UV.st).a * texture(sampler_alpha, ex_UV.st) ) * vec4(_color * TotalLight.rgb, 1.0 );
+	fragment = CalcFog( fragment );
+	ex_FragColor = fragment;
 }

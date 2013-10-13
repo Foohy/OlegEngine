@@ -924,6 +924,9 @@ namespace OlegEngine
 
             GL.Uniform3(this.locColor, this.Properties.Color);
             GL.Uniform1(locAlpha, this.Properties.Alpha);
+
+            //Bind the parameters for fog
+            FogTechnique.UpdateUniforms(Properties.ShaderProgram);
         }
 
         public int GetCurrentTexture()

@@ -42,7 +42,7 @@ namespace Gravity_Car.Levels
             ent_static oleg = EntManager.Create<ent_static>();
             oleg.Spawn();
             oleg.SetModel(Resource.GetMesh("props/oleg.obj"));
-            oleg.Mat = Resource.GetMaterial("models/props/oleg"); //Resource.GetMaterial("models/props/oleg");
+            oleg.Mat = Resource.GetMaterial("models/props/oleg");
             oleg.Name = "Oleg";
             oleg.SetPos(OlegPos);
             oleg.Scale = new Vector3(0.75f);
@@ -91,6 +91,16 @@ namespace Gravity_Car.Levels
 
             //Gimme some skyboxes!
             SkyboxTechnique.SetSkyMaterial(Resource.GetMaterial("skybox/skybox_default"));
+
+            //Some fog!
+            FogTechnique.SetFogParameters(new FogParams()
+            {
+                Color = new Vector3(0.37254f, 0.368627f, 0.427450f),
+                Start = 20,
+                End = 200,
+                Density = 0.03f,
+                Type = FogParams.FogType.Linear,
+            });
 
             Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
@@ -151,6 +161,8 @@ namespace Gravity_Car.Levels
                 spotlight.SetAngle(View.Angles);
                 spotlight.SetPos( View.Player.Position );
             }
+
+            FogTechnique.SetEnd((float)Math.Sin(Utilities.Time) * 100 + 130);
 
             //Create a camera matrix
             //Matrix4 shadowmat = Matrix4.LookAt(Pos - (Angle * 70), Pos + Angle - (Angle * 70), Vector3.UnitY);

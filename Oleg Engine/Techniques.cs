@@ -471,6 +471,120 @@ namespace OlegEngine
             return (Math.PI / 180) * deg;
         }
     }
+    public class FogTechnique : Technique
+    {
+        public static bool Enabled { get; set; }
+        public static FogParams FogParameters { get; private set; }
+
+        private static Dictionary<int, FogParamsLocations> programLocations = new Dictionary<int, FogParamsLocations>();
+
+        /// <summary>
+        /// 'Register' your shader program with the fog shader, so it can keep track of its fog uniform locations
+        /// This is done automatically when the shader program is loaded. Only call this if you know what you're doing
+        /// </summary>
+        /// <param name="prog">The integer ID of the shader program</param>
+        public static void BindWithProgram(int prog)
+        {
+            if (!GL.IsProgram(prog) || programLocations.ContainsKey(prog)) return;
+
+            FogParamsLocations locations = new FogParamsLocations()
+            {
+                Color = GL.GetUniformLocation(prog, "gFogParams.Color"),
+                Start = GL.GetUniformLocation(prog, "gFogParams.Start"),
+                End = GL.GetUniformLocation(prog, "gFogParams.End"),
+                Density = GL.GetUniformLocation(prog, "gFogParams.Density"),
+                FogType = GL.GetUniformLocation(prog, "gFogParams.FogType"),
+            };
+
+            //This wouldn't be correct if it only has _some_ of the locations, but if you're implementing fog in your shader, you either remember or you don't
+            if (locations.Color + locations.Start + locations.End + locations.Density + locations.FogType <= 0) return;
+
+            programLocations.Add(prog, locations);
+        }
+
+        /// <summary>
+        /// Set the fog parameters
+        /// </summary>
+        /// <param name="parameters">The <code>FogParams</code> parameters to set.</param>
+        public static void SetFogParameters(FogParams parameters)
+        {
+            FogParameters = parameters;
+        }
+
+
+        /// <summary>
+        /// Set the color of the fog
+        /// </summary>
+        /// <param name="color">The new fog color</param>
+        public static void SetColor(Vector3 color)
+        {
+            FogParameters.Color = color;
+        }
+
+        /// <summary>
+        /// Set the starting point of a linear fog type
+        /// </summary>
+        /// <param name="start">How far away from the camera to start</param>
+        public static void SetStart(float start)
+        {
+            FogParameters.Start = start;
+        }
+        /// <summary>
+        /// Set the ending point of a linear fog type
+        /// </summary>
+        /// <param name="end">How far away from the camera to end</param>
+        public static void SetEnd(float end)
+        {
+            FogParameters.End = end;
+        }
+
+        /// <summary>
+        /// Set both the start and end points of the fog.
+        /// </summary>
+        /// <param name="start">How far away from the camera to start</param>
+        /// <param name="end">How far away from the camera to end</param>
+        public static void SetStartEnd(float start, float end)
+        {
+            FogParameters.Start = start;
+            FogParameters.End = end;
+        }
+
+        /// <summary>
+        /// Set the density of either the <code>FogType.Exp</code> and <code>FogType.Exp2</code> fog types
+        /// </summary>
+        /// <param name="density">How 'dense' the fog should get</param>
+        public static void SetDensity(float density)
+        {
+            FogParameters.Density = density;
+        }
+
+        /// <summary>
+        /// Set the type of fog to use
+        /// </summary>
+        /// <param name="type">The new type of fog</param>
+        public static void SetFogType(FogParams.FogType type)
+        {
+            FogParameters.Type = type;
+        }
+
+        /// <summary>
+        /// Call to update a program's fog uniforms with the current fog settigs
+        /// NOTE: This function assumes you have already bound your program! This is to prevent needless shader switching
+        /// </summary>
+        /// <param name="prog">The integer ID of the shader program</param>
+        public static void UpdateUniforms( int prog )
+        {
+            FogParamsLocations locs;
+            if (!programLocations.TryGetValue(prog, out locs)) return;
+
+            GL.Uniform3(locs.Color, FogParameters.Color);
+            GL.Uniform1(locs.Start, FogParameters.Start);
+            GL.Uniform1(locs.End, FogParameters.End);
+            GL.Uniform1(locs.Density, FogParameters.Density);
+            GL.Uniform1(locs.FogType, (uint)FogParameters.Type);
+        }
+    }
+
 
     #region technique structures
 
@@ -599,6 +713,44 @@ namespace OlegEngine
         }
     }
 
+    public class FogParams
+    {
+        /// <summary>
+        /// The color of the fog
+        /// </summary>
+        public Vector3 Color;
+        /// <summary>
+        /// How far in front of the camera to start the fog
+        /// This is for the <code>FogType.Linear</code> mode only
+        /// </summary>
+        public float Start;
+        /// <summary>
+        /// How far in front of the camera to end the fog
+        /// This is for the <code>FogType.Linear</code> mode only
+        /// </summary>
+        public float End;
+        /// <summary>
+        /// The maximum density the fog will reach
+        /// This is for the <code>FogType.Exp</code> and <code>FogType.Exp2</code> modes only
+        /// </summary>
+        public float Density;
+
+        /// <summary>
+        /// Enumeration outlying the different types of fog
+        /// </summary>
+        public enum FogType
+        {
+            Linear  = 0,
+            Exp     = 1,
+            Exp2    = 2
+        }
+
+        /// <summary>
+        /// The type of fog to use
+        /// </summary>
+        public FogType Type;
+    }
+
     public struct LightLocations
     {
         public int Color;
@@ -654,6 +806,15 @@ namespace OlegEngine
 
         public int Cheap;
         public int Texture;
+    }
+
+    public struct FogParamsLocations
+    {
+        public int Color;
+        public int Start;
+        public int End;
+        public int Density;
+        public int FogType;
     }
 
     #endregion

@@ -242,6 +242,9 @@ namespace OlegEngine
                 GL.DeleteShader(VertexShader);
                 GL.DeleteShader(FragmentShader);
 
+                //Yay we've got a completed program. Now let's store some of its locations for things that we want to always have access to
+                FogTechnique.BindWithProgram(program);
+
                 return program;
             }
             else
