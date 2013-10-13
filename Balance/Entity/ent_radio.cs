@@ -15,7 +15,7 @@ namespace Balance.Entity
         public override void Init()
         {
             this.SetModel(Resource.GetMesh("radio.obj"));
-            this.Mat = Resource.GetMaterial("engine/white");
+            this.Material = Resource.GetMaterial("engine/white");
 
             Song = Audio.LoadSong("Resources/Audio/radio.mp3", true, true, this);
             //Song.Play(true);

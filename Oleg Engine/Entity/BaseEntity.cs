@@ -29,7 +29,7 @@ namespace OlegEngine.Entity
         public string Name { get; set; }
         public string Class { get; set; }
         public Mesh Model { get; protected set; }
-        public Material Mat { get; set; }
+        public Material Material { get; set; }
         public RenderModes RenderMode { get; set; }
         public bool DisableLighting { get; set; }
         public OpenTK.Graphics.OpenGL.BeginMode drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
@@ -59,13 +59,13 @@ namespace OlegEngine.Entity
             this.ShouldDraw = true;
             this.Init();
 
-            if (this.Mat == null) this.Mat = Utilities.ErrorMat;
+            if (this.Material == null) this.Material = Utilities.ErrorMat;
         }
 
         public virtual void Init()
         {
-            this.Model = Resource.GetMesh("engine/ball.obj");
-            this.Mat = Utilities.ErrorMat;
+            this.Model      = Resource.GetMesh("engine/ball.obj");
+            this.Material   = Utilities.ErrorMat;
         }
 
         public virtual void Remove()
@@ -82,7 +82,7 @@ namespace OlegEngine.Entity
             {
                 if (this.DisableLighting) GL.Disable(EnableCap.Lighting);
 
-                Model.mat       = this.Mat;
+                Model.mat       = this.Material;
                 Model.Color     = this.Color;
                 Model.Alpha     = this.Alpha;
 

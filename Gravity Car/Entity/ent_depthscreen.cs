@@ -19,7 +19,7 @@ namespace Gravity_Car.Entity
         float Size = 8;
         public override void Init()
         {
-            this.Mat = Resource.GetMaterial("engine/depth");
+            this.Material = Resource.GetMaterial("engine/depth");
             this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
             this.Model = Resource.GetMesh("engine/quad.obj");
 

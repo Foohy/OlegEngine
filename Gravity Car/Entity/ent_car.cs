@@ -56,9 +56,9 @@ namespace Gravity_Car.Entity
 
             //Load models
             this.Model = Resource.GetMesh("vehicles/van.obj");
-            this.Mat = Resource.GetMaterial("models/vehicles/van");
+            this.Material = Resource.GetMaterial("models/vehicles/van");
             wheel = Resource.GetMesh("wheel.obj");
-            wheel.mat = this.Mat;
+            wheel.mat = this.Material;
 
             //Create the physics
             Body bod = FarseerPhysics.Factories.BodyFactory.CreateRectangle(Utilities.PhysicsWorld, 14f * physScale, 4.7f * physScale, 0.7f);
@@ -172,11 +172,11 @@ namespace Gravity_Car.Entity
         Matrix4 wheelmat = Matrix4.Identity;
         public override void Draw()
         {
-            this.Mat.Properties.SpecularPower = 8.0f;
-            this.Mat.Properties.SpecularIntensity = 1.0f;
+            this.Material.Properties.SpecularPower = 8.0f;
+            this.Material.Properties.SpecularIntensity = 1.0f;
             base.Draw();
-            this.Mat.Properties.SpecularPower = 0;
-            this.Mat.Properties.SpecularIntensity = 0;
+            this.Material.Properties.SpecularPower = 0;
+            this.Material.Properties.SpecularIntensity = 0;
             
             wheel.Scale     = this.Scale;
             wheel.Angles    = new Angle(0, 0, wheelang[0]);

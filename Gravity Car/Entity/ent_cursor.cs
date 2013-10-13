@@ -21,7 +21,7 @@ namespace Gravity_Car.Entity
         public override void Init()
         {
             this.SetModel( Resource.GetMesh("cursor.obj"));
-            this.Mat = Resource.GetMaterial("models/cursor");
+            this.Material = Resource.GetMaterial("models/cursor");
             LightingTechnique.SetLights += new Action(LightingTechnique_SetLights);
 
             pl.AmbientIntensity = 0.3f;

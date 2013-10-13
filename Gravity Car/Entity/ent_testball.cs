@@ -23,9 +23,9 @@ namespace Gravity_Car.Entity
         {
             this.Model = Resource.GetMesh("engine/ball.obj");
 
-            this.Mat = Resource.GetMaterial("levels/dirt");
-            this.Mat.Properties.SpecularPower = 32.0f;
-            this.Mat.Properties.SpecularIntensity = 5.0f;
+            this.Material = Resource.GetMaterial("levels/dirt");
+            this.Material.Properties.SpecularPower = 32.0f;
+            this.Material.Properties.SpecularIntensity = 5.0f;
             //this.Mat.SetShader("default");
            // this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
             this.SetPos(new Vector3(0, 3.0f, 0.0f));

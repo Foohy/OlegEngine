@@ -77,7 +77,7 @@ namespace Balance
             pole.Spawn();
             pole.SetPos(Vector2.Zero);
             pole.SetModel(new Mesh("pole.obj"));
-            pole.Mat = Resource.GetMaterial("Models/wood_log");
+            pole.Material = Resource.GetMaterial("Models/wood_log");
             //Create the physics for it
             pole.Physics.Body.BodyType = BodyType.Static;
             pole.SetPos(new Vector2(0, -pole.Model.BBox.Negative.Y));
@@ -86,7 +86,7 @@ namespace Balance
             bar.Spawn();
             bar.SetPos(Vector2.Zero);
             bar.SetModel(new Mesh("balancebeam.obj"));
-            bar.Mat = Resource.GetMaterial("Models/balancebeam");
+            bar.Material = Resource.GetMaterial("Models/balancebeam");
             bar.SetPos(new Vector2(0, 30));
             bar.Physics.Body.BodyType = BodyType.Dynamic;
             bar.Physics.Body.Mass = 2;

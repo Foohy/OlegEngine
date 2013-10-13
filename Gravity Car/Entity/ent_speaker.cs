@@ -19,9 +19,9 @@ namespace Gravity_Car.Entity
   
         public override void Init()
         {
-            this.Mat = Resource.GetMaterial("models/props/speaker");
-            this.Mat.Properties.SpecularPower = 32.0f;
-            this.Mat.Properties.SpecularIntensity = 1.0f;
+            this.Material = Resource.GetMaterial("models/props/speaker");
+            this.Material.Properties.SpecularPower = 32.0f;
+            this.Material.Properties.SpecularIntensity = 1.0f;
             this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
             this.Model = Resource.GetMesh("speaker.obj");
             //this.Model = ObjLoader.LoadFile("Resources/Models/cow.obj");            

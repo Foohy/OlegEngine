@@ -23,8 +23,8 @@ namespace Gravity_Car.Entity
         {
             this.Model = Resource.GetMesh("monkey.obj");
 
-            this.Mat = Resource.GetMaterial("error.png");
-            this.Mat.SetShader("default");
+            this.Material = Resource.GetMaterial("error.png");
+            this.Material.SetShader("default");
             this.drawMode = OpenTK.Graphics.OpenGL.BeginMode.Triangles;
             this.SetPos(new Vector3(0, 3.0f, -3.0f));
 

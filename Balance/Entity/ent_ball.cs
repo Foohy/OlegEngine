@@ -18,7 +18,7 @@ namespace Balance.Entity
         public override void Init()
         {
             this.Model = Resource.GetMesh("circle.obj");
-            this.Mat = Resource.GetMaterial("models/circle");
+            this.Material = Resource.GetMaterial("models/circle");
             this.Scale = new Vector3(Radius);
 
             Body bod = new Body(Utilities.PhysicsWorld);

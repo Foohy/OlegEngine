@@ -25,7 +25,7 @@ namespace Gravity_Car.Entity
         {
             previewMesh = new Mesh();
             this.Model = Resource.GetMesh("engine/ball.obj");
-            this.Mat = Resource.GetMaterial("engine/white");
+            this.Material = Resource.GetMaterial("engine/white");
             //this.Mat.SetShader(Resource.GetProgram("default"));
             this.Scale = Vector3.One * 0.05f;
             this.Color = new Vector3(0, 1.0f, 0);
