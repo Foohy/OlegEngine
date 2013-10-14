@@ -489,6 +489,7 @@ namespace OlegEngine
 
             FogParamsLocations locations = new FogParamsLocations()
             {
+                Enabled = GL.GetUniformLocation(prog, "gFogParams.Enabled" ),
                 Color = GL.GetUniformLocation(prog, "gFogParams.Color"),
                 Start = GL.GetUniformLocation(prog, "gFogParams.Start"),
                 End = GL.GetUniformLocation(prog, "gFogParams.End"),
@@ -577,6 +578,7 @@ namespace OlegEngine
             FogParamsLocations locs;
             if (!programLocations.TryGetValue(prog, out locs)) return;
 
+            GL.Uniform1(locs.Enabled, Enabled ? 1 : 0);
             GL.Uniform3(locs.Color, FogParameters.Color);
             GL.Uniform1(locs.Start, FogParameters.Start);
             GL.Uniform1(locs.End, FogParameters.End);
@@ -716,6 +718,10 @@ namespace OlegEngine
     public class FogParams
     {
         /// <summary>
+        /// Whether to draw fog or not
+        /// </summary>
+        public bool Enabled;
+        /// <summary>
         /// The color of the fog
         /// </summary>
         public Vector3 Color;
@@ -810,6 +816,7 @@ namespace OlegEngine
 
     public struct FogParamsLocations
     {
+        public int Enabled;
         public int Color;
         public int Start;
         public int End;

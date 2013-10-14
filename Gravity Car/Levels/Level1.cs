@@ -101,6 +101,7 @@ namespace Gravity_Car.Levels
                 Density = 0.03f,
                 Type = FogParams.FogType.Exp2,
             });
+            FogTechnique.Enabled = true;
 
             Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }

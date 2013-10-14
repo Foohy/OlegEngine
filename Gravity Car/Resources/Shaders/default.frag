@@ -4,6 +4,8 @@ precision highp float;
 
 uniform struct FogParameters
 {
+	int Enabled;
+	
 	vec3 Color;
 	
 	float Start;
@@ -40,6 +42,8 @@ float CalcFogExp2( float fogDensity, float fogCoord )
 
 vec4 CalcFog(vec4 pixelColor)
 {
+	if (gFogParams.Enabled == 0 ) return pixelColor;
+
 	float z = (gl_FragCoord.z / gl_FragCoord.w);
 	
 	if (gFogParams.FogType == 0) 
