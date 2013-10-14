@@ -99,7 +99,7 @@ namespace Gravity_Car.Levels
                 Start = 20,
                 End = 200,
                 Density = 0.03f,
-                Type = FogParams.FogType.Linear,
+                Type = FogParams.FogType.Exp2,
             });
 
             Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
@@ -162,7 +162,8 @@ namespace Gravity_Car.Levels
                 spotlight.SetPos( View.Player.Position );
             }
 
-            FogTechnique.SetEnd((float)Math.Sin(Utilities.Time / 100f) * 70 + 130);
+            FogTechnique.SetDensity(((float)Math.Sin(Utilities.Time/70)+1)/40);
+            //FogTechnique.SetEnd((float)Math.Sin(Utilities.Time / 100f) * 70 + 130);
 
             //Create a camera matrix
             //Matrix4 shadowmat = Matrix4.LookAt(Pos - (Angle * 70), Pos + Angle - (Angle * 70), Vector3.UnitY);

@@ -581,7 +581,7 @@ namespace OlegEngine
             GL.Uniform1(locs.Start, FogParameters.Start);
             GL.Uniform1(locs.End, FogParameters.End);
             GL.Uniform1(locs.Density, FogParameters.Density);
-            GL.Uniform1(locs.FogType, (uint)FogParameters.Type);
+            GL.Uniform1(locs.FogType, (int)FogParameters.Type);
         }
     }
 
