@@ -895,7 +895,6 @@ namespace OlegEngine
         {
             //Bind the base texture
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.Enable(EnableCap.Texture2D);
             GL.BindTexture(this.Properties.TextureType, this.GetCurrentTexture());
 
             //Bind the normal map, if it exists
