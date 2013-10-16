@@ -149,54 +149,9 @@ namespace OlegEngine
             EnvironmentLightEnabled = enabled;
         }
 
-        static Vector3 day = new Vector3(1.0f, 1.0f, 0.862f);
-        static Vector3 dusk = new Vector3(1.0f, 0.2353f, 0.2353f);
-        static Vector3 night = new Vector3(0.133f, 0.149f, 0.176f) * 4;
-        static Vector3 current = new Vector3();
-        public static Vector3 angle = new Vector3();
-        private static void DayNightThink()
-        {
-            float time = (float)Math.Sin(Utilities.Time / 10);
-            if (time > 0)
-            {
-                current = ApproachVector(dusk, day, time);
-            }
-            else
-            {
-                current = ApproachVector(dusk, night, Math.Abs(time));
-            }
-            angle = new Vector3((float)Math.Cos(Utilities.Time / 10), -(float)Math.Sin(Utilities.Time / 10), -1.0f);
-
-            
-        }
-
-        private static Vector3 ApproachVector(Vector3 vec1, Vector3 vec2, float percent)
-        {
-            return new Vector3(Approach(vec1.X, vec2.X, percent),
-                Approach(vec1.Y, vec2.Y, percent),
-                Approach(vec1.Z, vec2.Z, percent));
-        }
-
-        private static float Approach(float start, float end, float percent)
-        {
-            return start + ((end - start) * percent);
-        }
-
         public static void SetEyeWorldPos(Vector3 pos)
         {
             GL.Uniform3(eyeWorldPosLocation, pos.X, pos.Y, pos.Z);
-        }
-
-        public static void SetShadowTexture(int tex)
-        {
-            //GL.ActiveTexture(TextureUnit.Texture2);
-            //GL.BindTexture(TextureTarget.Texture2D, tex);
-            //GL.BindSampler(2, shadowSamplerLocation);
-            //GL.ActiveTexture(TextureUnit.Texture0);
-        }
-
-        public static void SetTextureUnit(int unit)
-        {
         }
 
         private static void SetDirectionalLight(DirectionalLight Light)

@@ -154,7 +154,6 @@ namespace OlegEngine
             
             //Initalize lighting
             LightingTechnique.Init();
-            LightingTechnique.SetShadowTexture(shadowFBO.RenderTexture);
 
             //Initialize our shadows
             ShadowTechnique.Init();
