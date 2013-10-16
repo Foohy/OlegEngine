@@ -540,9 +540,9 @@ f 37/238/80 10/239/80 42/240/80";
             Utilities.NormalTex = GenerateNormalTex();
             Utilities.SpecTex = Utilities.White;
             Utilities.AlphaTex = Utilities.White;
+            Utilities.DefaultSkyboxTex = GenerateSolidSkybox(Color.Black);
             Utilities.ErrorMat = new Material(Utilities.ErrorTex, "default");
             Utilities.NormalMat = new Material(Utilities.NormalTex, "default");
-
 
             #endregion
 
@@ -712,6 +712,7 @@ f 37/238/80 10/239/80 42/240/80";
                 OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
 
             tex.UnlockBits(bmp_data);
+            tex.Dispose();
 
             // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
             // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
@@ -720,6 +721,50 @@ f 37/238/80 10/239/80 42/240/80";
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.ActiveTexture(TextureUnit.Texture0);
             return id;
+        }
+
+        /// <summary>
+        /// Generate a default skybox texture with the same color for all sides
+        /// </summary>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        private static int GenerateSolidSkybox(Color col)
+        {
+            int tex;
+            //Generate the opengl texture
+            GL.ActiveTexture(TextureUnit.Texture6);
+            tex = GL.GenTexture();
+            GL.BindTexture(TextureTarget.TextureCubeMap, tex);
+
+            for (int i = 0; i < Utilities._cubeMapTargets.Length; i++)
+            {
+                Bitmap bmp = new Bitmap(1, 1);
+                bmp.SetPixel(0, 0, col);
+
+                if (bmp == null)
+                {
+                    //alright fine whatever jerk
+                    return Utilities.ErrorTex;
+                }
+
+                //Load the data into it
+                System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                GL.TexImage2D(Utilities._cubeMapTargets[i], 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                    PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+                bmp.UnlockBits(bmp_data);
+                bmp.Dispose();
+            }
+
+            //Add some parameters
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
+
+            return tex;
         }
     }
 }

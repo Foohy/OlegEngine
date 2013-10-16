@@ -50,6 +50,7 @@ namespace OlegEngine
         public static int SpecTex { get; set; }
         public static int ScreenDepthTex { get; set; }
         public static int ScreenTex { get; set; }
+        public static int DefaultSkyboxTex { get; set; }
         public static Material ErrorMat { get; set; }
         public static Material NormalMat { get; set; }
         public static Matrix4 ProjectionMatrix { get; set; }
@@ -96,7 +97,7 @@ namespace OlegEngine
         /// <summary>
         /// An array of cubemap direction targets, to make it easy to loop through 
         /// </summary>
-        private static TextureTarget[] cubemaptargets = new TextureTarget[]
+        public static TextureTarget[] _cubeMapTargets = new TextureTarget[]
         {
             TextureTarget.TextureCubeMapPositiveX, //right
             TextureTarget.TextureCubeMapPositiveZ, //front
@@ -288,7 +289,7 @@ namespace OlegEngine
             tex = GL.GenTexture();
             GL.BindTexture(TextureTarget.TextureCubeMap, tex);
 
-            for (int i = 0; i < cubemaptargets.Length; i++)
+            for (int i = 0; i < _cubeMapTargets.Length; i++)
             {
                 Bitmap bmp = null;
                 if (i < filenames.Length)
@@ -303,7 +304,7 @@ namespace OlegEngine
                 //Load the data into it
                 System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-                GL.TexImage2D(cubemaptargets[i], 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                GL.TexImage2D(_cubeMapTargets[i], 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
                     PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
 
                 bmp.UnlockBits(bmp_data);
