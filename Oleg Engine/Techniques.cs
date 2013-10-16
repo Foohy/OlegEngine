@@ -266,19 +266,16 @@ namespace OlegEngine
     }
     public class SkyboxTechnique : Technique
     {
-        new public static int Program = 0; //Override
+        public static Vector3 SunVector { get; set; }
 
-        static Mesh skymodel;
+        private static Mesh skycube;
+        private static int locSunVector;
 
         public static bool Init()
         {
-            skymodel = Resource.GetMesh("engine/skybox.obj");
-            skymodel.ShouldDrawDebugInfo = false;
-
-            int prog = Resource.GetProgram("skybox");
-            GL.UseProgram(prog);
-
-            Program = prog;
+            skycube = Resource.GetMesh("engine/skybox.obj");
+            skycube.ShouldDrawDebugInfo = false;
+            skycube.mat = new Material(Utilities.DefaultSkyboxTex, "skybox");
 
             return true;
         }
@@ -287,23 +284,62 @@ namespace OlegEngine
         /// Set the material of the sky being drawn around the player. This should probably be using the <code>skybox</code> shader if you don't want it to break horribly.
         /// </summary>
         /// <param name="mat">The material to set the skybox model to</param>
-        public static void SetSkyMaterial(Material mat)
+        public static void SetSkyboxMaterial(Material mat)
         {
-            skymodel.mat = mat;
+            skycube.mat = mat;
+        }
+
+        /// <summary>
+        /// Set the material of the sky DOME. this should probably be using the <code>skydome</code> shader if you don't want it to break horribly.
+        /// <remarks>TODO: This entire function can be removed if textureparameters could be integrated into the texture itself. DO THIS.</remarks>
+        /// </summary>
+        /// <param name="mat">The material to set the skydome model to</param>
+        public static void SetSkyGradientMaterial(Material mat)
+        {
+            skycube.mat = mat;
+
+            //Store it's uniform location for sunvector
+            locSunVector = GL.GetUniformLocation(mat.Properties.ShaderProgram, "gSunVector");
+
+            //SUPER MEGA TODO: Figure out how to handle having textures with certain properties. Proprietary file format?
+            //For now, we need to make sure that the texture is set to clamp itself so we don't get gross artifacts
+            int color = mat.Properties.BaseTexture;
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, color);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+
+            //Aaaand the glow
+            int glow = mat.Properties.NormalMapTexture;
+
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, glow);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
         }
 
         public static void Render()
         {
-            if (skymodel.mat == null || skymodel.mat.Properties.TextureType != TextureTarget.TextureCubeMap) return;
+            if (skycube == null || skycube.mat == null) return;
 
             GL.CullFace(CullFaceMode.Front);
-            GL.DepthFunc(DepthFunction.Lequal );
+            GL.DepthFunc(DepthFunction.Lequal);
 
             Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
             modelview *= Matrix4.CreateTranslation(View.Position);
 
-            skymodel.DrawSimple(modelview);
+            //Bind the material
+            skycube.mat.BindMaterial();
 
+            //Update the sun vector
+            GL.Uniform3(locSunVector, SunVector);
+
+            //Draw the skybox
+            skycube.DrawSimple(modelview);
+
+            //Switch the drawing modes back to nromal
             GL.CullFace(CullFaceMode.Back);
             GL.DepthFunc(DepthFunction.Less);
         }
@@ -483,9 +519,9 @@ namespace OlegEngine
         /// This is done automatically when the shader program is loaded. Only call this if you know what you're doing
         /// </summary>
         /// <param name="prog">The integer ID of the shader program</param>
-        public static void BindWithProgram(int prog)
+        public static bool BindWithProgram(int prog)
         {
-            if (!GL.IsProgram(prog) || programLocations.ContainsKey(prog)) return;
+            if (!GL.IsProgram(prog) || programLocations.ContainsKey(prog)) return false;
 
             FogParamsLocations locations = new FogParamsLocations()
             {
@@ -498,9 +534,10 @@ namespace OlegEngine
             };
 
             //This wouldn't be correct if it only has _some_ of the locations, but if you're implementing fog in your shader, you either remember or you don't
-            if (locations.Color + locations.Start + locations.End + locations.Density + locations.FogType <= 0) return;
+            if (locations.Color + locations.Start + locations.End + locations.Density + locations.FogType <= 0) return false;
 
             programLocations.Add(prog, locations);
+            return true;
         }
 
         /// <summary>

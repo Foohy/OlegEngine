@@ -1,0 +1,5 @@
+{
+	"shader" 		: "skygradient",
+	"basetexture"	: "skybox/sky.png",
+	"normalmap"		: "skybox/glow.png",
+}

@@ -90,7 +90,7 @@ namespace Gravity_Car.Levels
             ShadowTechnique.Enable();
 
             //Gimme some skyboxes!
-            SkyboxTechnique.SetSkyMaterial(Resource.GetMaterial("skybox/skybox_default"));
+            SkyboxTechnique.SetSkyGradientMaterial(Resource.GetMaterial("skybox/skygradient_default"));
 
             //Some fog!
             FogTechnique.SetFogParameters(new FogParams()
@@ -161,9 +161,11 @@ namespace Gravity_Car.Levels
             {
                 spotlight.SetAngle(View.Angles);
                 spotlight.SetPos( View.Player.Position );
+
+                SkyboxTechnique.SunVector = View.Angles.Forward();
             }
 
-            FogTechnique.SetDensity(((float)Math.Sin(Utilities.Time/70)+1)/40);
+            FogTechnique.SetDensity(((float)Math.Sin(Utilities.Time/70)+1)/220);
             //FogTechnique.SetEnd((float)Math.Sin(Utilities.Time / 100f) * 70 + 130);
 
             //Create a camera matrix
