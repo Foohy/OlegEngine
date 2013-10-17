@@ -357,7 +357,7 @@ namespace OlegEngine
         /// <param name="topright">Top right vertex</param>
         /// <param name="bottomright">Bottom right vertex</param>
         /// <returns>Array of vertices that form a quad</returns>
-        private static Vertex[] AddQuad(Vertex bottomleft, Vertex topleft, Vertex topright, Vertex bottomright)
+        public static Vertex[] AddQuad(Vertex bottomleft, Vertex topleft, Vertex topright, Vertex bottomright)
         {
             Vertex[] verts = new Vertex[6];
             verts[5] = bottomleft;
