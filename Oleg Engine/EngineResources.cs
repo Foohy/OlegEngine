@@ -549,27 +549,24 @@ f 37/238/80 10/239/80 42/240/80";
 
             #region Basic/Debug models
 
-            Vector3[] verts;
-            Vector3[] tangents;
-            Vector3[] normals;
-            Vector2[] lsUV;
+            Vertex[] verts;
             int[] elements;
             Mesh.BoundingBox boundingbox;
 
             Resource.InsertMesh("engine/quad.obj", CreateNewQuadMesh());
 
-            Utilities.LoadOBJFromString(Box, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
-            Mesh mBox = new Mesh(verts, elements, tangents, normals, lsUV);
+            Utilities.LoadOBJFromString(Box, out verts, out elements, out boundingbox);
+            Mesh mBox = new Mesh(verts, elements);
             mBox.BBox = boundingbox;
             Resource.InsertMesh("engine/box.obj", mBox);
 
-            Utilities.LoadOBJFromString(Ball, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
-            Mesh mBall = new Mesh(verts, elements, tangents, normals, lsUV);
+            Utilities.LoadOBJFromString(Ball, out verts, out elements, out boundingbox);
+            Mesh mBall = new Mesh(verts, elements);
             mBall.BBox = boundingbox;
             Resource.InsertMesh("engine/ball.obj", mBall);
 
-            Utilities.LoadOBJFromString(Skybox, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
-            Mesh mSkybox = new Mesh(verts, elements, tangents, normals, lsUV);
+            Utilities.LoadOBJFromString(Skybox, out verts, out elements, out boundingbox);
+            Mesh mSkybox = new Mesh(verts, elements);
             mSkybox.BBox = boundingbox;
             Resource.InsertMesh("engine/skybox.obj", mSkybox);
 
@@ -612,15 +609,12 @@ f 37/238/80 10/239/80 42/240/80";
         /// <returns>Mesh quad</returns>
         public static Mesh CreateNewQuadMesh()
         {
-            Vector3[] verts;
-            Vector3[] tangents;
-            Vector3[] normals;
-            Vector2[] lsUV;
+            Vertex[] verts;
             int[] elements;
             Mesh.BoundingBox boundingbox;
 
-            Utilities.LoadOBJFromString(Quad, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
-            return new Mesh(verts, elements, tangents, normals, lsUV);
+            Utilities.LoadOBJFromString(Quad, out verts, out elements, out boundingbox);
+            return new Mesh(verts, elements);
         }
 
         /// <summary>

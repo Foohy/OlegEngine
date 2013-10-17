@@ -106,15 +106,12 @@ namespace OlegEngine
         {
             if (!Meshes.ContainsKey(filename) || newInstance )
             {
-                Vector3[] verts;
-                Vector3[] tangents;
-                Vector3[] normals;
-                Vector2[] lsUV;
+                Vertex[] verts;
                 int[] elements;
                 Mesh.BoundingBox boundingbox;
 
-                Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
-                Mesh m = new Mesh(verts, elements, tangents, normals, lsUV);
+                Utilities.LoadOBJ(filename, out verts, out elements, out boundingbox);
+                Mesh m = new Mesh(verts, elements);
                 m.BBox = boundingbox;
                 if (newInstance) return m;
                 else Meshes[filename] = m;

@@ -41,13 +41,12 @@ namespace Gravity_Car.Entity
         {
             Points.Add(point);
             //_meshPoints.Add(new Vector3(point.X, point.Y, this.Position.Z));
-            Vector3[] verts = GenerateVerts();
+            Vertex[] verts = GenerateVerts();
             int[] elements = GenerateElements(verts);
-            Vector3[] tangents = new Vector3[verts.Length];
 
             if (elements.Length > 1)
             {
-                previewMesh.UpdateMesh(verts, elements, tangents);
+                previewMesh.UpdateMesh(verts, elements);
             }
         }
 
@@ -70,22 +69,22 @@ namespace Gravity_Car.Entity
             this.Built = true;
             previewMesh.Color = new Vector3(1.0f, 1.0f, 1.0f);
         }
-        private Vector3[] GenerateVerts()
+        private Vertex[] GenerateVerts()
         {
-            List<Vector3> verts = new List<Vector3>();
+            List<Vertex> verts = new List<Vertex>();
             for (int i = 0; i + 1 < Points.Count; i++)
             {
-                verts.Add(new Vector3(Points[i].X, Points[i].Y, Points[i].Z));
-                verts.Add(new Vector3(Points[i + 1].X, Points[i + 1].Y, Points[i+1].Z));
+                verts.Add(new Vertex( new Vector3(Points[i].X, Points[i].Y, Points[i].Z)));
+                verts.Add(new Vertex( new Vector3(Points[i + 1].X, Points[i + 1].Y, Points[i+1].Z)));
             }
 
-            verts.Add(Points[Points.Count-1]);
-            verts.Add(Points[0]);
+            verts.Add(new Vertex(Points[Points.Count-1]));
+            verts.Add( new Vertex(Points[0]));
 
             return verts.ToArray();
         }
 
-        private int[] GenerateElements(Vector3[] verts)
+        private int[] GenerateElements(Vertex[] verts)
         {
             int[] elements = new int[verts.Length];
             for (int i = 0; i < elements.Length; i++)

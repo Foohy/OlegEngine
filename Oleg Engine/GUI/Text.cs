@@ -44,7 +44,7 @@ namespace OlegEngine.GUI
         public const string FontmapPath = "gui/fontmaps/"; //Relative to the directory for materials
         public string CurrentText;
 
-        public static void ConstructVertexArray(Charset ch, string str, out Vector3[] verts, out Vector2[] UV, out int[] elements )
+        public static void ConstructVertexArray(Charset ch, string str, out Vertex[] verts, out int[] elements )
         {
             ushort CharX;
             ushort CharY;
@@ -55,8 +55,7 @@ namespace OlegEngine.GUI
             int CurX = 0;
 
             //vert stuff
-            verts = new Vector3[str.Length * 4];
-            UV = new Vector2[str.Length * 4];
+            verts = new Vertex[str.Length * 4];
             elements = new int[str.Length * 4];
 
             for (int i = 0; i < str.Length; i++)
@@ -72,33 +71,36 @@ namespace OlegEngine.GUI
                 OffsetY = ch.Chars[curChar].YOffset;
 
                 //upper left
-                UV[i * 4].X = (float)CharX / (float)ch.Width;
-                UV[i * 4].Y = (float)CharY / (float)ch.Height;
-                verts[i * 4].X = (float)CurX + OffsetX;
-                verts[i * 4].Y = (float)OffsetY;
+                verts[i * 4].UV.X = (float)CharX / (float)ch.Width;
+                verts[i * 4].UV.Y = (float)CharY / (float)ch.Height;
+                verts[i * 4].Position.X = (float)CurX + OffsetX;
+                verts[i * 4].Position.Y = (float)OffsetY;
+                verts[i * 4].Color = Vector3.One;
                 elements[i*4] = i*4;
 
                 //upper right
-                UV[i * 4 + 1].X = (float)(CharX + Width) / (float)ch.Width;
-                UV[i * 4 + 1].Y = (float)CharY / (float)ch.Height;
-                verts[i * 4 + 1].X = (float)Width + CurX + OffsetX;
-                verts[i * 4 + 1].Y = (float)OffsetY;
+                verts[i * 4 + 1].UV.X = (float)(CharX + Width) / (float)ch.Width;
+                verts[i * 4 + 1].UV.Y = (float)CharY / (float)ch.Height;
+                verts[i * 4 + 1].Position.X = (float)Width + CurX + OffsetX;
+                verts[i * 4 + 1].Position.Y = (float)OffsetY;
+                verts[i * 4 + 1].Color = Vector3.One;
                 elements[i*4 + 1] = i*4 + 1;
 
                 //lower right
-                UV[i * 4 + 2].X = (float)(CharX + Width) / (float)ch.Width;
-                UV[i * 4 + 2].Y = (float)(CharY + Height) / (float)ch.Height;
-                verts[i * 4 + 2].X = (float)Width + CurX + OffsetX;
-                verts[i * 4 + 2].Y = (float)Height + OffsetY;
+                verts[i * 4 + 2].UV.X = (float)(CharX + Width) / (float)ch.Width;
+                verts[i * 4 + 2].UV.Y = (float)(CharY + Height) / (float)ch.Height;
+                verts[i * 4 + 2].Position.X = (float)Width + CurX + OffsetX;
+                verts[i * 4 + 2].Position.Y = (float)Height + OffsetY;
+                verts[i * 4 + 2].Color = Vector3.One;
                 elements[i*4 + 2] = i*4 + 2;
 
                 //lower left
-                UV[i * 4 + 3].X = (float)CharX / (float)ch.Width;
-                UV[i * 4 + 3].Y = (float)(CharY + Height) / (float)ch.Height;
-                verts[i * 4 + 3].X = (float)CurX + OffsetX;
-                verts[i * 4 + 3].Y = (float)Height + OffsetY;
+                verts[i * 4 + 3].UV.X = (float)CharX / (float)ch.Width;
+                verts[i * 4 + 3].UV.Y = (float)(CharY + Height) / (float)ch.Height;
+                verts[i * 4 + 3].Position.X = (float)CurX + OffsetX;
+                verts[i * 4 + 3].Position.Y = (float)Height + OffsetY;
+                verts[i * 4 + 3].Color = Vector3.One;
                 elements[i*4 + 3] = i*4 + 3;
-
 
 
                 CurX += ch.Chars[curChar].XAdvance;
@@ -246,7 +248,7 @@ namespace OlegEngine.GUI
             this.charset = Resource.GetCharset(font);
 
             //Create a blank vertex buffer which we'll update later with our text info
-            textMesh = new Mesh(new Vector3[0], new int[0], new Vector3[0], null, new Vector2[0]);
+            textMesh = new Mesh(new Vertex[0], new int[0]);
             textMesh.DrawMode = BeginMode.Quads;
             textMesh.ShouldDrawDebugInfo = false;
 
@@ -383,18 +385,17 @@ namespace OlegEngine.GUI
             if (text == null || text == this.CurrentText) return;
             this.CurrentText = text;
 
-            Vector3[] verts;
-            Vector2[] UV;
+            Vertex[] verts;
             int[] elements;
-            ConstructVertexArray(this.charset, text, out verts, out UV, out elements);
+            ConstructVertexArray(this.charset, text, out verts, out elements);
             if (textMesh == null)
             {
-                textMesh = new Mesh(verts, elements, new Vector3[verts.Length], null, UV);
+                textMesh = new Mesh(verts, elements);
                 textMesh.DrawMode = BeginMode.Quads;
             }
             else
             {
-                textMesh.UpdateMesh(verts, elements, new Vector3[verts.Length], null, UV);
+                textMesh.UpdateMesh(verts, elements);
             }
         }
 

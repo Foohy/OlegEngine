@@ -93,7 +93,7 @@ namespace OlegEngine
 
         public static void DrawNormals(Mesh m )
         {
-            if (m.DBG_Vertices == null || m.DBG_Normals == null || m.DBG_Elements == null) return;
+            if (m.DBG_Vertices == null || m.DBG_Elements == null) return;
 
             dbgWhite.BindMaterial();
             GL.UniformMatrix4(dbgWhite.locVMatrix, false, ref Matrix4.Identity);
@@ -102,9 +102,9 @@ namespace OlegEngine
             for (int i = 0; i < m.DBG_Elements.Length; i++)
             {
                 int element = m.DBG_Elements[i];
-                if (element > m.DBG_Normals.Length || element > m.DBG_Vertices.Length) continue;
+                if (element > m.DBG_Vertices.Length) continue;
 
-                DrawLine(m.Position + m.DBG_Vertices[element], m.Position + m.DBG_Vertices[element] + m.DBG_Normals[element], false);
+                DrawLine(m.Position + m.DBG_Vertices[element].Position, m.Position + m.DBG_Vertices[element].Position + m.DBG_Vertices[element].Normal, false);
             }
         }
 
@@ -133,21 +133,17 @@ namespace OlegEngine
         public Angle Angles { get; set; }
 
         public const int INDEX_BUFFER  = 0;
-        public const int POS_VB        = 1;
-        public const int NORMAL_VB     = 2;
-        public const int TEXCOORD_VB   = 3;
-        public const int TANGENT_VB    = 4;
+        public const int VERTEX_VB     = 1;
 
         int VAO = 0;
-        public int[] buffers = new int[5];
+        public int[] buffers = new int[2];
         public Material mat;
 
         int[] BaseIndex;
         int NumIndices = -1;
 
         //Debug properties
-        public Vector3[] DBG_Vertices;
-        public Vector3[] DBG_Normals;
+        public Vertex[] DBG_Vertices;
         public int[] DBG_Elements;
 
         public static int MeshesDrawn = 0;
@@ -296,48 +292,37 @@ namespace OlegEngine
             this.LoadMesh(filename);
             this.Scale = Vector3.One;
         }
-        public Mesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] texcoords = null)
+        public Mesh(Vertex[] verts, int[] elements)
         {
-            loadMesh(verts, elements, tangents, normals, texcoords);
-            this.Scale = Vector3.One;
-        }
-        public Mesh(Vector3[] verts, int[] elements, Vector3[] tangents)
-        {
-            loadMesh(verts, elements, tangents);
+            loadMesh(verts, elements);
             this.Scale = Vector3.One;
         }
 
         public void LoadMesh(string filename)
         {
-            Vector3[] verts;
-            Vector3[] tangents;
-            Vector3[] normals;
-            Vector2[] lsUV;
+            Vertex[] verts;
             int[] elements;
             Mesh.BoundingBox boundingbox;
 
-            Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox );
+            Utilities.LoadOBJ(filename, out verts, out elements, out boundingbox );
             this.BBox = boundingbox;
 
-            loadMesh(verts, elements, tangents, normals, lsUV);
+            loadMesh(verts, elements);
         }
 
         public void UpdateMesh(string filename)
         {
-            Vector3[] verts;
-            Vector3[] tangents;
-            Vector3[] normals;
-            Vector2[] lsUV;
+            Vertex[] verts;
             int[] elements;
             Mesh.BoundingBox boundingbox;
 
-            Utilities.LoadOBJ(filename, out verts, out elements, out tangents, out normals, out lsUV, out boundingbox);
+            Utilities.LoadOBJ(filename, out verts, out elements, out boundingbox);
             this.BBox = boundingbox;
 
-            UpdateMesh(verts, elements, tangents, normals, lsUV);
+            UpdateMesh(verts, elements);
         }
 
-        public void UpdateMesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] lsUV = null)
+        public void UpdateMesh(Vertex[] verts, int[] elements)
         {
             if (NumIndices < 0) //If we've never set this, we need to create our array buffer
             {
@@ -351,33 +336,22 @@ namespace OlegEngine
             NumIndices = elements.Length;
             BaseIndex = elements;
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[POS_VB]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * Vector3.SizeInBytes), verts, this.UsageHint);
+
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[VERTEX_VB]);
+            int vertexStride = BlittableValueType.StrideOf(verts);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * vertexStride), verts, this.UsageHint);
             GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+            //Positions
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, vertexStride, 0);
+            //UVs
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, true, vertexStride, 3);
+            //Normals
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, true, vertexStride, 5);
+            //Tangents
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, true, vertexStride, 8);
 
-            if (lsUV != null)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[TEXCOORD_VB]);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(lsUV.Length * Vector2.SizeInBytes), lsUV, this.UsageHint);
-                GL.EnableVertexAttribArray(1);
-                GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
-            }
-
-            if (normals != null)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[NORMAL_VB]);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(normals.Length * Vector3.SizeInBytes), normals, this.UsageHint);
-                GL.EnableVertexAttribArray(2);
-                GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
-            }
-
-            //tangent buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[TANGENT_VB]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tangents.Length * Vector3.SizeInBytes), tangents, this.UsageHint);
-            GL.EnableVertexAttribArray(3);
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, 0, 0);
-
+            //index buffer
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffers[INDEX_BUFFER]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(elements.Length * sizeof(int)), elements, this.UsageHint);
 
@@ -385,7 +359,6 @@ namespace OlegEngine
             GL.BindVertexArray(0);
 
             DBG_Elements = elements;
-            DBG_Normals = normals;
             DBG_Vertices = verts;
         }
 
@@ -449,12 +422,12 @@ namespace OlegEngine
 
         #endregion
 
-        private void loadMesh(Vector3[] verts, int[] elements, Vector3[] tangents, Vector3[] normals = null, Vector2[] lsUV = null )
+        private void loadMesh(Vertex[] verts, int[] elements )
         {
-            if (verts == null || elements == null || tangents == null)
+            if (verts == null || elements == null)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("ERROR LOADING MESH: Vertices: {0}, Elements: {1}, Tangents: {2}", verts, elements, tangents);
+                Console.WriteLine("ERROR LOADING MESH: Vertices: {0}, Elements: {1}", verts, elements);
                 Console.ResetColor();
 
                 return;
@@ -464,47 +437,40 @@ namespace OlegEngine
             GL.BindVertexArray(VAO);
 
             //Create the buffers for the vertices attributes
-            GL.GenBuffers(5, buffers);
+            GL.GenBuffers(2, buffers);
 
             NumIndices = elements.Length;
             BaseIndex = elements;
 
             //Create their buffers
-            GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[POS_VB]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * Vector3.SizeInBytes), verts, this.UsageHint);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[VERTEX_VB]);
+            int vertexStride = BlittableValueType.StrideOf(verts);
+            //GL.BufferData<Vertex>(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * vertexStride), verts, this.UsageHint);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * vertexStride), verts, this.UsageHint);
+           
+            //Positions
             GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-
-            if (lsUV != null)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[TEXCOORD_VB]);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(lsUV.Length * Vector2.SizeInBytes), lsUV, this.UsageHint);
-                GL.EnableVertexAttribArray(1);
-                GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
-            }
-
-            if (normals != null)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[NORMAL_VB]);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(normals.Length * Vector3.SizeInBytes), normals, this.UsageHint);
-                GL.EnableVertexAttribArray(2);
-                GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
-            }
-
-            //tangent buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[TANGENT_VB]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tangents.Length * Vector3.SizeInBytes), tangents, this.UsageHint);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, vertexStride, 0);
+            //UVs
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, vertexStride, 12);
+            //Normals
+            GL.EnableVertexAttribArray(2);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, vertexStride, 20);
+            //Tangents
             GL.EnableVertexAttribArray(3);
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, vertexStride, 32);
+            //Color
+            //GL.EnableVertexAttribArray(4);
+            //GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, true, vertexStride, 11);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffers[INDEX_BUFFER]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(elements.Length * sizeof(int)), elements, this.UsageHint);
 
-
+            //Reset it back
             GL.BindVertexArray(0);
 
             DBG_Elements = elements;
-            DBG_Normals = normals;
             DBG_Vertices = verts;
         }
 

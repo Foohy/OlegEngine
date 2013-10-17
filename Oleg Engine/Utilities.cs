@@ -428,12 +428,12 @@ namespace OlegEngine
             return Textures;
         }
 
-        public static Mesh.BoundingBox CalculateBoundingBox(Vector3[] vertices, Vector3 scale)
+        public static Mesh.BoundingBox CalculateBoundingBox(Vertex[] vertices, Vector3 scale)
         {
             Mesh.BoundingBox bbox = new Mesh.BoundingBox();
             for (int i = 0; i < vertices.Length; i++)
             {
-                Vector3 vertex = vertices[i].Multiply( scale);
+                Vector3 vertex = vertices[i].Position.Multiply( scale);
 
                 //Update the size of the bounding box
                 bbox.Negative = bbox.NegativeSet ? SmallestVec(bbox.Negative, vertex) : vertex;
@@ -443,16 +443,13 @@ namespace OlegEngine
             return bbox;
         }
 
-        public static void LoadOBJ(string filename, out Vector3[] lsVerts, out int[] lsElements, out Vector3[] lsTangents, out Vector3[] lsNormals, out Vector2[] lsUV, out Mesh.BoundingBox boundingBox)
+        public static void LoadOBJ(string filename, out Vertex[] lsVerts, out int[] lsElements, out Mesh.BoundingBox boundingBox)
         {
             filename = Resource.ModelDir + filename;
 
             string file = null;
             lsVerts = null;
             lsElements = null;
-            lsTangents = null;
-            lsNormals = null;
-            lsUV = null;
             boundingBox = new Mesh.BoundingBox();
 
             try
@@ -469,28 +466,24 @@ namespace OlegEngine
                 return;
             }
 
-            LoadOBJFromString(file, out lsVerts, out lsElements, out lsTangents, out lsNormals, out lsUV, out boundingBox);
+            LoadOBJFromString(file, out lsVerts, out lsElements, out boundingBox);
         }
 
-        public static void LoadOBJFromString(string objString, out Vector3[] lsVerts, out int[] lsElements, out Vector3[] lsTangents, out Vector3[] lsNormals, out Vector2[] lsUV, out Mesh.BoundingBox boundingBox)
+        public static void LoadOBJFromString(string objString, out Vertex[] lsVerts, out int[] lsElements, out Mesh.BoundingBox boundingBox)
         {
             lsVerts = null;
             lsElements = null;
-            lsTangents = null;
-            lsNormals = null;
-            lsUV = null;
             boundingBox = new Mesh.BoundingBox();
 
             string[] file = objString.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 
             //scan the file and look for the number of stuffs
-            List<Vector3> verts = new List<Vector3>();
             List<Vector3> verts_UNSORTED = new List<Vector3>();
-            List<Vector3> normals = new List<Vector3>();
             List<Vector3> normals_UNSORTED = new List<Vector3>();
-            List<Vector3> tangents = new List<Vector3>();
-            List<Vector2> uv = new List<Vector2>();
             List<Vector2> uv_UNSORTED = new List<Vector2>();
+            List<Vector3> tangents = new List<Vector3>();
+            List<Vertex> vertices = new List<Vertex>();
+
             List<int> elements = new List<int>();
             for (int i = 0; i < file.Length; i++)
             {
@@ -540,13 +533,15 @@ namespace OlegEngine
                         for (int n = 1; n < 4; n++)
                         {
                             string[] group = element[n].Split('/');
-                            //elements.Add(int.Parse(group[0]) - 1);
+
+                            Vertex newVert = new Vertex();
+                            newVert.Color = Vector3.One;
                             if (group.Length > 0 && group[0].Length > 0)
                             {
                                 int vertNum = int.Parse(group[0]);
                                 if (vertNum < verts_UNSORTED.Count + 1)
                                 {
-                                    verts.Add(verts_UNSORTED[vertNum - 1]);
+                                    newVert.Position = verts_UNSORTED[vertNum - 1];
                                     elements.Add(elements.Count);
                                 }
                             }
@@ -555,7 +550,7 @@ namespace OlegEngine
                                 int uvNum = int.Parse(group[1]);
                                 if (uvNum < uv_UNSORTED.Count + 1)
                                 {
-                                    uv.Add(uv_UNSORTED[uvNum - 1]);
+                                    newVert.UV = uv_UNSORTED[uvNum - 1];
                                 }
                             }
                             if (group.Length > 2 && group[2].Length > 0)
@@ -563,9 +558,11 @@ namespace OlegEngine
                                 int normNum = int.Parse(group[2]);
                                 if (normNum < normals_UNSORTED.Count + 1)
                                 {
-                                    normals.Add(normals_UNSORTED[normNum - 1]);
+                                    newVert.Normal = normals_UNSORTED[normNum - 1];
                                 }
                             }
+
+                            vertices.Add(newVert);
                         }
                         break;
 
@@ -573,125 +570,49 @@ namespace OlegEngine
                         //Console.WriteLine("Comment: {0}", curline );
                         break;
                     default:
-                        if (!string.IsNullOrEmpty(curline))
-                        {
-#if DEBUG
-                            //Console.WriteLine("Unknown line definition ({0}): {1}", i, curline);
-#endif
-                        }
                         break;
                 }
             }
+
+            //Slap them into normal arrays, we won't be changing it much now
             lsElements = elements.ToArray();
-            lsVerts = verts.ToArray();
+            lsVerts = vertices.ToArray();
 
-            if (normals.Count > 0) lsNormals = normals.ToArray();
-            if (uv.Count > 0) lsUV = uv.ToArray();
-
-            //Go through all the vertices and calculate their tangents/bitangents
-            if (uv.Count >= verts.Count)
-            {
-                for (int i = 0; i < verts.Count; i += 3)
-                {
-                    Vector3 v0 = verts[i];
-                    Vector3 v1 = verts[i + 1];
-                    Vector3 v2 = verts[i + 2];
-
-                    Vector3 edge1 = v1 - v0;
-                    Vector3 edge2 = v2 - v0;
-
-                    Vector2 uv0 = uv[i];
-                    Vector2 uv1 = uv[i + 1];
-                    Vector2 uv2 = uv[i + 2];
-
-                    float DeltaU1 = uv1.X - uv0.X;
-                    float DeltaV1 = uv1.Y - uv0.Y;
-                    float DeltaU2 = uv2.X - uv0.X;
-                    float DeltaV2 = uv2.Y - uv0.Y;
-
-                    float f = 1.0f / (DeltaU1 * DeltaV2 - DeltaU2 * DeltaV1);
-                    Vector3 Tangent, Bitangent;
-                    Tangent = new Vector3();
-                    Bitangent = new Vector3();
-
-                    Tangent.X = f * (DeltaV2 * edge1.X - DeltaV1 * edge2.X);
-                    Tangent.Y = f * (DeltaV2 * edge1.Y - DeltaV1 * edge2.Y);
-                    Tangent.Z = f * (DeltaV2 * edge1.Z - DeltaV1 * edge2.Z);
-
-                    Bitangent.X = f * (-DeltaU2 * edge1.X - DeltaU1 * edge2.X);
-                    Bitangent.X = f * (-DeltaU2 * edge1.Y - DeltaU1 * edge2.Y);
-                    Bitangent.X = f * (-DeltaU2 * edge1.X - DeltaU1 * edge2.Z);
-
-                    tangents.Add(Tangent);
-                    tangents.Add(Tangent);
-                    tangents.Add(Tangent);
-
-                }
-            }
+            //Calculate the tangents
+            CalculateTangents(ref lsVerts);
 
             //Calculate the bounding box
             boundingBox = CalculateBoundingBox(lsVerts, Vector3.One);
-
-            if (tangents.Count == 0)
-            {
-                for (int i = 0; i < verts.Count; i++)
-                {
-                    tangents.Add(new Vector3(0, 0, 0));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < tangents.Count; i++)
-                {
-                    tangents[i].Normalize();
-                }
-            }
-
-
-            lsTangents = tangents.ToArray();
         }
 
-        public static Mesh MeshFromData(Vector3[] lsVerts, int[] lsElements, Vector3[] lsTangents, Vector3[] lsNormals, Vector2[] lsUV, Mesh.BoundingBox boundingBox, string Material)
+        public static Mesh MeshFromData(Vertex[] lsVerts, int[] lsElements, Mesh.BoundingBox boundingBox, string Material)
         {
             //Try to load the material
             Material mat = Resource.GetMaterial(Material);
 
             //Create the model
-            Mesh m = new Mesh(lsVerts, lsElements, lsTangents, lsNormals, lsUV);
+            Mesh m = new Mesh(lsVerts, lsElements);
             m.mat = mat;
 
             return m;
         }
 
-        public static Mesh MeshFromRawData(List<Vector3> verts, List<int> elements, List<Vector3> normals, List<Vector2> uv, string Material)
+        public static Mesh MeshFromRawData(List<Vertex> verts, List<int> elements, string Material)
         {
-            Vector3[] lsVerts = null;
+            Vertex[] lsVerts = null;
             int[] lsElements = null;
-            Vector3[] lsTangents = null;
-            Vector3[] lsNormals = null;
-            Vector2[] lsUV = null;
 
             lsElements = elements.ToArray();
             lsVerts = verts.ToArray();
 
-            if (normals.Count > 0) lsNormals = normals.ToArray();
-            if (uv.Count > 0) lsUV = uv.ToArray();
-
-            //Calculate bitangents and tangents of model
-            if (uv.Count >= verts.Count)
-            {
-                lsTangents = CalculateTangents(lsVerts, lsUV);
-            }
-            else
-            {
-                lsTangents = new Vector3[lsVerts.Length];
-            }
+            //Calculate the tangents
+            CalculateTangents(ref lsVerts);
 
             //Try to load the material
             Material mat = Resource.GetMaterial(Material);
 
             //Create the model
-            Mesh m = new Mesh(lsVerts, lsElements, lsTangents, lsNormals, lsUV);
+            Mesh m = new Mesh(lsVerts, lsElements);
             m.mat = mat;
             m.BBox = CalculateBoundingBox(verts.ToArray(), Vector3.One);
 
@@ -722,13 +643,10 @@ namespace OlegEngine
             }
 
             //scan the file and look for the number of stuffs
-            List<Vector3> verts = new List<Vector3>();
             List<Vector3> verts_UNSORTED = new List<Vector3>();
-            List<Vector3> normals = new List<Vector3>();
             List<Vector3> normals_UNSORTED = new List<Vector3>();
-            List<Vector3> tangents = new List<Vector3>();
-            List<Vector2> uv = new List<Vector2>();
             List<Vector2> uv_UNSORTED = new List<Vector2>();
+            List<Vertex> vertices = new List<Vertex>();
             List<int> elements = new List<int>();
             for (int i = 0; i < file.Length; i++)
             {
@@ -778,13 +696,14 @@ namespace OlegEngine
                         for (int n = 1; n < 4; n++)
                         {
                             string[] group = element[n].Split('/');
-                            //elements.Add(int.Parse(group[0]) - 1);
+                            Vertex vertex = new Vertex();
+                            vertex.Color = Vector3.One;
                             if (group.Length > 0 && group[0].Length > 0)
                             {
                                 int vertNum = int.Parse(group[0]);
                                 if (vertNum < verts_UNSORTED.Count + 1)
                                 {
-                                    verts.Add(verts_UNSORTED[vertNum - 1]);
+                                    vertex.Position = verts_UNSORTED[vertNum - 1];
                                     elements.Add(elements.Count);
                                 }
                             }
@@ -793,7 +712,7 @@ namespace OlegEngine
                                 int uvNum = int.Parse(group[1]);
                                 if (uvNum < uv_UNSORTED.Count + 1)
                                 {
-                                    uv.Add(uv_UNSORTED[uvNum - 1]);
+                                    vertex.UV = uv_UNSORTED[uvNum - 1];
                                 }
                             }
                             if (group.Length > 2 && group[2].Length > 0)
@@ -801,9 +720,11 @@ namespace OlegEngine
                                 int normNum = int.Parse(group[2]);
                                 if (normNum < normals_UNSORTED.Count + 1)
                                 {
-                                    normals.Add(normals_UNSORTED[normNum - 1]);
+                                    vertex.Normal = normals_UNSORTED[normNum - 1];
                                 }
                             }
+
+                            vertices.Add(vertex);
                         }
                         break;
 
@@ -818,16 +739,13 @@ namespace OlegEngine
                         break;
                     case "o":
                         //If there is info, compile it into a model
-                        if (verts.Count > 0)
+                        if (vertices.Count > 0)
                         {
-                            meshList.Add(MeshFromRawData(verts, elements, normals, uv, material));
+                            meshList.Add(MeshFromRawData(vertices, elements, material));
                         }
 
                         // Reset everything for this new mesh
-                        verts = new List<Vector3>();
-                        normals = new List<Vector3>();
-                        tangents = new List<Vector3>();
-                        uv = new List<Vector2>();
+                        vertices = new List<Vertex>();
                         elements = new List<int>();
 
                         break;
@@ -835,23 +753,58 @@ namespace OlegEngine
                         //Console.WriteLine("Comment: {0}", curline );
                         break;
                     default:
-                        if (!string.IsNullOrEmpty(curline))
-                        {
-#if DEBUG
-                            //Console.WriteLine("Unknown line definition ({0}): {1}", i, curline);
-#endif
-                        }
                         break;
                 }
             }
 
             //If there is info, compile it into a model
-            if (verts.Count > 0)
+            if (vertices.Count > 0)
             {
-                meshList.Add(MeshFromRawData(verts, elements, normals, uv, material));
+                meshList.Add(MeshFromRawData(vertices, elements, material));
             }
 
             return new MeshGroup(meshList);
+        }
+
+
+        /// <summary>
+        /// Calculate the tangents to the surface of a mesh constructed by an array of vertices
+        /// </summary>
+        /// <param name="verts">The array of vertices that make up the mesh with valid UV properties</param>
+        public static void CalculateTangents(ref Vertex[] verts)
+        {
+            for (int i = 0; i < verts.Length; i += 3)
+            {
+                Vector3 v0 = verts[i].Position;
+                Vector3 v1 = verts[i + 1].Position;
+                Vector3 v2 = verts[i + 2].Position;
+
+                Vector3 edge1 = v1 - v0;
+                Vector3 edge2 = v2 - v0;
+
+                Vector2 uv0 = verts[i].UV;
+                Vector2 uv1 = verts[i + 1].UV;
+                Vector2 uv2 = verts[i + 2].UV;
+
+                float DeltaU1 = uv1.X - uv0.X;
+                float DeltaV1 = uv1.Y - uv0.Y;
+                float DeltaU2 = uv2.X - uv0.X;
+                float DeltaV2 = uv2.Y - uv0.Y;
+
+                float f = 1.0f / (DeltaU1 * DeltaV2 - DeltaU2 * DeltaV1);
+                Vector3 Tangent;
+                Tangent = new Vector3()
+                {
+                    X = f * (DeltaV2 * edge1.X - DeltaV1 * edge2.X),
+                    Y = f * (DeltaV2 * edge1.Y - DeltaV1 * edge2.Y),
+                    Z = f * (DeltaV2 * edge1.Z - DeltaV1 * edge2.Z),
+                };
+
+                Tangent.Normalize();
+                verts[i].Tangent = Tangent;
+                verts[i + 1].Tangent = Tangent;
+                verts[i + 2].Tangent = Tangent;
+            }
         }
 
         private static CultureInfo ParseCultureInfo = CultureInfo.CreateSpecificCulture("en-US");
@@ -989,54 +942,6 @@ namespace OlegEngine
             }
 
             return currentBiggest;
-        }
-
-        public static Vector3[] CalculateTangents(Vector3[] vertices, Vector2[] UV)
-        {
-            List<Vector3> Tangents = new List<Vector3>();
-            for (int i = 0; i < vertices.Length; i += 3)
-            {
-                Vector3 v0 = vertices[i];
-                Vector3 v1 = vertices[i + 1];
-                Vector3 v2 = vertices[i + 2];
-
-                Vector3 edge1 = v1 - v0;
-                Vector3 edge2 = v2 - v0;
-
-                Vector2 uv0 = UV[i];
-                Vector2 uv1 = UV[i + 1];
-                Vector2 uv2 = UV[i + 2];
-
-                float DeltaU1 = uv1.X - uv0.X;
-                float DeltaV1 = uv1.Y - uv0.Y;
-                float DeltaU2 = uv2.X - uv0.X;
-                float DeltaV2 = uv2.Y - uv0.Y;
-
-                float f = 1.0f / (DeltaU1 * DeltaV2 - DeltaU2 * DeltaV1);
-                Vector3 Tangent, Bitangent;
-                Tangent = new Vector3();
-                Bitangent = new Vector3();
-
-                Tangent.X = f * (DeltaV2 * edge1.X - DeltaV1 * edge2.X);
-                Tangent.Y = f * (DeltaV2 * edge1.Y - DeltaV1 * edge2.Y);
-                Tangent.Z = f * (DeltaV2 * edge1.Z - DeltaV1 * edge2.Z);
-
-                Bitangent.X = f * (-DeltaU2 * edge1.X - DeltaU1 * edge2.X);
-                Bitangent.X = f * (-DeltaU2 * edge1.Y - DeltaU1 * edge2.Y);
-                Bitangent.X = f * (-DeltaU2 * edge1.X - DeltaU1 * edge2.Z);
-
-                Tangents.Add(Tangent);
-                Tangents.Add(Tangent);
-                Tangents.Add(Tangent);
-
-            }
-
-            for (int i = 0; i < Tangents.Count; i++)
-            {
-                Tangents[i].Normalize();
-            }
-
-            return Tangents.ToArray();
         }
 
         public static string LoadShaderSource(string shader)

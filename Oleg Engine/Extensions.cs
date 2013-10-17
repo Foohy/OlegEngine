@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.InteropServices;
 
 using OpenTK;
 
@@ -138,6 +139,82 @@ namespace OlegEngine
             Vector3 forward, up, right;
             AngleVectors(out forward, out up, out right);
             return up;
+        }
+    }
+
+    /// <summary>
+    /// Vertex class to hold important information about the data that makes up a mesh
+    /// TODO: Optimize this so it doesn't all use floats for things that don't need it
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Vertex
+    {
+        public static readonly int SizeInBytes = Marshal.SizeOf(new Vertex());
+
+        /// <summary>
+        /// The position in model-space of the vertex
+        /// </summary>
+        public Vector3 Position;
+        /// <summary>
+        /// The UV coordinate for textures for this vertex
+        /// </summary>
+        public Vector2 UV;
+        /// <summary>
+        /// The normal pointing away from the vertex/face
+        /// </summary>
+        public Vector3 Normal;
+        /// <summary>
+        /// The tangent of the vertex. This can be generated automatically by calling <code>Utilities.GenerateTangents()</code> with a list of vertices
+        /// </summary>
+        public Vector3 Tangent;
+        /// <summary>
+        /// The color of the vertex. Will be blended over textures/stuff
+        /// </summary>
+        public Vector3 Color;
+
+        public Vertex( Vector3 position, Vector3 normal, Vector3 tangent, Vector3 color, Vector2 uv)
+        {
+            Position    = position;
+            Normal      = normal;
+            Tangent     = tangent;
+            Color       = color;
+            UV          = uv;
+        }
+
+        public Vertex(Vector3 position)
+        {
+            Position    = position;
+            Normal      = Vector3.Zero;
+            Tangent     = Vector3.Zero;
+            Color       = Vector3.One;
+            UV          = Vector2.Zero;
+        }
+
+        public Vertex(Vector3 position, Vector3 normal)
+        {
+            Position    = position;
+            Normal      = normal;
+            Tangent     = Vector3.Zero;
+            Color       = Vector3.One;
+            UV          = Vector2.Zero;
+        }
+
+        public Vertex(Vector3 position, Vector3 normal, Vector2 uv)
+        {
+            Position    = position;
+            Normal      = normal;
+            Tangent     = Vector3.Zero;
+            Color       = Vector3.One;
+            UV          = uv;
+        }
+
+        public Vertex(Vector3 position, Vector3 normal, Vector2 uv, Vector3 color)
+        {
+            Position    = position;
+            Normal      = normal;
+            Tangent     = Vector3.Zero;
+            Color       = color;
+            UV          = uv;
         }
     }
 }
