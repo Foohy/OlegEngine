@@ -349,6 +349,28 @@ namespace OlegEngine
             return new MeshGroup(meshList);
         }
 
+        /// <summary>
+        /// Utility function to construct a quad from four vertices
+        /// </summary>
+        /// <param name="bottomleft">Bottom left vertex</param>
+        /// <param name="topleft">Top left vertex</param>
+        /// <param name="topright">Top right vertex</param>
+        /// <param name="bottomright">Bottom right vertex</param>
+        /// <returns>Array of vertices that form a quad</returns>
+        private static Vertex[] AddQuad(Vertex bottomleft, Vertex topleft, Vertex topright, Vertex bottomright)
+        {
+            Vertex[] verts = new Vertex[6];
+            verts[5] = bottomleft;
+            verts[4] = bottomright;
+            verts[3] = topright;
+
+            verts[2] = topright;
+            verts[1] = topleft;
+            verts[0] = bottomleft;
+
+            return verts;
+        }
+
 
         /// <summary>
         /// Calculate the tangents to the surface of a mesh constructed by an array of vertices
