@@ -110,7 +110,7 @@ namespace OlegEngine
                 int[] elements;
                 Mesh.BoundingBox boundingbox;
 
-                Utilities.LoadOBJ(filename, out verts, out elements, out boundingbox);
+                MeshGenerator.LoadOBJ(filename, out verts, out elements, out boundingbox);
                 Mesh m = new Mesh(verts, elements);
                 m.BBox = boundingbox;
                 if (newInstance) return m;

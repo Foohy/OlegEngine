@@ -304,7 +304,7 @@ namespace OlegEngine
             int[] elements;
             Mesh.BoundingBox boundingbox;
 
-            Utilities.LoadOBJ(filename, out verts, out elements, out boundingbox );
+            MeshGenerator.LoadOBJ(filename, out verts, out elements, out boundingbox);
             this.BBox = boundingbox;
 
             loadMesh(verts, elements);
@@ -316,7 +316,7 @@ namespace OlegEngine
             int[] elements;
             Mesh.BoundingBox boundingbox;
 
-            Utilities.LoadOBJ(filename, out verts, out elements, out boundingbox);
+            MeshGenerator.LoadOBJ(filename, out verts, out elements, out boundingbox);
             this.BBox = boundingbox;
 
             UpdateMesh(verts, elements);

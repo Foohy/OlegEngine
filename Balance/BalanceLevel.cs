@@ -59,7 +59,7 @@ namespace Balance
         private static void SetUpScene(World w)
         {
             //Load the world
-            WorldMesh = Utilities.LoadOBJMulti("balancelevel.obj");
+            WorldMesh = MeshGenerator.LoadOBJMulti("balancelevel.obj");
 
             //Create the floor's physics mesh
             Body level = FarseerPhysics.Factories.BodyFactory.CreateRectangle(Utilities.PhysicsWorld, 1000, 10, 1.00f);

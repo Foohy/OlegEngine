@@ -23,7 +23,7 @@ namespace Gravity_Car.Levels
 
         public override void Preload()
         {
-            levelmodel = Utilities.LoadOBJMulti("Levels/sponza.obj"); //Levels/multi_test.obj Levels/sponza.obj
+            levelmodel = MeshGenerator.LoadOBJMulti("Levels/sponza.obj"); //Levels/multi_test.obj Levels/sponza.obj
             //levelmodel = Resource.GetMesh("Levels/level1.obj");
             //levelmodel.mat = Resource.GetMaterial("levels/level1");
 

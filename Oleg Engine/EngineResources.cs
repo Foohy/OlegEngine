@@ -555,17 +555,17 @@ f 37/238/80 10/239/80 42/240/80";
 
             Resource.InsertMesh("engine/quad.obj", CreateNewQuadMesh());
 
-            Utilities.LoadOBJFromString(Box, out verts, out elements, out boundingbox);
+            MeshGenerator.LoadOBJFromString(Box, out verts, out elements, out boundingbox);
             Mesh mBox = new Mesh(verts, elements);
             mBox.BBox = boundingbox;
             Resource.InsertMesh("engine/box.obj", mBox);
 
-            Utilities.LoadOBJFromString(Ball, out verts, out elements, out boundingbox);
+            MeshGenerator.LoadOBJFromString(Ball, out verts, out elements, out boundingbox);
             Mesh mBall = new Mesh(verts, elements);
             mBall.BBox = boundingbox;
             Resource.InsertMesh("engine/ball.obj", mBall);
 
-            Utilities.LoadOBJFromString(Skybox, out verts, out elements, out boundingbox);
+            MeshGenerator.LoadOBJFromString(Skybox, out verts, out elements, out boundingbox);
             Mesh mSkybox = new Mesh(verts, elements);
             mSkybox.BBox = boundingbox;
             Resource.InsertMesh("engine/skybox.obj", mSkybox);
@@ -613,7 +613,7 @@ f 37/238/80 10/239/80 42/240/80";
             int[] elements;
             Mesh.BoundingBox boundingbox;
 
-            Utilities.LoadOBJFromString(Quad, out verts, out elements, out boundingbox);
+            MeshGenerator.LoadOBJFromString(Quad, out verts, out elements, out boundingbox);
             return new Mesh(verts, elements);
         }
 
