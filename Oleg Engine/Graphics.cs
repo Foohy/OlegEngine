@@ -546,6 +546,11 @@ namespace OlegEngine
         //Private inner collection of meshes
         private List<Mesh> meshes = new List<Mesh>();
 
+        public MeshGroup()
+        {
+            this.Scale = Vector3.One;
+        }
+
         public MeshGroup(Mesh[] meshArray)
         {
             meshes = meshArray.ToList<Mesh>();
