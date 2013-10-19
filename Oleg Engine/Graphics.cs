@@ -477,7 +477,7 @@ namespace OlegEngine
                 MeshesTotal++;
 
                 //this.Color = Vector3.UnitY;
-                if (Graphics.ViewFrustum.SphereInFrustum(this.Position + (this.BBox.Positive + this.BBox.Negative) / 2, BBox.Radius) == Frustum.FrustumState.OUTSIDE) { return; }
+                if (Graphics.ViewFrustum.SphereInFrustum(this.Position + this.PositionOffset + (this.BBox.Positive + this.BBox.Negative) / 2, BBox.Radius) == Frustum.FrustumState.OUTSIDE) { return; }
                 //if (Graphics.ViewFrustum.BoxInFrustum(this.BBox, this.Position) == Frustum.FrustumState.OUTSIDE) { this.Color = Vector3.UnitX; MeshesDrawn--; }
                 //if (Graphics.ViewFrustum.PointInFrustum((this.BBox.BottomLeft + this.BBox.TopRight) / 2 + this.Position) == Frustum.FrustumState.OUTSIDE) { this.Color = Vector3.UnitX; MeshesDrawn--;  }
 
