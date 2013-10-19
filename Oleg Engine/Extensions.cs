@@ -149,7 +149,7 @@ namespace OlegEngine
     [StructLayout(LayoutKind.Sequential)]
     public struct Vertex
     {
-        public static readonly int SizeInBytes = Marshal.SizeOf(new Vertex());
+        public static readonly int SizeInBytes = BlittableValueType.StrideOf(new Vertex());
 
         /// <summary>
         /// The position in model-space of the vertex

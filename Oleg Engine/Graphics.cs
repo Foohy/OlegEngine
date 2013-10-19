@@ -135,7 +135,7 @@ namespace OlegEngine
         public const int INDEX_BUFFER  = 0;
         public const int VERTEX_VB     = 1;
 
-        int VAO = 0;
+        int VAO = -1;
         public int[] buffers = new int[2];
         public Material mat;
 
@@ -294,7 +294,7 @@ namespace OlegEngine
         }
         public Mesh(Vertex[] verts, int[] elements)
         {
-            loadMesh(verts, elements);
+            UpdateMesh(verts, elements);
             this.Scale = Vector3.One;
         }
 
@@ -307,9 +307,14 @@ namespace OlegEngine
             MeshGenerator.LoadOBJ(filename, out verts, out elements, out boundingbox);
             this.BBox = boundingbox;
 
-            loadMesh(verts, elements);
+            UpdateMesh(verts, elements);
         }
 
+        /// <summary>
+        /// Update an existing VAO with new vertex data
+        /// Depending on what you've set your <code>UsageHint</code> to, this may potentially be a performance hit.
+        /// </summary>
+        /// <param name="filename">The filename to load from the disk</param>
         public void UpdateMesh(string filename)
         {
             Vertex[] verts;
@@ -322,40 +327,50 @@ namespace OlegEngine
             UpdateMesh(verts, elements);
         }
 
+        /// <summary>
+        /// Update an existing VAO with new vertex data
+        /// Depending on what you've set your <code>UsageHint</code> to, this may potentially be a performance hit.
+        /// </summary>
+        /// <param name="verts">The array of vertices to update the VAO with</param>
+        /// <param name="elements">The array of elements to update the VAO with</param>
         public void UpdateMesh(Vertex[] verts, int[] elements)
         {
-            if (NumIndices < 0) //If we've never set this, we need to create our array buffer
+            if (VAO < 0) //If we've never set this, we need to create our array buffer
             {
                 GL.GenVertexArrays(1, out VAO);
                 GL.BindVertexArray(VAO);
 
                 //Create the buffers for the vertices attributes
-                GL.GenBuffers(5, buffers);
+                GL.GenBuffers(2, buffers);
             }
 
             NumIndices = elements.Length;
             BaseIndex = elements;
 
-
-
+            //Create their buffers
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[VERTEX_VB]);
-            int vertexStride = BlittableValueType.StrideOf(verts);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * vertexStride), verts, this.UsageHint);
-            GL.EnableVertexAttribArray(0);
-            //Positions
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, vertexStride, 0);
-            //UVs
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, true, vertexStride, 3);
-            //Normals
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, true, vertexStride, 5);
-            //Tangents
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, true, vertexStride, 8);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * Vertex.SizeInBytes), verts, this.UsageHint);
 
-            //index buffer
+            //Positions
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vertex.SizeInBytes, 0);
+            //UVs
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, true, Vertex.SizeInBytes, 12);
+            //Normals
+            GL.EnableVertexAttribArray(2);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, true, Vertex.SizeInBytes, 20);
+            //Tangents
+            GL.EnableVertexAttribArray(3);
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, true, Vertex.SizeInBytes, 32);
+            //Color
+            //GL.EnableVertexAttribArray(4);
+            //GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, true, vertexStride, 11);
+
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffers[INDEX_BUFFER]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(elements.Length * sizeof(int)), elements, this.UsageHint);
 
-
+            //Reset it back
             GL.BindVertexArray(0);
 
             DBG_Elements = elements;
@@ -421,58 +436,6 @@ namespace OlegEngine
 
 
         #endregion
-
-        private void loadMesh(Vertex[] verts, int[] elements )
-        {
-            if (verts == null || elements == null)
-            {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine("ERROR LOADING MESH: Vertices: {0}, Elements: {1}", verts, elements);
-                Console.ResetColor();
-
-                return;
-            }
-
-            GL.GenVertexArrays(1, out VAO);
-            GL.BindVertexArray(VAO);
-
-            //Create the buffers for the vertices attributes
-            GL.GenBuffers(2, buffers);
-
-            NumIndices = elements.Length;
-            BaseIndex = elements;
-
-            //Create their buffers
-            GL.BindBuffer(BufferTarget.ArrayBuffer, buffers[VERTEX_VB]);
-            int vertexStride = BlittableValueType.StrideOf(verts);
-            //GL.BufferData<Vertex>(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * vertexStride), verts, this.UsageHint);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(verts.Length * vertexStride), verts, this.UsageHint);
-           
-            //Positions
-            GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, vertexStride, 0);
-            //UVs
-            GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, vertexStride, 12);
-            //Normals
-            GL.EnableVertexAttribArray(2);
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, vertexStride, 20);
-            //Tangents
-            GL.EnableVertexAttribArray(3);
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, vertexStride, 32);
-            //Color
-            //GL.EnableVertexAttribArray(4);
-            //GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, true, vertexStride, 11);
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffers[INDEX_BUFFER]);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(elements.Length * sizeof(int)), elements, this.UsageHint);
-
-            //Reset it back
-            GL.BindVertexArray(0);
-
-            DBG_Elements = elements;
-            DBG_Vertices = verts;
-        }
 
         public void DrawSimple(Matrix4 vmatrix)
         {
