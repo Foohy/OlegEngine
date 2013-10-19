@@ -39,13 +39,38 @@ namespace OlegEngine.Entity
         public MoveTypes Movetype { get; set; }
         public bool ShouldDraw { get; set; }
 
-        public Vector3 Position { get; private set; }
-        public Angle Angles { get; private set; }
+        public Vector3 Position 
+        {
+            get
+            {
+                return (this.Parent != null) ? this.Parent.Position + this.posOffset : this.posOffset;
+            }
+            private set 
+            { 
+                this.posOffset = value; 
+            } 
+        }
+
+        public Angle Angles 
+        {
+            get
+            {
+                return (this.Parent != null) ? this.Parent.Angles + this.angleOffset : this.angleOffset;
+            }
+            private set
+            {
+                this.angleOffset = value;   
+            } 
+        }
         public Vector3 Scale { get; set; }
+
+        public BaseEntity Parent { get; private set; }
 
         public Fixture Physics { get; set; }
 
         private Matrix4 modelview = Matrix4.Identity;
+        private Vector3 posOffset;
+        private Angle angleOffset;
         public bool _toRemove = false;
 
         public void Spawn()
@@ -82,13 +107,14 @@ namespace OlegEngine.Entity
             {
                 if (this.DisableLighting) GL.Disable(EnableCap.Lighting);
 
-                Model.mat       = this.Material;
-                Model.Color     = this.Color;
-                Model.Alpha     = this.Alpha;
+                Model.mat               = this.Material;
+                Model.Color             = this.Color;
+                Model.Alpha             = this.Alpha;
 
-                Model.Position  = this.Position;
-                Model.Scale     = this.Scale;
-                Model.Angles    = this.Angles;
+                Model.Position          = this.Parent == null ? this.Position : this.Parent.Position;
+                Model.PositionOffset    = this.Parent == null ? Vector3.Zero : this.posOffset;
+                Model.Scale             = this.Scale;
+                Model.Angles            = this.Angles;
 
                 Model.Draw();
 
@@ -137,6 +163,18 @@ namespace OlegEngine.Entity
             song.Play(true);
             song.SetVolume(volume);
             song.SetFrequency(frequency);
+        }
+
+        public void SetParent(BaseEntity parent)
+        {
+            Vector3 worldPos = this.Position;
+            this.Parent = parent;
+
+            //Get local coordinates from the parent 
+            if (this.Parent != null)
+                this.SetPos(worldPos - parent.Position);
+            else //Or just set us to where we are
+                this.SetPos(worldPos);
         }
         #endregion
 

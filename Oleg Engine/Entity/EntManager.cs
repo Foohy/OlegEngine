@@ -50,6 +50,9 @@ namespace OlegEngine.Entity
                     i--;
                 }
 
+                if (ent.Parent != null && ent.Parent._toRemove)
+                    ent.SetParent(null);
+
                 if (ent.Physics != null && ent.Movetype == BaseEntity.MoveTypes.PHYSICS)
                 {
                     Vector3 pos = new Vector3( ent.Physics.Body.Position.X, ent.Physics.Body.Position.Y, ent.Position.Z );

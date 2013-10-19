@@ -20,6 +20,7 @@ namespace Gravity_Car.Levels
         bool SetShadow = true;
         Vector3 Angle = new Vector3();
         ent_spotlight spotlight;
+        ent_static oleg;
 
         public override void Preload()
         {
@@ -33,13 +34,12 @@ namespace Gravity_Car.Levels
             level.Position = new Microsoft.Xna.Framework.Vector2(-400, -50);
             level.BodyType = BodyType.Static;
 
-
-            BaseEntity ent = EntManager.Create<ent_depthscreen>();
-            ent.Spawn();
+            //Spawn the little depth screen thingy
+            EntManager.Create<ent_depthscreen>().Spawn();
 
             Vector3 OlegPos = new Vector3(-2.00f, 2.421f, -14.90f);
-            //some fires too
-            ent_static oleg = EntManager.Create<ent_static>();
+            //don't forget oleg
+            oleg = EntManager.Create<ent_static>();
             oleg.Spawn();
             oleg.SetModel(Resource.GetMesh("props/oleg.obj"));
             oleg.Material = Resource.GetMaterial("models/props/oleg");
@@ -47,23 +47,16 @@ namespace Gravity_Car.Levels
             oleg.SetPos(OlegPos);
             oleg.Scale = new Vector3(0.75f);
             oleg.SetAngle(new Angle(0, 0, 14.3f));
-            /*
-            oleg = Entity.EntManager.Create<ent_static>();
-            oleg.Spawn();
-            oleg.Model = Resource.GetMesh("props/radio.obj");
-            oleg.Mat = Resource.GetMaterial("engine/white");
-            oleg.Name = "Popcorn Machine";
-            oleg.SetPos(new Vector3( 60.614f, 0.0f, -2.1119f ));
-            oleg.Scale = new Vector3(0.45f);
-
-            oleg = Entity.EntManager.Create<ent_static>();
-            oleg.Spawn();
-            oleg.Model = Resource.GetMesh("props/foilage/ivy_01.obj");
-            oleg.Mat = Resource.GetMaterial("models/props/foilage/ivy01");
-            //oleg.Mat.SetShader("default"); //Temporary until I can figure out shadowmapping on a single plane for alphatested things
-            oleg.SetPos(new Vector3(10.614f, 0.45f, -15.5119f));
-            oleg.Scale = new Vector3(0.45f);
-            */
+            
+            //and the boys
+            var ent = EntManager.Create<ent_static>();
+            ent.Spawn();
+            ent.SetModel(Resource.GetMesh("props/oleg.obj"));
+            ent.Material = Resource.GetMaterial("engine/white");
+            ent.SetPos(OlegPos + new Vector3(0, 0.0f, -0.1f));
+            ent.Scale = new Vector3(0.75f);
+            ent.SetParent(oleg);
+            
             ent_pointlight pointlight = (ent_pointlight)EntManager.Create<ent_pointlight>();
             pointlight.Spawn();
             pointlight.AmbientIntensity = 0.40f;
@@ -71,6 +64,7 @@ namespace Gravity_Car.Levels
             pointlight.Color = new Vector3(1.0f, 0.5f, 0.0f);
             pointlight.SetPos(OlegPos);
             pointlight.Linear = 0.1f;
+            pointlight.SetParent(oleg);
 
             spotlight = (ent_spotlight)EntManager.Create<ent_spotlight>();
             spotlight.Spawn();
@@ -163,6 +157,12 @@ namespace Gravity_Car.Levels
                 spotlight.SetPos( View.Player.Position );
 
                 SkyboxTechnique.SunVector = View.Angles.Forward();
+            }
+
+            if (oleg != null)
+            {
+                oleg.SetPos(new Vector3((float)Math.Cos(Utilities.Time)*10, (float)Math.Sin(Utilities.Time) + 3.9f, oleg.Position.Z));
+                oleg.SetAngle(oleg.Angles.SetRoll((float)Math.Sin(Utilities.Time * 2) * 20f)); 
             }
 
             FogTechnique.SetDensity(((float)Math.Sin(Utilities.Time/70)+1)/220);

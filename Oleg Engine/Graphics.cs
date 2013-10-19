@@ -129,6 +129,7 @@ namespace OlegEngine
         public bool ShouldDrawDebugInfo = true;
 
         public Vector3 Position { get; set; }
+        public Vector3 PositionOffset { get; set; }
         public Vector3 Scale { get; set; }
         public Angle Angles { get; set; }
 
@@ -335,6 +336,7 @@ namespace OlegEngine
         /// <param name="elements">The array of elements to update the VAO with</param>
         public void UpdateMesh(Vertex[] verts, int[] elements)
         {
+            if (verts == null || elements == null) return;
             if (VAO < 0) //If we've never set this, we need to create our array buffer
             {
                 GL.GenVertexArrays(1, out VAO);
@@ -446,11 +448,15 @@ namespace OlegEngine
         {
             Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
             modelview *= Matrix4.Scale(Scale);
+
+            modelview *= Matrix4.CreateTranslation(PositionOffset);
+            
             modelview *= Matrix4.CreateRotationZ(this.Angles.Roll * Utilities.F_DEG2RAD);
             modelview *= Matrix4.CreateRotationX(this.Angles.Pitch * Utilities.F_DEG2RAD);
             modelview *= Matrix4.CreateRotationY(this.Angles.Yaw * Utilities.F_DEG2RAD);
 
             modelview *= Matrix4.CreateTranslation(Position);
+            
 
             this.BBox.Scale = this.Scale;
             render(Utilities.ViewMatrix, modelview, Utilities.ProjectionMatrix);
