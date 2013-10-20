@@ -136,12 +136,14 @@ namespace OlegEngine
         public const int INDEX_BUFFER  = 0;
         public const int VERTEX_VB     = 1;
 
-        int VAO = -1;
+        
         public int[] buffers = new int[2];
         public Material mat;
 
-        int[] BaseIndex;
-        int NumIndices = -1;
+        private int[] BaseIndex;
+        private int NumIndices = -1;
+        private int VAO = -1;
+        private Matrix4 modelview = Matrix4.CreateTranslation(0, 0, 0);
 
         //Debug properties
         public Vertex[] DBG_Vertices;
@@ -150,6 +152,7 @@ namespace OlegEngine
         public static int MeshesDrawn = 0;
         public static int MeshesTotal = 0;
         private static double LastDrawTime = 0;
+        private static Matrix4 matrixTranslationZero = Matrix4.CreateTranslation(0, 0, 0);
 
         public class BoundingBox
         {
@@ -270,7 +273,7 @@ namespace OlegEngine
 
             public static float RadiusFromBoundingBox(BoundingBox b)
             {
-                return Math.Abs(Distance(b.Negative.Multiply(b.Scale), b.Positive.Multiply(b.Scale)));
+                return b.Negative.Multiply(b.Scale).DistanceFast( b.Positive.Multiply(b.Scale));
             }
 
             /// <summary>
@@ -446,10 +449,10 @@ namespace OlegEngine
 
         public void Draw()
         {
-            Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
+            modelview = matrixTranslationZero;
             modelview *= Matrix4.Scale(Scale);
 
-            modelview *= Matrix4.CreateTranslation(PositionOffset);
+            modelview *= Matrix4.CreateTranslation( PositionOffset);
             
             modelview *= Matrix4.CreateRotationZ(this.Angles.Roll * Utilities.F_DEG2RAD);
             modelview *= Matrix4.CreateRotationX(this.Angles.Pitch * Utilities.F_DEG2RAD);
@@ -565,12 +568,15 @@ namespace OlegEngine
             this.Scale = Vector3.One;
         }
 
+        private Matrix4 modelview = Matrix4.CreateTranslation(0, 0, 0);
+        private static Matrix4 matrixTranslationZero = Matrix4.CreateTranslation(0, 0, 0);
+
         /// <summary>
         /// Draw the group of meshes
         /// </summary>
         public void Draw()
         {
-            Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
+            modelview = matrixTranslationZero;
             modelview *= Matrix4.Scale(Scale);
             modelview *= Matrix4.CreateRotationZ(this.Angle.Z);
             modelview *= Matrix4.CreateRotationX(this.Angle.X);

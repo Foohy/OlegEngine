@@ -104,8 +104,6 @@ namespace OlegEngine.Entity
         {
             if (Model != null && this.ShouldDraw)
             {
-                if (this.DisableLighting) GL.Disable(EnableCap.Lighting);
-
                 Model.mat               = this.Material;
                 Model.Color             = this.Color;
                 Model.Alpha             = this.Alpha;
@@ -116,8 +114,6 @@ namespace OlegEngine.Entity
                 Model.Angles            = this.Angles;
 
                 Model.Draw();
-
-                if (this.DisableLighting) GL.Enable(EnableCap.Lighting);
             }
         }
 

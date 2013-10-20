@@ -28,6 +28,11 @@ namespace OlegEngine
                 a.X * b.Y - a.Y * b.X);
         }
 
+        public static float DistanceFast(this Vector3 a, Vector3 b)
+        {
+            return (a - b).LengthFast;
+        }
+
         public static Vector2 Multiply(this Vector2 a, Vector2 b)
         {
             return new Vector2(a.X * b.X, a.Y * b.Y);
