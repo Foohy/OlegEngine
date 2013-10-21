@@ -54,9 +54,6 @@
     <ApplicationIcon>cat.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FarseerPhysics">
-      <HintPath>..\Two and a Half Dimensions\FarseerPhysics.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Two and a Half Dimensions\OpenTK.dll</HintPath>

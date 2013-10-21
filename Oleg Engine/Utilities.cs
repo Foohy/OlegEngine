@@ -58,8 +58,6 @@ namespace OlegEngine
         public static Random Rand;
         public static Engine engine;
 
-        public static FarseerPhysics.Dynamics.World PhysicsWorld { get; set; }
-
         /// <summary>
         /// Units to the near clipping plane
         /// </summary>

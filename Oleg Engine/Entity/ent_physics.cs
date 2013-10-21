@@ -6,10 +6,6 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-using FarseerPhysics.Common;
-using FarseerPhysics.Collision;
-using FarseerPhysics.Dynamics;
-
 namespace OlegEngine.Entity
 {
     public class ent_physics : BaseEntity 
@@ -37,8 +33,8 @@ namespace OlegEngine.Entity
 
         private void CreatePhysics()
         {
-            Body bod = FarseerPhysics.Factories.BodyFactory.CreateRectangle(Utilities.PhysicsWorld, this.Model.BBox.Positive.X - this.Model.BBox.Negative.X, this.Model.BBox.Positive.Y - this.Model.BBox.Negative.Y, 1.0f);
-            this.Physics = bod.FixtureList[0];
+            //Body bod = FarseerPhysics.Factories.BodyFactory.CreateRectangle(Utilities.PhysicsWorld, this.Model.BBox.Positive.X - this.Model.BBox.Negative.X, this.Model.BBox.Positive.Y - this.Model.BBox.Negative.Y, 1.0f);
+            //this.Physics = bod.FixtureList[0];
         }
     }
 }

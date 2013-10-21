@@ -6,10 +6,6 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-using FarseerPhysics.Common;
-using FarseerPhysics.Collision;
-using FarseerPhysics.Dynamics;
-
 using OlegEngine;
 using OlegEngine.Entity;
 
@@ -25,8 +21,7 @@ namespace Gravity_Car.Entity
         public bool NoClip = false;
 
         private float physScale = 0.44f;
-        //physics for wheels and stuff
-        Fixture[] wheels;
+
         private float wheelsize = 0.9f;
         private Vector2[] offsets = new Vector2[]
         {
@@ -61,6 +56,7 @@ namespace Gravity_Car.Entity
             wheel.mat = this.Material;
 
             //Create the physics
+            /*
             Body bod = FarseerPhysics.Factories.BodyFactory.CreateRectangle(Utilities.PhysicsWorld, 14f * physScale, 4.7f * physScale, 0.7f);
             bod.BodyType = BodyType.Dynamic;
 
@@ -93,7 +89,7 @@ namespace Gravity_Car.Entity
             this.Physics.Body.Position = new Microsoft.Xna.Framework.Vector2(this.Position.X, this.Position.Y);
             wheels[0].Body.Position = new Microsoft.Xna.Framework.Vector2(offsets[0].X, offsets[0].Y) + this.Physics.Body.Position;
             wheels[1].Body.Position = new Microsoft.Xna.Framework.Vector2(offsets[1].X, offsets[1].Y) + this.Physics.Body.Position;
-
+            */
             //Setup overriding the camera and stuff
 
             Zoom = 15.0f;
@@ -128,6 +124,7 @@ namespace Gravity_Car.Entity
         public override void Think()
         {
             if (NoClip) return;
+            /*
             this.SetAngle(Physics.Body.Rotation);
 
             wheelpos[0] = new Vector3(wheels[0].Body.Position.X, wheels[0].Body.Position.Y, this.Position.Z);
@@ -160,7 +157,7 @@ namespace Gravity_Car.Entity
             }
 
             //Console.WriteLine(this.Physics.Body.LinearVelocity);
-
+            */
             //Zoom
             if (Utilities.engine.Keyboard[OpenTK.Input.Key.PageDown]) Zoom -= (float)Utilities.ThinkTime * 100;
             if (Utilities.engine.Keyboard[OpenTK.Input.Key.PageUp]) Zoom += (float)Utilities.ThinkTime * 100;
@@ -192,8 +189,8 @@ namespace Gravity_Car.Entity
         {
             base.Remove();
 
-            Utilities.PhysicsWorld.RemoveBody(wheels[0].Body);
-            Utilities.PhysicsWorld.RemoveBody(wheels[1].Body);
+            //Utilities.PhysicsWorld.RemoveBody(wheels[0].Body);
+            //Utilities.PhysicsWorld.RemoveBody(wheels[1].Body);
 
             Utilities.engine.Keyboard.KeyDown -= Keyboard_KeyDown;
             View.CalcView -= ply_CalcView;

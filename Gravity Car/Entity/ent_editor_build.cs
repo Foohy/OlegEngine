@@ -6,10 +6,6 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-using FarseerPhysics.Common;
-using FarseerPhysics.Collision;
-using FarseerPhysics.Dynamics;
-
 using OlegEngine.Entity;
 using OlegEngine;
 
@@ -52,20 +48,6 @@ namespace Gravity_Car.Entity
 
         public void Build()
         {
-            //previewMesh.DrawMode = BeginMode.Polygon;
-            //this.SetModel(previewMesh);
-            //Create a list of verts for the physics
-            Vertices physverts = new Vertices();
-            for (int i = 0; i < Points.Count; i++)
-            {
-                physverts.Add(new Microsoft.Xna.Framework.Vector2(Points[i].X, Points[i].Y));
-            }
-            //Create something that could be construed as physics
-            Body bod = new Body(Utilities.PhysicsWorld);
-            bod.BodyType = BodyType.Static;
-            List<Vertices> moreverts = FarseerPhysics.Common.Decomposition.EarclipDecomposer.ConvexPartition(physverts);
-            List<Fixture> fixt = FarseerPhysics.Factories.FixtureFactory.AttachCompoundPolygon(moreverts, 0.5f, bod);
-
             this.Built = true;
             previewMesh.Color = new Vector3(1.0f, 1.0f, 1.0f);
         }

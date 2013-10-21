@@ -6,10 +6,6 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-using FarseerPhysics.Common;
-using FarseerPhysics.Collision;
-using FarseerPhysics.Dynamics;
-
 using OlegEngine.Entity;
 using OlegEngine;
 

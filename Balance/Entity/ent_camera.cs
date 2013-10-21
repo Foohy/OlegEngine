@@ -46,11 +46,11 @@ namespace Balance.Entity
             {
                 if (Utilities.engine.Keyboard[Key.A])
                 {
-                    this.BalanceEnt.Physics.Body.ApplyTorque(PushForce);
+                    //this.BalanceEnt.Physics.Body.ApplyTorque(PushForce);
                 }
                 if (Utilities.engine.Keyboard[Key.D])
                 {
-                    this.BalanceEnt.Physics.Body.ApplyTorque(-PushForce);
+                    //this.BalanceEnt.Physics.Body.ApplyTorque(-PushForce);
                 }
             }
         }

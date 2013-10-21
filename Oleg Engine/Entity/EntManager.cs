@@ -5,12 +5,6 @@ using System.Text;
 
 using OpenTK;
 
-using FarseerPhysics;
-using FarseerPhysics.Common;
-using FarseerPhysics.Collision;
-using FarseerPhysics.Controllers;
-using FarseerPhysics.Dynamics;
-
 namespace OlegEngine.Entity
 {
     public class EntManager
@@ -46,19 +40,18 @@ namespace OlegEngine.Entity
                 if (ent._toRemove)
                 {
                     Ents.Remove(ent);
-                    removePhys(ent);
                     i--;
                 }
 
                 if (ent.Parent != null && ent.Parent._toRemove)
                     ent.SetParent(null);
 
-                if (ent.Physics != null && ent.Movetype == BaseEntity.MoveTypes.PHYSICS)
-                {
-                    Vector3 pos = new Vector3( ent.Physics.Body.Position.X, ent.Physics.Body.Position.Y, ent.Position.Z );
-                    ent.SetPos(pos, false);
-                    ent.SetAngle(ent.Physics.Body.Rotation * Utilities.F_RAD2DEG);
-                }
+                //if (ent.Physics != null && ent.Movetype == BaseEntity.MoveTypes.PHYSICS)
+                //{
+                //    Vector3 pos = new Vector3( ent.Physics.Body.Position.X, ent.Physics.Body.Position.Y, ent.Position.Z );
+                //    ent.SetPos(pos, false);
+                //    ent.SetAngle(ent.Physics.Body.Rotation * Utilities.F_RAD2DEG);
+                //}
                 ent.Think();
             }
         }
@@ -89,13 +82,6 @@ namespace OlegEngine.Entity
 
             if (OnPostDrawTranslucentEntities != null)
                 OnPostDrawTranslucentEntities();
-        }
-
-        private static void removePhys(BaseEntity ent)
-        {
-            if (ent.Physics == null ) return;
-
-            Utilities.PhysicsWorld.RemoveBody(ent.Physics.Body);
         }
 
         #region utility functions

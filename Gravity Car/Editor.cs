@@ -472,11 +472,6 @@ namespace OlegEngine
                 if (dragging && Editor.SelectedEnt != null)
                 {
                     Editor.SelectedEnt.SetPos(MousePos - offset);
-
-                    if (Editor.SelectedEnt.Physics != null)
-                    {
-                        Editor.SelectedEnt.Physics.Body.LinearVelocity = new Microsoft.Xna.Framework.Vector2(Input.deltaX, -Input.deltaY) / 4.0f;
-                    }
                 }
             }
         }

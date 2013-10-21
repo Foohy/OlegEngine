@@ -6,9 +6,6 @@ using System.Text;
 //Graphical stuff
 using OpenTK;
 
-//Physics
-using FarseerPhysics.Dynamics;
-
 //Engine calls
 using OlegEngine;
 using OlegEngine.Entity;
@@ -40,10 +37,10 @@ namespace Balance
         public static void Initialize()
         {
             //Create the physics world
-            if (Utilities.PhysicsWorld != null)
-                Utilities.PhysicsWorld.Clear();
+            //if (Utilities.PhysicsWorld != null)
+           //     Utilities.PhysicsWorld.Clear();
 
-            Utilities.PhysicsWorld = new World(new Microsoft.Xna.Framework.Vector2(0, -9.82f)); //Create a world with a gravity of 9.82 m/s^2 downward
+           // Utilities.PhysicsWorld = new World(new Microsoft.Xna.Framework.Vector2(0, -9.82f)); //Create a world with a gravity of 9.82 m/s^2 downward
 
             //Create the player
             ent_camera cam = EntManager.Create<ent_camera>();
@@ -53,14 +50,14 @@ namespace Balance
             //Set the player as the object that'll be controlling the view
             View.SetLocalPlayer(cam);
 
-            SetUpScene(Utilities.PhysicsWorld);
+            //SetUpScene(Utilities.PhysicsWorld);
         }
 
-        private static void SetUpScene(World w)
+        private static void SetUpScene()
         {
             //Load the world
             WorldMesh = MeshGenerator.LoadOBJMulti("balancelevel.obj");
-
+            /*
             //Create the floor's physics mesh
             Body level = FarseerPhysics.Factories.BodyFactory.CreateRectangle(Utilities.PhysicsWorld, 1000, 10, 1.00f);
             level.Position = new Microsoft.Xna.Framework.Vector2(0, -5.0f);
@@ -93,7 +90,7 @@ namespace Balance
             bar.Physics.Friction = 1000;
 
             BalanceEnt = bar;
-
+            */
             //Turn on the lights
             DirectionalLight light = new DirectionalLight();
             light.AmbientIntensity = 0.4f;
@@ -137,10 +134,10 @@ namespace Balance
         public static void Think()
         {
             //Tell the physics to go forward a step
-            if (Utilities.PhysicsWorld != null)
-            {
-                Utilities.PhysicsWorld.Step(0.033333f );
-            }
+            //if (Utilities.PhysicsWorld != null)
+            //{
+            //    Utilities.PhysicsWorld.Step(0.033333f );
+            //}
 
             if ( spotlight != null && Utilities.engine.Keyboard[OpenTK.Input.Key.Q])
             {
@@ -199,8 +196,6 @@ namespace Balance
             ball.Radius = (float)Utilities.Rand.NextDouble(DifficultyScale + 0.05f, DifficultyScale*1.2f + 0.05f);
             ball.Spawn();
             ball.SetPos(new Vector2((float)Utilities.Rand.NextDouble(-3, 3), 20));
-            ball.Physics.Restitution = 0.0f;
-            ball.Physics.Body.Mass = ball.Radius * 0.2f;
         }
 
         public static void Draw()

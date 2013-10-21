@@ -7,10 +7,6 @@ using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
 
-using FarseerPhysics.Common;
-using FarseerPhysics.Collision;
-using FarseerPhysics.Dynamics;
-
 using OlegEngine;
 using OlegEngine.Entity;
 
@@ -38,7 +34,6 @@ namespace Gravity_Car.Entity
         private static float Fraction = 0;
         private static Audio phys_hit;
 
-        RayCastCallback callback = new RayCastCallback(CastCallbackFunc);
         public override void Init()
         {
             //Create the model
@@ -87,11 +82,11 @@ namespace Gravity_Car.Entity
             {
                 this.Movetype = MoveTypes.NONE;
                 this.ShouldDraw = false;
-                if (this.Physics != null) this.Physics.CollisionCategories = Category.None;
+                //if (this.Physics != null) this.Physics.CollisionCategories = Category.None;
             }
             else
             {
-                if (this.Physics != null) this.Physics.CollisionCategories = Category.Cat1;
+                //if (this.Physics != null) this.Physics.CollisionCategories = Category.Cat1;
             }
 
             if (this.Mode == PlayerMode.EDIT) Editor.Stop();
@@ -117,7 +112,7 @@ namespace Gravity_Car.Entity
             }
 
             this.Movetype = MoveTypes.PHYSICS;
-            this.SetAngle(Physics.Body.Rotation);
+            //this.SetAngle(Physics.Body.Rotation);
             this.ShouldDraw = true;
             //this.SetAngle(new Vector3((float)Utilities.Time + Physics.Body.LinearVelocity.Length() / 10, (float) Utilities.Time + Physics.Body.LinearVelocity.Length() / 10, Physics.Body.Rotation));
 
@@ -131,44 +126,30 @@ namespace Gravity_Car.Entity
 
                 if (Utilities.engine.Keyboard[OpenTK.Input.Key.W])
                 {
-                    this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(0, multiplier * 100));
+                    //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(0, multiplier * 100));
                 }
                 
             }
             if (Utilities.engine.Keyboard[OpenTK.Input.Key.A])
             {
-                this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(-5.0f, 0.0f));
-                float amt = 70 * radius * multiplier;
-                if (this.Physics.Body.AngularVelocity < 0) amt = amt * 4 * multiplier;
-                this.Physics.Body.ApplyTorque(amt);
+                //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(-5.0f, 0.0f));
+                //float amt = 70 * radius * multiplier;
+                //if (this.Physics.Body.AngularVelocity < 0) amt = amt * 4 * multiplier;
+                //this.Physics.Body.ApplyTorque(amt);
             }
             if (Utilities.engine.Keyboard[OpenTK.Input.Key.D])
             {
-                this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(5.0f, 0.0f));
-                float amt = -70 * radius * multiplier;
-                if (this.Physics.Body.AngularVelocity > 0) amt = amt * 4 * multiplier;
-                this.Physics.Body.ApplyTorque(amt);
+                //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(5.0f, 0.0f));
+                //float amt = -70 * radius * multiplier;
+                //if (this.Physics.Body.AngularVelocity > 0) amt = amt * 4 * multiplier;
+                //this.Physics.Body.ApplyTorque(amt);
             }
-            RayCastInput input = new RayCastInput();
 
-            input.Point1 = new Microsoft.Xna.Framework.Vector2( this.Position.X, this.Position.Y );
-            input.Point2 = new Microsoft.Xna.Framework.Vector2( this.Position.X, this.Position.Y - 100 );
 
-            //Levels.LevelManager.physWorld.RayCast(callback, input.Point1, input.Point2);
-            //RayCastOutput output;
-            //this.Physics.RayCast( out output, ref input, 0 );
-            //Console.WriteLine("{0}, {1}", Normal, Fraction );
             if (Utilities.engine.Keyboard[OpenTK.Input.Key.Space] && Fraction < 0.001f)
             {
-                this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(0, 200.0f));
+                //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(0, 200.0f));
             }
-
-            //Levels.LevelManager.physWorld.Gravity = new Microsoft.Xna.Framework.Vector2(-Normal.X, -Normal.Y) * 10;
-
-            //Vector3 point = new Vector3((float)Math.Cos(CamAngle.X), (float)Math.Sin(CamAngle.Y) - 0.21f, (float)Math.Sin(CamAngle.X));
-            //camMatrix = Matrix4.LookAt(Position + new Vector3(0, crZoom / 90, crZoom), Position + point + new Vector3(0, crZoom / 90, 0), Vector3.UnitY);
-
-            //OlegEngine.Player.ply.SetPos(Position + new Vector3(0, crZoom / 900, 1.0f + crZoom / 10));
 
         }
 
@@ -225,77 +206,6 @@ namespace Gravity_Car.Entity
 
             View.SetPos(this.Position);
             View.SetAngles(this.Angles);
-        }
-
-        private static float CastCallbackFunc(Fixture fixture, Microsoft.Xna.Framework.Vector2 point, Microsoft.Xna.Framework.Vector2 normal, float fraction)
-        {
-            if (fixture != null && fixture.UserData == null)
-            {
-                Normal = new Vector2(normal.X, normal.Y); ;
-                Fraction = fraction;
-                return fraction;
-            }
-            return -1;
-        }
-        /*
-        private bool CollideSounds( Fixture f1, Fixture f2, FarseerPhysics.Dynamics.Contacts.Contact contact)
-        {
-            double force = CalculateForce(f1, f2, contact);
-            if (force > 15.0f)
-            {
-                phys_hit.Play(false);
-                phys_hit.SetFrequency((100 - (float)force) * 1000); // (100 - (float)force) / 100
-            }
-            return true;
-        }*/
-
-        private void CollideSounds( FarseerPhysics.Dynamics.Contacts.Contact contact, FarseerPhysics.Dynamics.Contacts.ContactConstraint impulse )
-        {
-            double force = CalculateForce(contact, impulse);
-            if (force > 85.0f)
-            {
-                //Console.WriteLine((500 - (float)force) * 100);
-                //phys_hit.Play(false);
-                //phys_hit.SetFrequency((100 - (float)force) * 1000); // (100 - (float)force) / 100
-                int freq = 60000 - (int)force * 100;
-                Console.WriteLine(freq);
-                Audio.PlaySound("rock_hit", 1.0f, freq);
-            }
-
-        }
-
-        private double CalculateForce(FarseerPhysics.Dynamics.Contacts.Contact contact, FarseerPhysics.Dynamics.Contacts.ContactConstraint impulse)
-        {
-            /*
-            Vector2 position = new Vector2(manifold.LocalNormal.X, manifold.LocalNormal.Y);
-            float angle = (float)Math.Atan2(position.Y, position.X);
-            Vector2 force = Vector2.Zero;
-            if (angle < 0)
-                force = new Vector2((float)(Math.Cos(angle) * f1.Body.LinearVelocity.X),
-                (float)Math.Sin(MathHelper.TwoPi + angle) * f1.Body.LinearVelocity.Y);
-
-            else
-                force = new Vector2((float)(Math.Cos(angle) * f1.Body.LinearVelocity.X),
-                (float)Math.Sin(MathHelper.TwoPi - angle) * f1.Body.LinearVelocity.Y);
-
-            double XForce = Math.Sqrt(force.X * force.X);
-            double YForce = Math.Sqrt(force.Y * force.Y);
-            double totalForce = XForce + YForce;
-            */
-            if ((string)contact.FixtureA.UserData == "Player" || (string)contact.FixtureB.UserData == "Player")
-            {
-                float maxImpulse = 0.0f;
-                int count = contact.Manifold.PointCount;
-
-                for (int i = 0; i < count; ++i)
-                {
-                    maxImpulse = Math.Max(maxImpulse, impulse.Points[i].NormalImpulse);
-                }
-
-                return maxImpulse;
-            }
-
-            return 0;
         }
 
         /*

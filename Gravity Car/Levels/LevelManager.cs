@@ -5,12 +5,6 @@ using System.Text;
 
 using OpenTK;
 
-using FarseerPhysics;
-using FarseerPhysics.Common;
-using FarseerPhysics.Collision;
-using FarseerPhysics.Controllers;
-using FarseerPhysics.Dynamics;
-
 using OlegEngine.Entity;
 using OlegEngine;
 
@@ -32,11 +26,7 @@ namespace Gravity_Car.Levels
 
         public static void InitalizeLevel(LevelBase level)
         {
-            if (Utilities.PhysicsWorld != null)
-                Utilities.PhysicsWorld.Clear();
 
-            Utilities.PhysicsWorld = new World(new Microsoft.Xna.Framework.Vector2(0, -9.82f));
-            
             CurrentLevel = level;
             IsLoading = true;
             CurrentLevel.Preload();
@@ -64,10 +54,6 @@ namespace Gravity_Car.Levels
         {
             if (CurrentLevel != null)
             {
-                if (Utilities.PhysicsWorld != null && !PausePhysics)
-                {
-                    Utilities.PhysicsWorld.Step(0.033333f * PhysicsTimescale);
-                }
                 CurrentLevel.Think(e);
             }
         }

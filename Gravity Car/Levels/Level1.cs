@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 
 using OpenTK;
-using FarseerPhysics;
-using FarseerPhysics.Dynamics;
 
 using OlegEngine.Entity;
 using OlegEngine;
@@ -27,12 +25,6 @@ namespace Gravity_Car.Levels
             levelmodel = MeshGenerator.LoadOBJMulti("Levels/sponza.obj"); //Levels/multi_test.obj Levels/sponza.obj
             //levelmodel = Resource.GetMesh("Levels/level1.obj");
             //levelmodel.mat = Resource.GetMaterial("levels/level1");
-
-            //Create the physics mesh on the ground
-            //TODO: create a level format or something
-            Body level = FarseerPhysics.Factories.BodyFactory.CreateRectangle(Utilities.PhysicsWorld, 1000, 100, 1.00f);
-            level.Position = new Microsoft.Xna.Framework.Vector2(-400, -50);
-            level.BodyType = BodyType.Static;
 
             //Spawn the little depth screen thingy
             EntManager.Create<ent_depthscreen>().Spawn();

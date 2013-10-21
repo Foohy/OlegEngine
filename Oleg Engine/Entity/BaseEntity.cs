@@ -6,10 +6,6 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-using FarseerPhysics.Common;
-using FarseerPhysics.Collision;
-using FarseerPhysics.Dynamics;
-
 namespace OlegEngine.Entity
 {
     public class BaseEntity
@@ -66,8 +62,6 @@ namespace OlegEngine.Entity
 
         public BaseEntity Parent { get; private set; }
 
-        public Fixture Physics { get; set; }
-
         private Matrix4 modelview = Matrix4.Identity;
         private Vector3 posOffset;
         private Angle angleOffset;
@@ -121,10 +115,6 @@ namespace OlegEngine.Entity
         public void SetPos(Vector3 pos, bool setPhys = true)
         {
             Position = pos;
-            if (this.Physics != null && setPhys )
-            {
-                this.Physics.Body.Position = new Microsoft.Xna.Framework.Vector2(pos.X, pos.Y );
-            }
         }
         public void SetPos(Vector2 pos, bool setPhys = true)
         {
@@ -134,11 +124,6 @@ namespace OlegEngine.Entity
         public void SetAngle(Angle ang, bool phys = false)
         {
             this.Angles = ang;
-            if (this.Physics != null && phys)
-            {
-                this.Physics.Body.Rotation = ang.Roll;
-            }
-            //Update physics position
         }
 
         public void SetAngle(float ang, bool phys = false)
