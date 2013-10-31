@@ -118,15 +118,15 @@ namespace OlegEngine
             Pointlights.Clear(); 
             Spotlights.Clear();
 
+            if (EnvironmentLightEnabled)
+                SetDirectionalLight(EnvironmentLight);
+
             if (SetLights == null) return; //don't bother setting the lights if no one is out there
             SetLights();
 
             //Now that we have a list of all the lights to render this frame, friggin set em
             SetPointLights(Pointlights.ToArray());
             SetSpotlights(Spotlights.ToArray());
-
-            if (EnvironmentLightEnabled)
-                SetDirectionalLight(EnvironmentLight);
         }
 
         public static void AddPointLight(PointLight pl)
