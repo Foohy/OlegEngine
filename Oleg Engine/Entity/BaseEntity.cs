@@ -34,6 +34,7 @@ namespace OlegEngine.Entity
         public float Alpha { get; set; }
         public MoveTypes Movetype { get; set; }
         public bool ShouldDraw { get; set; }
+        public List<BaseEntity> Children = new List<BaseEntity>();
 
         public Vector3 Position 
         {
@@ -89,6 +90,8 @@ namespace OlegEngine.Entity
         public virtual void Remove()
         {
             _toRemove = true;
+            if (this.Parent != null)
+                this.Parent.Children.Remove(this);
         }
         public virtual void Think()
         {
@@ -147,12 +150,18 @@ namespace OlegEngine.Entity
 
         public void SetParent(BaseEntity parent)
         {
+            if (this.Parent != null)
+                this.Parent.Children.Remove(this);
+
             Vector3 worldPos = this.Position;
             this.Parent = parent;
 
             //Get local coordinates from the parent 
             if (this.Parent != null)
+            {
                 this.SetPos(worldPos - parent.Position);
+                this.Parent.Children.Add(this);
+            }
             else //Or just set us to where we are
                 this.SetPos(worldPos);
         }
