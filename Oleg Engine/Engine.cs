@@ -26,9 +26,26 @@ namespace OlegEngine
     public class Engine : GameWindow 
     {
         public FBO shadowFBO;
+        /// <summary>
+        /// Called when it's time to render opaque renderables on the scene
+        /// </summary>
         public event Action<FrameEventArgs> OnRenderSceneOpaque;
+        /// <summary>
+        /// Called when it's time to render translucent renderables on the scene
+        /// </summary>
         public event Action<FrameEventArgs> OnRenderSceneTranslucent;
+        /// <summary>
+        /// Called when the window is resized and the viewmatrix changes
+        /// </summary>
         public event Action OnSceneResize;
+        /// <summary>
+        /// Boolean for whether to prevent the game from rendering too many frames when the game isn't focused.
+        /// </summary>
+        public bool ShouldSlowFrametimeWhenUnfocused = true;
+        /// <summary>
+        /// How many milliseconds to sleep when the game isn't focused
+        /// </summary>
+        public int SlowFrameTimeAmount = 33;
 
         private DropOutStack<double> AveragedFrametimes = new DropOutStack<double>( 30 );
 
@@ -241,7 +258,7 @@ namespace OlegEngine
             base.OnRenderFrame(e);
 
             //Slow the heck down when we're not in focus
-            if (!this.Focused) System.Threading.Thread.Sleep(33);
+            if (!this.Focused && this.ShouldSlowFrametimeWhenUnfocused) System.Threading.Thread.Sleep(this.SlowFrameTimeAmount);
 
             //Update timing information
             Utilities.Draw(e);
