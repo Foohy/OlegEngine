@@ -221,6 +221,19 @@ namespace OlegEngine
     }
     public class SkyboxTechnique : Technique
     {
+        /// <summary>
+        /// Called when the engine is just about to draw the skybox
+        /// </summary>
+        public static event Action PreDrawSkybox;
+        /// <summary>
+        /// Called when the engine has just rendered the skybox
+        /// </summary>
+        public static event Action PostDrawSkybox;
+
+        /// <summary>
+        /// The position of the sun relative to the camera.
+        /// This is NOT a normal
+        /// </summary>
         public static Vector3 SunVector { get; set; }
 
         private static Mesh skycube;
@@ -281,6 +294,10 @@ namespace OlegEngine
 
             GL.CullFace(CullFaceMode.Front);
             GL.DepthFunc(DepthFunction.Lequal);
+            Graphics.EnableBlending(true);
+
+            //Does anyone else want to add in?
+            if (PreDrawSkybox != null) PreDrawSkybox();
 
             Matrix4 modelview = Matrix4.CreateTranslation(Vector3.Zero);
             modelview *= Matrix4.CreateTranslation(View.Position);
@@ -294,7 +311,11 @@ namespace OlegEngine
             //Draw the skybox
             skycube.DrawSimple(modelview);
 
-            //Switch the drawing modes back to nromal
+            //Anyone have anything to add?
+            if (PostDrawSkybox != null) PostDrawSkybox();
+
+            //Switch the drawing modes back to normal
+            Graphics.EnableBlending(false);
             GL.CullFace(CullFaceMode.Back);
             GL.DepthFunc(DepthFunction.Less);
         }
