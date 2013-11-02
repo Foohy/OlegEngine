@@ -137,21 +137,12 @@ namespace OlegEngine
             Utilities.Init(this);
             Audio.Init();
 
-            float[] fogColor = { 0.18431f, 0.1764f, 0.22745f };//0.18431372549019607843137254901961
-            //float[] fogColor = { 1.0f, 0.55f, 0.0f };
-            GL.ClearColor(fogColor[0], fogColor[1], fogColor[2], 0.0f);
+            GL.ClearColor(0, 0, 0, 0.0f);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             GL.AlphaFunc(AlphaFunction.Greater, 0.1f);
-
-            //Fog
-            GL.Fog(FogParameter.FogStart, 30.0f);
-            GL.Fog(FogParameter.FogEnd, 250.0f);
-            GL.Fog(FogParameter.FogColor, fogColor);
-            GL.Fog(FogParameter.FogMode, (int)FogMode.Linear);
-            //GL.Enable(EnableCap.Fog);
 
             //Textures
             GL.Enable(EnableCap.Texture2D);
