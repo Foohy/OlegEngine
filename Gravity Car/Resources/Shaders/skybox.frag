@@ -8,5 +8,5 @@ out vec4 ex_FragColor;
 
 void main()
 {
-	ex_FragColor = textureCube( sampler, ex_UV ); // * vec4(_color, gAlpha );
+	ex_FragColor = texture( sampler, ex_UV ); // * vec4(_color, gAlpha );
 }
