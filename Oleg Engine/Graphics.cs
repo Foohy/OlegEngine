@@ -545,12 +545,8 @@ namespace OlegEngine
         }
     }
 
-    public class MeshGroup : ICollection<Mesh>
+    public class MeshGroup : Mesh, ICollection<Mesh>
     {
-        public Vector3 Scale { get; set; }
-        public Vector3 Angle { get; set; }
-        public Vector3 Position { get; set; }
-
         //Private inner collection of meshes
         private List<Mesh> meshes = new List<Mesh>();
 
@@ -579,13 +575,13 @@ namespace OlegEngine
         /// <summary>
         /// Draw the group of meshes
         /// </summary>
-        public void Draw()
+        new public void Draw()
         {
             modelview = matrixTranslationZero;
             modelview *= Matrix4.Scale(Scale);
-            modelview *= Matrix4.CreateRotationZ(this.Angle.Z);
-            modelview *= Matrix4.CreateRotationX(this.Angle.X);
-            modelview *= Matrix4.CreateRotationY(this.Angle.Y);
+            modelview *= Matrix4.CreateRotationZ(this.Angles.Roll * Utilities.F_DEG2RAD);
+            modelview *= Matrix4.CreateRotationX(this.Angles.Pitch * Utilities.F_DEG2RAD);
+            modelview *= Matrix4.CreateRotationY(this.Angles.Yaw * Utilities.F_DEG2RAD);
 
             modelview *= Matrix4.CreateTranslation(Position);
 
