@@ -116,6 +116,11 @@ namespace OlegEngine
             if (enabled) GL.Enable(EnableCap.Blend);
             else GL.Disable(EnableCap.Blend);
         }
+
+        public static void EnableZWrite(bool enabled)
+        {
+            GL.DepthMask(enabled);
+        }
         #endregion
     }
 
