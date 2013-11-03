@@ -295,6 +295,7 @@ namespace OlegEngine
             GL.CullFace(CullFaceMode.Front);
             GL.DepthFunc(DepthFunction.Lequal);
             Graphics.EnableBlending(true);
+            Graphics.EnableZWrite(false);
 
             //Does anyone else want to add in?
             if (PreDrawSkybox != null) PreDrawSkybox();
@@ -315,6 +316,7 @@ namespace OlegEngine
             if (PostDrawSkybox != null) PostDrawSkybox();
 
             //Switch the drawing modes back to normal
+            Graphics.EnableZWrite(true);
             Graphics.EnableBlending(false);
             GL.CullFace(CullFaceMode.Back);
             GL.DepthFunc(DepthFunction.Less);
