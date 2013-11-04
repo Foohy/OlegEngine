@@ -447,12 +447,12 @@ namespace OlegEngine
 
         #endregion
 
-        public void DrawSimple(Matrix4 vmatrix)
+        public virtual void DrawSimple(Matrix4 vmatrix)
         {
             render(Utilities.ViewMatrix, vmatrix, Utilities.ProjectionMatrix);
         }
 
-        public void Draw()
+        public virtual void Draw()
         {
             modelview = matrixTranslationZero;
             modelview *= Matrix4.Scale(Scale);
@@ -539,7 +539,7 @@ namespace OlegEngine
             }
         }
 
-        public void Remove()
+        public virtual void Remove()
         {
             GL.DeleteVertexArrays(1, ref this.VAO);
         }
@@ -550,33 +550,65 @@ namespace OlegEngine
         //Private inner collection of meshes
         private List<Mesh> meshes = new List<Mesh>();
 
+        private Matrix4 modelview = Matrix4.CreateTranslation(0, 0, 0);
+        private static Matrix4 matrixTranslationZero = Matrix4.CreateTranslation(0, 0, 0);
+
+        /// <summary>
+        /// Create a new blank mesh group object
+        /// </summary>
         public MeshGroup()
         {
             this.Scale = Vector3.One;
         }
 
+        /// <summary>
+        /// Create a new mesh group object from an array of existing meshes
+        /// </summary>
+        /// <param name="meshArray"></param>
         public MeshGroup(Mesh[] meshArray)
         {
             meshes = meshArray.ToList<Mesh>();
+            this.RefreshBoundingBox();
 
             this.Scale = Vector3.One;
         }
 
+        /// <summary>
+        /// Create a new mesh group object from a list of existing meshes
+        /// </summary>
+        /// <param name="meshList"></param>
         public MeshGroup(List<Mesh> meshList)
         {
             meshes = meshList;
+            this.RefreshBoundingBox();
 
             this.Scale = Vector3.One;
         }
 
-        private Matrix4 modelview = Matrix4.CreateTranslation(0, 0, 0);
-        private static Matrix4 matrixTranslationZero = Matrix4.CreateTranslation(0, 0, 0);
+        /// <summary>
+        /// Draw the group of meshes with a specified model matrix
+        /// </summary>
+        /// <param name="vmatrix"></param>
+        public override void DrawSimple(Matrix4 modelview)
+        {
+            //Because our group bounding box contains all of its members, we can do one check to see if IT is in the frustum and we can escape early if not
+            if (!WithinFrustum()) return;
+
+            foreach (Mesh m in this)
+            {
+                m.DrawSimple(modelview);
+            }
+        }
 
         /// <summary>
         /// Draw the group of meshes
+        /// TODO: Make the meshgroup bbox as the maximum size of it's group. potential performance opportunity.
         /// </summary>
-        new public void Draw()
+        public override void Draw()
         {
+            //Because our group bounding box contains all of its members, we can do one check to see if IT is in the frustum and we can escape early if not
+            if (!WithinFrustum()) return;
+
             modelview = matrixTranslationZero;
             modelview *= Matrix4.Scale(Scale);
             modelview *= Matrix4.CreateRotationZ(this.Angles.Roll * Utilities.F_DEG2RAD);
@@ -589,6 +621,20 @@ namespace OlegEngine
             {
                 m.DrawSimple(modelview);
             }
+        }
+
+        public bool WithinFrustum()
+        {
+            if (Graphics.ViewFrustum.SphereInFrustum(this.Position + this.PositionOffset + (this.BBox.Positive + this.BBox.Negative) / 2, BBox.Radius) == Frustum.FrustumState.OUTSIDE)
+            {
+                //Update the total mesh count with all the ones it missed just now
+                MeshesTotal += this.Count;
+
+                //See later suckers!
+                return false;
+            }
+
+            return true;
         }
 
         public IEnumerator<Mesh> GetEnumerator()
@@ -615,11 +661,16 @@ namespace OlegEngine
         public void Add( Mesh m)
         {
             meshes.Add(m);
+
+            //Update bounding boxes
+            this.BBox.Positive = Vector3.ComponentMax(this.BBox.Positive, m.BBox.Positive);
+            this.BBox.Negative = Vector3.ComponentMin(this.BBox.Negative, m.BBox.Negative);
         }
 
         public void Clear()
         {
             meshes.Clear();
+            this.BBox = new BoundingBox();
         }
 
         public void CopyTo(Mesh[] array, int arrayIndex)
@@ -642,7 +693,19 @@ namespace OlegEngine
 
         public bool Remove(Mesh item)
         {
-            return meshes.Remove(item);
+            bool success = meshes.Remove(item);
+            this.RefreshBoundingBox();
+            return success;
+        }
+
+        private void RefreshBoundingBox()
+        {
+            this.BBox = new BoundingBox();
+            foreach (Mesh m in this)
+            {
+                this.BBox.Positive = Vector3.ComponentMax(this.BBox.Positive, m.BBox.Positive);
+                this.BBox.Negative = Vector3.ComponentMin(this.BBox.Negative, m.BBox.Negative);
+            }
         }
     }
 
