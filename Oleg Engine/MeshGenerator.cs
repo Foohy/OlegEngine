@@ -321,6 +321,7 @@ namespace OlegEngine
 
                         break;
                     case "o":
+                    case "g":
                         //If there is info, compile it into a model
                         if (vertices.Count > 0)
                         {
