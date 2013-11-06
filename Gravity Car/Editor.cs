@@ -174,13 +174,38 @@ namespace OlegEngine
             button.SetHeight(70);
             button.Dock(Panel.DockStyle.TOP);
 
+            Slider slider = GUIManager.Create<Slider>(w);
+            slider.SetMinMax(-10, 100);
+            slider.SetValue(40);
+            slider.SetWidthHeight(w.Width - 60, 20);
+            slider.SetPos(40, 0);
+            slider.Below(button, 5);
+            slider.SetAnchorStyle(Panel.Anchors.Left | Panel.Anchors.Right);
+            slider.OnValueChanged += new Action<Panel, float>(slider_OnValueChanged);
+
+            Label l = GUIManager.Create<Label>(w);
+            l.SetText("0");
+            l.SetPos(10, slider.Position.Y);
+            l.SetWidthHeight(25, 20);
+            l.SetAlignment(Label.TextAlign.MiddleLeft);
+            slider.Userdata = l;
+
             Button disabled = GUIManager.Create<Button>(w);
             disabled.SetText("I'm disabled :(");
-            disabled.SetWidthHeight(button.Width, button.Height);
-            disabled.Below(button, 5);
+            disabled.SetWidthHeight(slider.Width, slider.Height);
+            disabled.Below(slider, 5);
             disabled.DockPadding(20, 20, 20, 20);
             disabled.Dock(Panel.DockStyle.BOTTOM);
             disabled.SetEnabled(false);
+        }
+
+        static void slider_OnValueChanged(Panel sender, float newval)
+        {
+            if (sender.Userdata is Label)
+            {
+                Label l = (Label)sender.Userdata;
+                l.SetText(newval.ToString());
+            }
         }
 
         static void GUIManager_PostDrawHUD(EventArgs e)

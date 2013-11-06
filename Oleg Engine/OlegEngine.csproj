@@ -83,6 +83,7 @@
     <Compile Include="GUI\Elements\ListView.cs" />
     <Compile Include="GUI\Elements\ListViewItem.cs" />
     <Compile Include="GUI\Elements\ScrollBar.cs" />
+    <Compile Include="GUI\Elements\Slider.cs" />
     <Compile Include="GUI\Elements\TextInput.cs" />
     <Compile Include="GUI\Elements\Label.cs" />
     <Compile Include="GUI\Elements\Toolbar.cs" />
