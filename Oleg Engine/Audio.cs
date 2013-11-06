@@ -327,7 +327,7 @@ namespace OlegEngine
             {
                 return Bass.BASS_ChannelIsActive(this.Handle);
             }
-            else return BASSActive.BASS_ACTIVE_STALLED;
+            else return BASSActive.BASS_ACTIVE_STOPPED;
         }
         public void Set3DPosition( float x, float y, float z )
         {
