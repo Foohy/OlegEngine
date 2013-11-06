@@ -72,8 +72,7 @@ namespace OlegEngine.GUI
         private void setHiddenProps()
         {
             this.SetEnabled(!this.IsHidden, false);
-            this.IsVisible = !this.IsHidden;
-            this.ShouldPassInput = this.IsHidden;
+            this.SetHidden(this.IsHidden);
         }
 
         /// <summary>

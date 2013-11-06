@@ -78,10 +78,10 @@ namespace OlegEngine.GUI
             closeButton.SetParent(Title);
             closeButton.AlignRight();
             closeButton.OnButtonPress += new Button.OnButtonPressDel(closeButton_OnButtonPress);
-            closeButton.PreDraw += new Action<Panel, Vector2>(closeButton_PreDraw);
+            closeButton.PreDraw += new Action<Panel, Vector2, DrawEventArgs>(closeButton_PreDraw);
         }
 
-        void closeButton_PreDraw(Panel btn, Vector2 ScreenPos)
+        void closeButton_PreDraw(Panel btn, Vector2 ScreenPos, DrawEventArgs e)
         {
             Surface.SetDrawColor(48, 55, 71);
             Surface.DrawRect(ScreenPos.X + 2, ScreenPos.Y + 2, btn.Width - 4, btn.Height - 4);
@@ -212,6 +212,12 @@ namespace OlegEngine.GUI
 
             base.Resize(oldWidth, oldHeight, this.Width, this.Height);
             Title.SetWidth(this.Width);
+        }
+
+        public override void SetHidden(bool bHidden)
+        {
+            base.SetHidden(bHidden);
+            Title.SetHidden(bHidden);
         }
 
         public override void Remove()

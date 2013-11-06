@@ -31,6 +31,11 @@ namespace OlegEngine.GUI
             Top     = 0x8
         }
 
+        public class DrawEventArgs : EventArgs
+        {
+            public bool OverrideDraw { get; set; }
+        }
+
         public float Width { get; protected set; }
         public float Height { get; protected set; }
         public bool IsVisible { get; set; }
@@ -77,7 +82,7 @@ namespace OlegEngine.GUI
         public event Action<Panel, KeyPressEventArgs> OnKeyPressed;
         public event Action<Panel, ResizeEventArgs> OnResize;
         public event Action<Panel, bool> OnEnableChange;
-        public event Action<Panel, Vector2> PreDraw;
+        public event Action<Panel, Vector2, DrawEventArgs> PreDraw;
         public event Action<Panel, Vector2> PostDraw;
         public event Action<Panel> OnRemove;
 
@@ -662,6 +667,16 @@ namespace OlegEngine.GUI
             this.DisabledColor = new Vector3(color.R / (float)255, color.G / (float)255, color.B / (float)255);
         }
 
+        /// <summary>
+        /// Set if the panel should be hidden from sight, but not removed
+        /// </summary>
+        /// <param name="bHidden">Whether to hide or show the panel</param>
+        public virtual void SetHidden(bool bHidden)
+        {
+            this.IsVisible = !bHidden;
+            this.ShouldPassInput = bHidden;
+        }
+
         public Panel GetChildByName(string name, bool recursive = false)
         {
              //Get the text input with our name
@@ -800,18 +815,22 @@ namespace OlegEngine.GUI
                 GL.Enable(EnableCap.ScissorTest);
                 GL.Scissor( X, Y, W, H);
             }
+            DrawEventArgs ev = new DrawEventArgs();
+            if (this.PreDraw != null) { this.PreDraw(this, posOffset, ev); }
 
-            if (this.PreDraw != null) { this.PreDraw(this, posOffset); }
-            if (!AlphaBlendmode) { Graphics.EnableBlending(false); }
+            if (!ev.OverrideDraw)
+            {
+                if (!AlphaBlendmode) { Graphics.EnableBlending(false); }
 
-            panelMesh.mat = Mat;
-            modelview = Matrix4.CreateTranslation(Vector3.Zero);
-            modelview *= Matrix4.Scale((int)Width, (int)Height, 1.0f);
-            modelview *= Matrix4.CreateTranslation((int)posOffset.X, (int)posOffset.Y, 3.0f);
+                panelMesh.mat = Mat;
+                modelview = Matrix4.CreateTranslation(Vector3.Zero);
+                modelview *= Matrix4.Scale((int)Width, (int)Height, 1.0f);
+                modelview *= Matrix4.CreateTranslation((int)posOffset.X, (int)posOffset.Y, 3.0f);
 
 
-            this.panelMesh.Color = this.Enabled ? this.Color : this.DisabledColor;
-            panelMesh.DrawSimple(modelview);
+                this.panelMesh.Color = this.Enabled ? this.Color : this.DisabledColor;
+                panelMesh.DrawSimple(modelview);
+            }
             if (this.PostDraw != null) { this.PostDraw(this, posOffset); }
 
 
@@ -858,7 +877,7 @@ namespace OlegEngine.GUI
             return true;
         }
 
-        private void DrawChildren()
+        protected void DrawChildren()
         {
             foreach (Panel p in this.Children)
             {
