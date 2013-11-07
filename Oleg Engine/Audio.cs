@@ -479,6 +479,8 @@ namespace OlegEngine
                 }
             }
 
+            fs.Dispose();
+
             CueStruct[] cues = new CueStruct[2];
             int CueCount = 0;
             //Given a list of keys, get the sample positions for start_cue and end_cue

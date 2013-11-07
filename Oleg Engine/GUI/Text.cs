@@ -216,6 +216,8 @@ namespace OlegEngine.GUI
 
             }
 
+            sr.Dispose();
+
             return charset;
         }
 

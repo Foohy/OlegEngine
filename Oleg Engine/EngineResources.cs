@@ -654,6 +654,9 @@ f 37/238/80 10/239/80 42/240/80";
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.ActiveTexture(TextureUnit.Texture0);
+
+            tex.Dispose();
+
             return id;
         }
 
@@ -682,6 +685,9 @@ f 37/238/80 10/239/80 42/240/80";
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.ActiveTexture(TextureUnit.Texture0);
+
+            tex.Dispose();
+
             return id;
         }
 
@@ -734,12 +740,6 @@ f 37/238/80 10/239/80 42/240/80";
             {
                 Bitmap bmp = new Bitmap(1, 1);
                 bmp.SetPixel(0, 0, col);
-
-                if (bmp == null)
-                {
-                    //alright fine whatever jerk
-                    return Utilities.ErrorTex;
-                }
 
                 //Load the data into it
                 System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
