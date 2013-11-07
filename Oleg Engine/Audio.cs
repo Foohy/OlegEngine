@@ -13,12 +13,33 @@ namespace OlegEngine
 {
     public class Audio
     {
+        /// <summary>
+        /// The unique handle associated with this song stream, used in BASS.Net
+        /// </summary>
         public int Handle { get; private set; }
+        /// <summary>
+        /// The original filename of the sound
+        /// </summary>
         public string Filename { get; private set; }
-        public Entity.BaseEntity attachedEnt = null;
+        /// <summary>
+        /// The entity this sound is attached to, if any. Used for locational sounds.
+        /// </summary>
+        public Entity.BaseEntity AttachedEntity = null;
+        /// <summary>
+        /// Define whether the sound should be locational or global
+        /// </summary>
         public bool Positional = false;
+        /// <summary>
+        /// The world position of the sound, if played as 'Positional'
+        /// </summary>
         public Vector3 Position { get; private set; }
+        /// <summary>
+        /// The volume of the sound, between 0 and 1
+        /// </summary>
         public float Volume { get; private set; }
+        /// <summary>
+        /// Whether the sound should loop when it ends.
+        /// </summary>
         public bool Looped { get; private set; }
 
         public BASS_CHANNELINFO Info;
@@ -37,8 +58,12 @@ namespace OlegEngine
             Handle = handle;
             Filename = filename;
             Info = Bass.BASS_ChannelGetInfo(handle);
+            Volume = 1.0f;
         }
 
+        /// <summary>
+        /// Initialize the sound system. Only called once within the engine.
+        /// </summary>
         public static void Init()
         {
             try
@@ -111,16 +136,19 @@ namespace OlegEngine
             {
                 Audio audio = new Audio(handle, filename);
                 audio.Positional = (Positional || ent != null);
-                audio.attachedEnt = ent;
+                audio.AttachedEntity = ent;
                 audio.Looped = Loop;
 
+                //Try to load the loop positions from wav files
                 if (audio.Looped)
-                {
-                    //Try to load the loop positions from wav files
                     LoadCuePoints(audio, filename);
-                }
 
+                //Add the audio object to our list to keep track of it
                 _lsAudio.Add(audio);
+
+                //Set its volume so it's in line with our global volume
+                audio.SetVolume(audio.Volume);
+
                 //Create a callback so we can control playback looping and stuff
                 Bass.BASS_ChannelSetSync(audio.Handle, BASSSync.BASS_SYNC_END, 0, _SyncDel, IntPtr.Zero);
 
@@ -204,10 +232,10 @@ namespace OlegEngine
 
             for (int i = 0; i < _lsAudio.Count; i++)
             {
-                Audio audio = _lsAudio[i]; 
-                if (audio.attachedEnt != null)
+                Audio audio = _lsAudio[i];
+                if (audio.AttachedEntity != null)
                 {
-                   audio.Set3DPosition(audio.attachedEnt.Position);
+                    audio.Set3DPosition(audio.AttachedEntity.Position);
                 }
 
                 long seconds = Bass.BASS_ChannelGetPosition(audio.Handle, BASSMode.BASS_POS_BYTES);
@@ -275,6 +303,10 @@ namespace OlegEngine
 
 
         #region non-static methods
+        /// <summary>
+        /// Set the volume of the audio stream
+        /// </summary>
+        /// <param name="volume">The volume, between 0 and 1, of the stream</param>
         public void SetVolume(float volume)
         {
             if (_lsAudio.Contains(this) && this.Handle != 0)
@@ -283,6 +315,11 @@ namespace OlegEngine
                 Bass.BASS_ChannelSetAttribute(this.Handle, BASSAttribute.BASS_ATTRIB_VOL, volume * Utilities.EngineSettings.GlobalVolume);
             }
         }
+
+        /// <summary>
+        /// Set the playback frequency of the audio stream
+        /// </summary>
+        /// <param name="freq">The frequency, in hertz, to play at</param>
         public void SetFrequency(float freq)
         {
             if (_lsAudio.Contains(this) && this.Handle != 0)
@@ -290,6 +327,11 @@ namespace OlegEngine
                 Bass.BASS_ChannelSetAttribute(this.Handle, BASSAttribute.BASS_ATTRIB_FREQ, freq);
             }
         }
+
+        /// <summary>
+        /// Begin playback of the audio stream, optionally from the begin.
+        /// </summary>
+        /// <param name="fromBeginning">True to play back from the beginning, false to resume from where it paused.</param>
         public void Play(bool fromBeginning)
         {
             if (_lsAudio.Contains(this) && this.Handle != 0)
@@ -297,6 +339,10 @@ namespace OlegEngine
                 Bass.BASS_ChannelPlay(this.Handle, fromBeginning);
             }
         }
+
+        /// <summary>
+        /// Halt playback of the audio stream altogether
+        /// </summary>
         public void Stop()
         {
             if (_lsAudio.Contains(this) && this.Handle != 0)
@@ -304,6 +350,10 @@ namespace OlegEngine
                 Bass.BASS_ChannelStop(this.Handle);
             }
         }
+
+        /// <summary>
+        /// Pause playback of the audio stream
+        /// </summary>
         public void Pause()
         {
             if (_lsAudio.Contains(this) && this.Handle != 0)
@@ -311,6 +361,11 @@ namespace OlegEngine
                 Bass.BASS_ChannelPause(this.Handle);
             }
         }
+
+        /// <summary>
+        /// Get whether the audio stream is playing
+        /// </summary>
+        /// <returns>True if it is playing, false if not</returns>
         public bool IsPlaying()
         {
             if (_lsAudio.Contains(this) && this.Handle != 0)
@@ -321,6 +376,12 @@ namespace OlegEngine
             
             return false;
         }
+
+        /// <summary>
+        /// Get the BASS stream state of the audio stream.
+        /// This provides a bit more useful information for the state of the stream.
+        /// </summary>
+        /// <returns>BASSActive stream state</returns>
         public BASSActive GetStreamState()
         {
             if (_lsAudio.Contains(this) && this.Handle != 0)
@@ -329,6 +390,13 @@ namespace OlegEngine
             }
             else return BASSActive.BASS_ACTIVE_STOPPED;
         }
+
+        /// <summary>
+        /// Set the 3D world position of the sound, if it is set to "Positional"
+        /// </summary>
+        /// <param name="x">X world position</param>
+        /// <param name="y">Y world position</param>
+        /// <param name="z">Z world position</param>
         public void Set3DPosition( float x, float y, float z )
         {
             if (_lsAudio.Contains(this) && this.Handle != 0 && this.Positional )
@@ -338,6 +406,11 @@ namespace OlegEngine
                 Bass.BASS_Apply3D();
             }
         }
+
+        /// <summary>
+        /// Set the 3D world position of the sound, if it is set to "Positional"
+        /// </summary>
+        /// <param name="vecpos">The 3 dimensional world position of the sound</param>
         public void Set3DPosition(Vector3 vecpos)
         {
             if (_lsAudio.Contains(this) && this.Handle != 0 && this.Positional)
@@ -348,6 +421,9 @@ namespace OlegEngine
             }
         }
 
+        /// <summary>
+        /// Stop and remove the sound from playback and memory.
+        /// </summary>
         public void Remove()
         {
             //Remove the channel
