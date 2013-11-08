@@ -272,24 +272,44 @@ namespace OlegEngine.GUI
             this.Position = new Vector2(offset, this.Position.Y);
         }
 
+        /// <summary>
+        /// Align the panel to the right of a given panel
+        /// </summary>
+        /// <param name="p">The panel to move to the right of</param>
+        /// <param name="offset">The offset away from the panel</param>
         public void RightOf(Panel p, int offset = 0)
         {
             this.Position = new Vector2(p.Position.X + p.Width + offset, this.Position.Y);
         }
 
+        /// <summary>
+        /// Align the panel to the left of a given panel
+        /// </summary>
+        /// <param name="p">The panel to move to the left of</param>
+        /// <param name="offset">The offset away from the panel</param>
         public void LeftOf(Panel p, int offset = 0)
         {
-            this.Position = new Vector2(p.Position.X - offset, this.Position.Y);
+            this.Position = new Vector2(p.Position.X - offset - this.Width, this.Position.Y);
         }
 
+        /// <summary>
+        /// Align the panel below a given panel
+        /// </summary>
+        /// <param name="p">The panel to move below</param>
+        /// <param name="offset">The offset away from the panel</param>
         public void Below(Panel p, int offset = 0)
         {
             this.Position = new Vector2(this.Position.X, p.Position.Y + p.Height + offset);
         }
 
+        /// <summary>
+        /// Align the panel above a given panel
+        /// </summary>
+        /// <param name="p">The panel to move above</param>
+        /// <param name="offset">The offset away from the panel</param>
         public void Above(Panel p, int offset = 0)
         {
-            this.Position = new Vector2(this.Position.X, p.Position.Y - offset);
+            this.Position = new Vector2(this.Position.X, p.Position.Y - offset - this.Height);
         }
 
         public void SetPos(Vector2 pos)
