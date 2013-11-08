@@ -56,6 +56,8 @@ namespace OlegEngine.GUI
         public override void Init()
         {
             base.Init();
+
+            this.SetHeight(25);
         }
 
         public override void MouseMove(MouseMoveEventArgs e)
