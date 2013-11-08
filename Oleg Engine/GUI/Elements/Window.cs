@@ -48,20 +48,21 @@ namespace OlegEngine.GUI
             this.SetMaterial(Resource.GetTexture("gui/window.png"));
             this.SetColor(20, 24, 33);
 
+            //Create the grabbable title section of the window
             Title = GUIManager.Create<Panel>( this.Parent );
             Title.SetMaterial(Resource.GetTexture("gui/title.png"));
-            Title.SetHeight(25);
-            Title.SetWidth(this.Width);
+            Title.SetWidthHeight(this.Width, 25);
             Title.SetPos(this.Position - new Vector2(0, Title.Height));
             Title.OnMouseDown += new Action<Panel,OpenTK.Input.MouseButtonEventArgs>(Title_OnMouseDown);
             Title.OnMouseMove += new Action<Panel,OpenTK.Input.MouseMoveEventArgs>(Title_OnMouseMove);
             Title.OnMouseUp += new Action<Panel,OpenTK.Input.MouseButtonEventArgs>(Title_OnMouseUp);
             Title.SetColor(135, 36, 31);
 
-            TitleText = GUIManager.Create<Label>();
+            //Create the text that is overlayed upon the title section
+            TitleText = GUIManager.Create<Label>(Title);
             TitleText.SetFont("defaultTitle");
-            TitleText.SetParent(Title);
             TitleText.SetPos(0, 0);
+            TitleText.SetWidthHeight(this.Width, Title.Height);
             TitleText.SetColor(255, 255, 255);
             TitleText.SetText(this.WindowTitle);
             TitleText.Dock(DockStyle.LEFT);
@@ -69,13 +70,11 @@ namespace OlegEngine.GUI
             TitleText.DockPadding(10, 10, 0, 0);
 
             //Create the close button
-            closeButton = GUIManager.Create<Button>();
+            closeButton = GUIManager.Create<Button>(Title);
             closeButton.SetImage(Resource.GetTexture("gui/close.png"));
-            closeButton.SetWidth(25);
-            closeButton.SetHeight(25);
+            closeButton.SetWidthHeight(25, 25);
             closeButton.SetColor(26, 30, 38);
             closeButton.Dock(DockStyle.RIGHT);
-            closeButton.SetParent(Title);
             closeButton.AlignRight();
             closeButton.OnButtonPress += new Button.OnButtonPressDel(closeButton_OnButtonPress);
             closeButton.PreDraw += new Action<Panel, Vector2, DrawEventArgs>(closeButton_PreDraw);
