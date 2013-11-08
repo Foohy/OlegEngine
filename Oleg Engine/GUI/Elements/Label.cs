@@ -34,7 +34,13 @@ namespace OlegEngine.GUI
         {
             this.Text = "";
             DrawText = new Text("default", this.Text);
-            SizeToText();
+        }
+
+        public override void Init()
+        {
+            base.Init();
+
+            this.SizeToText();
             this.ShouldPassInput = true;
             this.Autosize = false;
             this.SetColor(255, 255, 255);
