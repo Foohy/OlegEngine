@@ -596,6 +596,10 @@ namespace OlegEngine
 
             foreach (Mesh m in this)
             {
+                //Offset the mesh's position so it's bounding box is correct
+                m.PositionOffset = this.Position;
+
+                //woof
                 m.DrawSimple(modelview);
             }
         }
@@ -619,6 +623,10 @@ namespace OlegEngine
 
             foreach (Mesh m in this)
             {
+                //Offset the mesh's position so it's bounding box is correct
+                m.PositionOffset = this.Position;
+
+                //woof
                 m.DrawSimple(modelview);
             }
         }
