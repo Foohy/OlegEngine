@@ -706,7 +706,10 @@ namespace OlegEngine
             return success;
         }
 
-        private void RefreshBoundingBox()
+        /// <summary>
+        /// Recalculate the meshgroup's bounding box based on the meshes it holds
+        /// </summary>
+        public void RefreshBoundingBox()
         {
             this.BBox = new BoundingBox(Vector3.One * float.MaxValue, Vector3.One * float.MinValue );
             foreach (Mesh m in this)
