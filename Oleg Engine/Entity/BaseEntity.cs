@@ -90,8 +90,6 @@ namespace OlegEngine.Entity
         public virtual void Remove()
         {
             _toRemove = true;
-            if (this.Parent != null)
-                this.Parent.Children.Remove(this);
         }
         public virtual void Think()
         {

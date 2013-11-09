@@ -39,6 +39,11 @@ namespace OlegEngine.Entity
                 BaseEntity ent = Ents[i];
                 if (ent._toRemove)
                 {
+                    //Remove the entity from its parent
+                    if (ent.Parent != null)
+                        ent.Parent.Children.Remove(ent);
+
+                    //Skiddaddle from our current list
                     Ents.Remove(ent);
                     i--;
                 }
