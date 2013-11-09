@@ -13,7 +13,7 @@ namespace OlegEngine
     {
         public static Mesh.BoundingBox CalculateBoundingBox(Vertex[] vertices, Vector3 scale)
         {
-            Mesh.BoundingBox bbox = new Mesh.BoundingBox();
+            Mesh.BoundingBox bbox = new Mesh.BoundingBox(Vector3.One * float.MaxValue, Vector3.One * float.MinValue);
             for (int i = 0; i < vertices.Length; i++)
             {
                 Vector3 vertex = vertices[i].Position.Multiply(scale);

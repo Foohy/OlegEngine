@@ -708,7 +708,7 @@ namespace OlegEngine
 
         private void RefreshBoundingBox()
         {
-            this.BBox = new BoundingBox();
+            this.BBox = new BoundingBox(Vector3.One * float.MaxValue, Vector3.One * float.MinValue );
             foreach (Mesh m in this)
             {
                 this.BBox.Positive = Vector3.ComponentMax(this.BBox.Positive, m.BBox.Positive);
