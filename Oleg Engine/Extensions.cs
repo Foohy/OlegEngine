@@ -48,6 +48,17 @@ namespace OlegEngine
             return (a.X * b.X + a.Y * b.Y + a.Z * b.Z);
         }
 
+        /// <summary>
+        /// Convert a normalized vector to an Angle with pitch and yaw
+        /// </summary>
+        /// <param name="vec">The vector to get the angle of</param>
+        /// <returns>Angle in terms of pitch and yaw</returns>
+        public static Angle GetAngles(this Vector3 vec)
+        {
+            Vector3 norm = Vector3.NormalizeFast(vec);
+            return new Angle((float)Math.Asin(norm.Y) * Utilities.F_RAD2DEG, ((float)Math.Atan2(norm.X, -norm.Z)) * Utilities.F_RAD2DEG - 90, 0);
+        }
+
         //Rand
         public static double NextDouble(this Random rand, double min, double max)
         {
