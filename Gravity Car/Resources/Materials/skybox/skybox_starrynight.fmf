@@ -1,0 +1,12 @@
+{
+	"shader" 		: "skybox",
+	"skybox" 		:
+	[
+		"skybox/star_right.png",
+		"skybox/star_front.png",
+		"skybox/star_left.png",
+		"skybox/star_back.png",
+		"skybox/star_up.png",
+		"skybox/star_down.png",
+	]
+}

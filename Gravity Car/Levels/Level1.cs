@@ -20,6 +20,10 @@ namespace Gravity_Car.Levels
         ent_spotlight spotlight;
         ent_static oleg;
 
+        //Dome for stars n stuff
+        private static Mesh dome;
+        private static Material starBox;
+
         public override void Preload()
         {
             levelmodel = MeshGenerator.LoadOBJMulti("Levels/sponza.obj"); //Levels/multi_test.obj Levels/sponza.obj
@@ -77,6 +81,9 @@ namespace Gravity_Car.Levels
 
             //Gimme some skyboxes!
             SkyboxTechnique.SetSkyGradientMaterial(Resource.GetMaterial("skybox/skygradient_default"));
+            SkyboxTechnique.PreDrawSkybox += new Action(SkyboxTechnique_PreDrawSkybox);
+            dome = Resource.GetMesh("engine/skybox.obj");
+            starBox = Resource.GetMaterial("skybox/skybox_starrynight");
 
             //Some fog!
             FogTechnique.SetFogParameters(new FogParams()
@@ -90,6 +97,22 @@ namespace Gravity_Car.Levels
             FogTechnique.Enabled = true;
 
             Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+        }
+
+        void SkyboxTechnique_PreDrawSkybox()
+        {
+            if (dome == null) return;
+
+            //Because we're sharing this mesh with the actual skybox, store their current material so we can set it back
+            var mat = dome.mat;
+            dome.mat = starBox;
+
+            //draw our stuff
+            dome.Position = View.Position;
+            dome.Draw();
+
+            //Set the material back to the skybox
+            dome.mat = mat;
         }
 
         void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
