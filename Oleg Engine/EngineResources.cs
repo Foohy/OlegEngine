@@ -614,7 +614,9 @@ f 37/238/80 10/239/80 42/240/80";
             Mesh.BoundingBox boundingbox;
 
             MeshGenerator.LoadOBJFromString(Quad, out verts, out elements, out boundingbox);
-            return new Mesh(verts, elements);
+            Mesh m = new Mesh(verts, elements);
+            m.BBox = boundingbox;
+            return m;
         }
 
         /// <summary>
