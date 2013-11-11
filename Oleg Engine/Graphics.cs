@@ -606,7 +606,6 @@ namespace OlegEngine
 
         /// <summary>
         /// Draw the group of meshes
-        /// TODO: Make the meshgroup bbox as the maximum size of it's group. potential performance opportunity.
         /// </summary>
         public override void Draw()
         {
@@ -619,12 +618,12 @@ namespace OlegEngine
             modelview *= Matrix4.CreateRotationX(this.Angles.Pitch * Utilities.F_DEG2RAD);
             modelview *= Matrix4.CreateRotationY(this.Angles.Yaw * Utilities.F_DEG2RAD);
 
-            modelview *= Matrix4.CreateTranslation(Position);
+            modelview *= Matrix4.CreateTranslation(this.Position + this.PositionOffset);
 
             foreach (Mesh m in this)
             {
                 //Offset the mesh's position so it's bounding box is correct
-                m.PositionOffset = this.Position;
+                m.PositionOffset = this.Position + this.PositionOffset;
 
                 //woof
                 m.DrawSimple(modelview);
