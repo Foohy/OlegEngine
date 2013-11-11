@@ -8,6 +8,19 @@ using OpenTK.Graphics.OpenGL;
 
 namespace OlegEngine
 {
+    public enum CullMode
+    {
+        Front = 0,
+        Back = 1,
+        Both = 2
+    }
+
+    public enum FaceMode
+    {
+        CounterClockwise = 0,
+        Clockwise = 1,
+    }
+
     public class Graphics
     {
         public static Frustum ViewFrustum;
@@ -20,6 +33,21 @@ namespace OlegEngine
         private static Mesh box;
         private static Mesh sphere;
         private static Material dbgWhite;
+
+        private static CullFaceMode[] GLCullModeAssociations = new CullFaceMode[]
+        {
+            CullFaceMode.Front,
+            CullFaceMode.Back,
+            CullFaceMode.FrontAndBack,
+        };
+
+        private static FrontFaceDirection[] GLFaceModeAssociations = new FrontFaceDirection[]
+        {
+            FrontFaceDirection.Ccw,
+            FrontFaceDirection.Cw,
+        };
+
+
 
         #region Debug drawing functions
 
@@ -120,6 +148,16 @@ namespace OlegEngine
         public static void EnableZWrite(bool enabled)
         {
             GL.DepthMask(enabled);
+        }
+
+        public static void CullMode(CullMode mode)
+        {
+            GL.CullFace(GLCullModeAssociations[(int)mode]);
+        }
+
+        public static void FrontFaceMode(FaceMode mode)
+        {
+            GL.FrontFace(GLFaceModeAssociations[(int)mode]);
         }
         #endregion
     }
