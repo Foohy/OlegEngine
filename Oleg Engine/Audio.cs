@@ -69,7 +69,7 @@ namespace OlegEngine
             try
             {
                 if (init) return;
-                //This is so you don't see the dumb HERPADERP BASS IS STARTING spash screen
+                //This is so you don't see the dumb HERPADERP BASS IS STARTING splash screen
                 BassNet.Registration("swkauker@yahoo.com", "2X2832371834322");
                 Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_3D, IntPtr.Zero);
 
@@ -86,10 +86,21 @@ namespace OlegEngine
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("COULD NOT INITIALIZE AUDIO CONTEXT: " + ex.Message);
-                Console.ResetColor();
+                Utilities.Print("FAILED TO INITIALIZE AUDIO CONTEXT! " + ex.Message, Utilities.PrintCode.ERROR);
             }
+        }
+
+        /// <summary>
+        /// Load a bass-compatible plugin
+        /// </summary>
+        /// <param name="filename">The filename of the plugin file</param>
+        /// <returns>The handle of the loaded plugin (0 if the plugin failed to load)</returns>
+        public static int LoadPlugin(string filename)
+        {
+            int handle = Bass.BASS_PluginLoad(filename);
+            Utilities.Print(handle != 0 ? "Loaded bass plugin \"" + filename + "\"": "Failed to load bass plugin \"" + filename + "\"", handle != 0 ? Utilities.PrintCode.INFO : Utilities.PrintCode.WARNING);
+
+            return handle;
         }
 
         /// <summary>
