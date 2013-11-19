@@ -372,6 +372,23 @@ namespace OlegEngine
             return verts;
         }
 
+        /// <summary>
+        /// Utility function to construct an array of three vertices
+        /// </summary>
+        /// <param name="first">The first vertex</param>
+        /// <param name="second">The second vertex</param>
+        /// <param name="third">The third vertex</param>
+        /// <returns>Array of vertices that form a tri</returns>
+        public static Vertex[] AddTri(Vertex first, Vertex second, Vertex third)
+        {
+            Vertex[] verts = new Vertex[3];
+            verts[0] = first;
+            verts[1] = second;
+            verts[2] = third;
+
+            return verts;
+        }
+
 
         /// <summary>
         /// Calculate the tangents to the surface of a mesh constructed by an array of vertices
