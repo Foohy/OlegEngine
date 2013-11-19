@@ -132,7 +132,7 @@ namespace OlegEngine
                 int element = m.DBG_Elements[i];
                 if (element > m.DBG_Vertices.Length) continue;
 
-                DrawLine(m.Position + m.DBG_Vertices[element].Position, m.Position + m.DBG_Vertices[element].Position + m.DBG_Vertices[element].Normal, false);
+                DrawLine(m.Position + m.PositionOffset + m.DBG_Vertices[element].Position, m.Position + m.PositionOffset + m.DBG_Vertices[element].Position + m.DBG_Vertices[element].Normal * 30, false);
             }
         }
 
@@ -567,7 +567,7 @@ namespace OlegEngine
 
                 if (Graphics.ShouldDrawBoundingSpheres)
                 {
-                    Graphics.DrawSphere(this.Position + (this.BBox.Positive + this.BBox.Negative ) / 2, this.BBox.Radius);
+                    Graphics.DrawSphere(this.Position + this.PositionOffset + (this.BBox.Positive + this.BBox.Negative) / 2, this.BBox.Radius);
                 }
 
                 if (Graphics.ShouldDrawNormals)
