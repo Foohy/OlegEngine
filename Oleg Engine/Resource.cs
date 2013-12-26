@@ -111,7 +111,7 @@ namespace OlegEngine
                 Mesh.BoundingBox boundingbox;
 
                 MeshGenerator.LoadOBJ(filename, out verts, out elements, out boundingbox);
-                Mesh m = new Mesh(verts, elements);
+                Mesh m = new Mesh(verts, elements, filename);
                 m.BBox = boundingbox;
                 if (newInstance) return m;
                 else Meshes[filename] = m;
