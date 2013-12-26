@@ -13,7 +13,7 @@ in vec3 ex_Tangent;
 
 in vec3 WorldPos0;  
 
-out vec4 gl_FragColor;
+out vec4 ex_FragColor;
 
 struct BaseLight
 {
@@ -82,6 +82,18 @@ uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform ShadowCaster gShadowCasters[MAX_SHADOW_CASTERS];
 uniform DirectionalLight gDirectionalLight;
 
+uniform struct FogParameters
+{
+	int Enabled;
+	
+	vec3 Color;
+	
+	float Start;
+	float End;
+	float Density;
+	int FogType; //0 = Linear, 1 = Exp, 2 = Exp2
+} gFogParams;
+
 uniform mat4 _pmatrix;
 uniform mat4 _vmatrix;
 uniform float _time;
@@ -92,15 +104,18 @@ uniform int gCheap = 0;
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
 uniform float gAlpha = 1.0;
+uniform vec2 gShadowMapSize = vec2( 1024, 1024 );
 uniform vec3 gEyeWorldPos;
 uniform vec3 _color = vec3( 1.0, 1.0, 1.0);
 
 uniform sampler2D sampler;
 uniform sampler2D sampler_normal;
-uniform sampler2D sampler_shadow;
-uniform sampler2D sampler_shadow_tex;
 uniform sampler2D sampler_spec;
 uniform sampler2D sampler_alpha;
+uniform sampler2D sampler_shadow_tex;
+uniform sampler2DShadow sampler_shadow;
+
+#define EPSILON 0.00001
 
 // Returns a random number based on a vec3 and an int.
 float random(vec3 seed, int i){
@@ -116,20 +131,24 @@ float CalcShadowFactor(vec4 LightSpacePos)
     UVCoords.x = 0.5 * ProjCoords.x + 0.5;
     UVCoords.y = 0.5 * ProjCoords.y + 0.5;
     float z = 0.5 * ProjCoords.z + 0.5;
+	
+	
+    float xOffset = 1.0/gShadowMapSize.x;
+    float yOffset = 1.0/gShadowMapSize.y;
 
-	float visibility = 1.0;
+    float Factor = 0.0;
 
-	for (int i=0;i<4;i++)
+    for (int y = -1 ; y <= 1 ; y++) 
 	{
-		int index = int(16.0*random(gl_FragCoord.xyy, i))%16;
-		float Depth = texture2D(sampler_shadow, UVCoords + poissonDisk[index]/900.0).x;
-		if ( Depth < z + 0.00000001)
+        for (int x = -1 ; x <= 1 ; x++) 
 		{
-			visibility -= 0.25;
-		}
-	}
+            vec2 Offsets = vec2(x * xOffset, y * yOffset);
+            vec3 UVC = vec3(UVCoords + Offsets, z + EPSILON);
+            Factor += texture(sampler_shadow, UVC);
+        }
+    }
 
-	return visibility;
+    return (Factor / 9.0);
 } 
 
 vec4 CalcLightInternal( BaseLight Light, vec3 LightDirection, vec3 Normal, float ShadowFactor)
@@ -257,6 +276,37 @@ vec3 CalcBumpedNormal()
     return NewNormal;
 }
 
+float CalcFogLinear( float fogStart, float fogEnd, float fogCoord )
+{
+	return clamp( (fogEnd-fogCoord)/(fogEnd-fogStart), 0.0, 1.0);
+}
+
+float CalcFogExp( float fogDensity, float fogCoord )
+{
+	return clamp( exp(-fogDensity*fogCoord), 0.0, 1.0);
+}
+
+float CalcFogExp2( float fogDensity, float fogCoord )
+{
+	return clamp(exp(-pow(fogDensity*fogCoord, 2.0)), 0.0, 1.0);
+}
+
+vec4 CalcFog(vec4 pixelColor)
+{
+	if (gFogParams.Enabled == 0 ) return pixelColor;
+	
+	float z = (gl_FragCoord.z / gl_FragCoord.w);
+	
+	if (gFogParams.FogType == 0) 
+		return mix( vec4( gFogParams.Color, 0), pixelColor, CalcFogLinear( gFogParams.Start, gFogParams.End, z ) );
+	else if (gFogParams.FogType == 1)
+		return mix( vec4( gFogParams.Color, 0), pixelColor, CalcFogExp(gFogParams.Density, z ) ); 
+	else if (gFogParams.FogType == 2)
+		return mix( vec4( gFogParams.Color, 0), pixelColor, CalcFogExp2(gFogParams.Density, z ) ); 
+	
+	return pixelColor;
+}
+
 void main()
 {
 	vec3 Normal = CalcBumpedNormal();
@@ -276,6 +326,8 @@ void main()
 	{
 		TotalLight += CalcShadowSpotLight(gShadowCasters[i], Normal, ex_LightSpacePos );
 	}
-
-	gl_FragColor = vec4(texture2D( sampler, ex_UV.st).rgb, gAlpha * texture2D( sampler, ex_UV.st).a * texture(sampler_alpha, ex_UV.st) ) * vec4(_color * TotalLight.rgb, 1.0 );
+	
+	vec4 fragment = vec4(texture2D( sampler, ex_UV.st).rgb, gAlpha * texture2D( sampler, ex_UV.st).a * texture(sampler_alpha, ex_UV.st) ) * vec4(_color * TotalLight.rgb, 1.0 );
+	fragment = CalcFog( fragment );
+	ex_FragColor = fragment;
 }

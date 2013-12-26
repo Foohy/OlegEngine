@@ -14,7 +14,7 @@ out vec3 ex_Normal;
 vec4 vert;
 void main() {
 	vert = vec4( _Position.x, _Position.y, _Position.z, 1.0);
-    gl_Position = _mmatrix * _pmatrix * _vmatrix * vert;
+    gl_Position =  _pmatrix * _vmatrix * _mmatrix * vert;
 	ex_UV = _UV;
 	ex_Normal = _Normal;
 }
