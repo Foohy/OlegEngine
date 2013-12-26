@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -132,10 +133,17 @@ namespace OlegEngine.Entity
             this.SetAngle(this.Angles.SetRoll(ang), phys);
         }
 
-        public void SetModel(Mesh model)
+        public void SetModel(Mesh model, bool autoSetMaterial = true)
         {
             if (Model != null) { Model.Remove(); }
             Model = model;
+
+            //Most models have corresponding materials to them, automatically load it in
+            if (autoSetMaterial && !string.IsNullOrEmpty(model.SourceFileName))
+            {
+                string filename = string.Format("models{0}{1}{2}{3}", Path.DirectorySeparatorChar, Path.GetDirectoryName(model.SourceFileName), Path.DirectorySeparatorChar, Path.GetFileNameWithoutExtension(model.SourceFileName) );
+                this.Material = Resource.GetMaterial(filename);
+            }
         }
 
         public void EmitSound(string soundpath, bool loop = false, float volume = 1.0f, int frequency = 44100)

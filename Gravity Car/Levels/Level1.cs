@@ -38,7 +38,6 @@ namespace Gravity_Car.Levels
             oleg = EntManager.Create<ent_static>();
             oleg.Spawn();
             oleg.SetModel(Resource.GetMesh("props/oleg.obj"));
-            oleg.Material = Resource.GetMaterial("models/props/oleg");
             oleg.Name = "Oleg";
             oleg.SetPos(OlegPos);
             oleg.Scale = new Vector3(0.75f);
@@ -139,7 +138,7 @@ namespace Gravity_Car.Levels
                 Console.WriteLine("Position: {0}", View.Player.Position);
                 Console.WriteLine("Orientation: {0}", View.Angles);
                 Console.WriteLine("ViewNormal: {0}", View.ViewNormal);
-                Console.WriteLine("Matrix: {0}", View.CameraMatrix);
+                Console.WriteLine("Matrix: {0}", View.ViewMatrix);
                 Console.WriteLine("==========================");
             }
             /*
