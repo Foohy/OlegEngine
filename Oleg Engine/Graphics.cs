@@ -164,6 +164,7 @@ namespace OlegEngine
 
     public class Mesh
     {
+        public string SourceFileName { get; private set; }
         public BeginMode DrawMode = BeginMode.Triangles;
         public BufferUsageHint UsageHint = BufferUsageHint.StaticDraw;
         public Vector3 Color = Vector3.One;
@@ -195,7 +196,6 @@ namespace OlegEngine
         public static int MeshesDrawn = 0;
         public static int MeshesTotal = 0;
         private static double LastDrawTime = 0;
-        private static Matrix4 matrixTranslationZero = Matrix4.CreateTranslation(0, 0, 0);
 
         public class BoundingBox
         {
@@ -344,6 +344,12 @@ namespace OlegEngine
             UpdateMesh(verts, elements);
             this.Scale = Vector3.One;
         }
+        public Mesh(Vertex[] verts, int[] elements, string sourceFileName)
+        {
+            UpdateMesh(verts, elements);
+            this.Scale = Vector3.One;
+            this.SourceFileName = sourceFileName;
+        }
 
         public void LoadMesh(string filename)
         {
@@ -352,6 +358,7 @@ namespace OlegEngine
             Mesh.BoundingBox boundingbox;
 
             MeshGenerator.LoadOBJ(filename, out verts, out elements, out boundingbox);
+            this.SourceFileName = filename;
             this.BBox = boundingbox;
 
             UpdateMesh(verts, elements);
@@ -485,15 +492,14 @@ namespace OlegEngine
 
         #endregion
 
-        public virtual void DrawSimple(Matrix4 vmatrix)
+        public virtual void DrawSimple(Matrix4 mmatrix)
         {
-            render(Utilities.ViewMatrix, vmatrix, Utilities.ProjectionMatrix);
+            render(mmatrix, Utilities.ViewMatrix, Utilities.ProjectionMatrix);
         }
 
         public virtual void Draw()
         {
-            modelview = matrixTranslationZero;
-            modelview *= Matrix4.Scale(Scale);
+            modelview = Matrix4.Scale(Scale);
 
             modelview *= Matrix4.CreateTranslation( PositionOffset);
             
@@ -505,7 +511,7 @@ namespace OlegEngine
             
 
             this.BBox.Scale = this.Scale;
-            render(Utilities.ViewMatrix, modelview, Utilities.ProjectionMatrix);
+            render(modelview, Utilities.ViewMatrix, Utilities.ProjectionMatrix);
         }
 
         private void render(Matrix4 mmatrix, Matrix4 vmatrix, Matrix4 pmatrix)
@@ -518,14 +524,12 @@ namespace OlegEngine
             }
 
 
-            if (Utilities.CurrentPass > 1 && (ShouldDrawDebugInfo))
+            if (ShouldDrawDebugInfo)
             {
                 MeshesTotal++;
 
-                //this.Color = Vector3.UnitY;
-                if (Graphics.ViewFrustum.SphereInFrustum(this.Position + this.PositionOffset + (this.BBox.Positive + this.BBox.Negative) / 2, BBox.Radius) == Frustum.FrustumState.OUTSIDE) { return; }
-                //if (Graphics.ViewFrustum.BoxInFrustum(this.BBox, this.Position) == Frustum.FrustumState.OUTSIDE) { this.Color = Vector3.UnitX; MeshesDrawn--; }
-                //if (Graphics.ViewFrustum.PointInFrustum((this.BBox.BottomLeft + this.BBox.TopRight) / 2 + this.Position) == Frustum.FrustumState.OUTSIDE) { this.Color = Vector3.UnitX; MeshesDrawn--;  }
+                Vector3 Center = this.Position + this.PositionOffset + (this.BBox.Positive + this.BBox.Negative) / 2;
+                if (Graphics.ViewFrustum.SphereInFrustumMulticheck(Center, BBox.Radius) == Frustum.FrustumState.OUTSIDE) { return; }
 
                 MeshesDrawn++;
             }
@@ -589,7 +593,6 @@ namespace OlegEngine
         private List<Mesh> meshes = new List<Mesh>();
 
         private Matrix4 modelview = Matrix4.CreateTranslation(0, 0, 0);
-        private static Matrix4 matrixTranslationZero = Matrix4.CreateTranslation(0, 0, 0);
 
         /// <summary>
         /// Create a new blank mesh group object
@@ -650,8 +653,7 @@ namespace OlegEngine
             //Because our group bounding box contains all of its members, we can do one check to see if IT is in the frustum and we can escape early if not
             if (!WithinFrustum()) return;
 
-            modelview = matrixTranslationZero;
-            modelview *= Matrix4.Scale(Scale);
+            modelview = Matrix4.Scale(Scale);
             modelview *= Matrix4.CreateRotationZ(this.Angles.Roll * Utilities.F_DEG2RAD);
             modelview *= Matrix4.CreateRotationX(this.Angles.Pitch * Utilities.F_DEG2RAD);
             modelview *= Matrix4.CreateRotationY(this.Angles.Yaw * Utilities.F_DEG2RAD);
@@ -670,7 +672,7 @@ namespace OlegEngine
 
         public bool WithinFrustum()
         {
-            if (Graphics.ViewFrustum.SphereInFrustum(this.Position + this.PositionOffset + (this.BBox.Positive + this.BBox.Negative) / 2, BBox.Radius) == Frustum.FrustumState.OUTSIDE)
+            if (Graphics.ViewFrustum.SphereInFrustumMulticheck(this.Position + this.PositionOffset + (this.BBox.Positive + this.BBox.Negative) / 2, BBox.Radius) == Frustum.FrustumState.OUTSIDE)
             {
                 //Update the total mesh count with all the ones it missed just now
                 MeshesTotal += this.Count;

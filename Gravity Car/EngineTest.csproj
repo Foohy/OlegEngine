@@ -76,6 +76,7 @@
     <Compile Include="Entity\ent_speaker.cs" />
     <Compile Include="Entity\ent_testball.cs" />
     <Compile Include="Entity\ent_testnerd.cs" />
+    <Compile Include="Levels\FrustumCullTest.cs" />
     <Compile Include="Levels\Level1.cs" />
     <Compile Include="Levels\LevelBase.cs" />
     <Compile Include="Levels\LevelManager.cs" />
