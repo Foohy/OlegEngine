@@ -478,7 +478,7 @@ namespace OlegEngine
         /// <returns>2D position relative to the screen of a world positon</returns>
         public static Vector2 Get3Dto2D(Vector3 position)
         {
-            return Get3Dto2D(position, View.CameraMatrix, View.ViewMatrix, Utilities.engine.Width, Utilities.engine.Height);
+            return Get3Dto2D(position, View.ViewMatrix, View.ProjectionMatrix, Utilities.engine.Width, Utilities.engine.Height);
         }
 
         /// <summary>

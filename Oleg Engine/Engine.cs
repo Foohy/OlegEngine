@@ -196,6 +196,7 @@ namespace OlegEngine
                 frametime = frametime / (double)AveragedFrametimes.Count;
                 GUI.Surface.SetDrawColor(255, 255, 255);
                 GUI.Surface.DrawSimpleText("debug", string.Format("FPS: {0,3:N0} ({1:0.000}ms)", 1 / frametime, frametime * 1000), 10, 10);
+                GUI.Surface.DrawSimpleText("debug", string.Format("{0} of {1} meshes drawn", Mesh.MeshesDrawn, Mesh.MeshesTotal), 10, 25);
             }
         }
 
@@ -232,9 +233,8 @@ namespace OlegEngine
             Audio.Think(e);
 
             //Update the player's view so we know where to render
-            View.Think(e); 
+            View.Update(e); 
 
-            //Levels.LevelManager.Think(e);
             Entity.EntManager.Think(e);
 
         }
@@ -254,8 +254,8 @@ namespace OlegEngine
             //Update timing information
             Utilities.Draw(e);
 
-            //Reset the view matrix, just in case it's been altered
-            Utilities.ViewMatrix = View.ViewMatrix;
+            //Reset the projection matrix, just in case it's been altered
+            Utilities.ProjectionMatrix = View.ProjectionMatrix;
 
             //Get the positions for all the light positions that'll cast fancyshadows
             ShadowTechnique.UpdateLightPositions();
@@ -267,8 +267,8 @@ namespace OlegEngine
             ShadowTechnique.SetLightInfo(info);
             if (ShadowTechnique.Enabled && shadowFBO.Loaded && ShadowTechnique._lights.Count > 0 && Utilities.EngineSettings.EnableShadows)
             {
-                Utilities.ProjectionMatrix = info.matrix;
-                Utilities.ViewMatrix = View.ViewMatrix;
+                Utilities.ProjectionMatrix = View.ProjectionMatrix;
+                Utilities.ViewMatrix = info.matrix;
 
                 //Pass 1, render in the view of the light
                 Utilities.CurrentPass = 1;
@@ -282,6 +282,10 @@ namespace OlegEngine
 
                 shadowFBO.BindForWriting();
                 GL.Clear(ClearBufferMask.DepthBufferBit);
+
+                //Update our frustum to cull out things in accordance to the light's view
+                Graphics.ViewFrustum.SetCameraDef(info.Position, (info.Position + info.Direction), Vector3.UnitY);
+
                 RenderSceneOpaque(e);
                 RenderSceneTranslucent(e);
 
@@ -295,8 +299,9 @@ namespace OlegEngine
             GL.ActiveTexture(TextureUnit.Texture0);
 
             //Set the view to the normal camera
-            Utilities.ProjectionMatrix = View.CameraMatrix;
+            Utilities.ProjectionMatrix = View.ProjectionMatrix;
             Utilities.ViewMatrix = View.ViewMatrix;
+            Graphics.ViewFrustum.SetCameraDef(View.Position, (View.Position + View.ViewNormal), Vector3.UnitY);
 
             //Second pass, render normally
             Utilities.CurrentPass = 2;
@@ -314,8 +319,8 @@ namespace OlegEngine
             RenderSceneTranslucent(e);
 
             //Draw surface stuff
-            Utilities.ViewMatrix = View.OrthoMatrix;
-            Utilities.ProjectionMatrix = Matrix4.Identity;
+            Utilities.ProjectionMatrix = View.OrthoMatrix;
+            Utilities.ViewMatrix = Matrix4.Identity;
 
             GUI.GUIManager.Draw();
         }

@@ -13,12 +13,16 @@ namespace OlegEngine
         public static Vector3 Position { get; private set; }
         public static Angle Angles { get; private set; }
         public static Vector3 ViewNormal { get; private set; }
-        public static Matrix4 CameraMatrix { get; private set; }
 
         /// <summary>
-        /// The default view matrix for use in 3D projection based rendering
+        /// The matrix representing the transformation of the camera
         /// </summary>
-        public static Matrix4 ViewMatrix = Matrix4.Identity;
+        public static Matrix4 ViewMatrix { get; private set; }
+
+        /// <summary>
+        /// The default projection matrix for use in 3D projection based rendering
+        /// </summary>
+        public static Matrix4 ProjectionMatrix = Matrix4.Identity;
         /// <summary>
         /// The default view for 2D 'orthographic' rendering
         /// </summary>
@@ -31,7 +35,7 @@ namespace OlegEngine
         private static System.Reflection.MethodInfo PlyCalcView;
         private const float DEG2RAD =  (float)Math.PI / 180f;
 
-        public static void Think(FrameEventArgs e)
+        public static void Update(FrameEventArgs e)
         {
             if (Player != null && PlyCalcView != null )
             {
@@ -49,9 +53,7 @@ namespace OlegEngine
             //Find the point where we'll be facing
             ViewNormal = Angles.Forward();
             ViewNormal.Normalize();
-            CameraMatrix = Matrix4.LookAt(Position, (Position + ViewNormal), Vector3.UnitY);
-
-            Graphics.ViewFrustum.SetCameraDef(Position, (Position + ViewNormal), Vector3.UnitY);
+            ViewMatrix = Matrix4.LookAt(Position, (Position + ViewNormal), Vector3.UnitY);
         }
 
         /// <summary>
@@ -104,11 +106,11 @@ namespace OlegEngine
             var clientRec = Utilities.engine.ClientRectangle;
 
             GL.Viewport(clientRec.X, clientRec.Y, clientRec.Width, clientRec.Height);
-            ViewMatrix = Matrix4.CreatePerspectiveFieldOfView(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
+            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
             OrthoMatrix = Matrix4.CreateOrthographicOffCenter(0, Utilities.engine.Width, Utilities.engine.Height, 0, Utilities.NearClip, Utilities.FarClip);
-            Utilities.ViewMatrix = ViewMatrix;
+            Utilities.ProjectionMatrix = ProjectionMatrix;
             GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref ViewMatrix);
+            GL.LoadMatrix(ref ProjectionMatrix);
 
             Graphics.ViewFrustum.SetCamInternals(FOV, Ratio, Utilities.NearClip, Utilities.FarClip);
         }
