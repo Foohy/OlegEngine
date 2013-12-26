@@ -238,6 +238,7 @@ namespace OlegEngine
 
         private static Mesh skycube;
         private static int locSunVector;
+        private static Material skyMat;
 
         public static bool Init()
         {
@@ -254,7 +255,7 @@ namespace OlegEngine
         /// <param name="mat">The material to set the skybox model to</param>
         public static void SetSkyboxMaterial(Material mat)
         {
-            skycube.mat = mat;
+            skyMat = mat;
         }
 
         /// <summary>
@@ -264,7 +265,7 @@ namespace OlegEngine
         /// <param name="mat">The material to set the skydome model to</param>
         public static void SetSkyGradientMaterial(Material mat)
         {
-            skycube.mat = mat;
+            skyMat = mat;
 
             //Store it's uniform location for sunvector
             locSunVector = GL.GetUniformLocation(mat.Properties.ShaderProgram, "gSunVector");
@@ -290,7 +291,8 @@ namespace OlegEngine
 
         public static void Render()
         {
-            if (skycube == null || skycube.mat == null) return;
+            if (skycube == null || skyMat == null) return;
+            skycube.mat = skyMat;
 
             GL.CullFace(CullFaceMode.Front);
             GL.DepthFunc(DepthFunction.Lequal);
