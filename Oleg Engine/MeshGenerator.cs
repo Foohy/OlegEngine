@@ -118,7 +118,7 @@ namespace OlegEngine
                             string[] group = element[n].Split('/');
 
                             Vertex newVert = new Vertex();
-                            newVert.Color = Vector3.One;
+                            newVert.Color = (Vector3h)Vector3.One;
                             if (group.Length > 0 && group[0].Length > 0)
                             {
                                 int vertNum = int.Parse(group[0]);
@@ -280,7 +280,7 @@ namespace OlegEngine
                         {
                             string[] group = element[n].Split('/');
                             Vertex vertex = new Vertex();
-                            vertex.Color = Vector3.One;
+                            vertex.Color = (Vector3h)Vector3.One;
                             if (group.Length > 0 && group[0].Length > 0)
                             {
                                 int vertNum = int.Parse(group[0]);

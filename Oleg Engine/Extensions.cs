@@ -186,9 +186,9 @@ namespace OlegEngine
         /// <summary>
         /// The color of the vertex. Will be blended over textures/stuff
         /// </summary>
-        public Vector3 Color;
+        public Vector3h Color;
 
-        public Vertex( Vector3 position, Vector3 normal, Vector3 tangent, Vector3 color, Vector2 uv)
+        public Vertex(Vector3 position, Vector3 normal, Vector3 tangent, Vector2 uv, Vector3h color)
         {
             Position    = position;
             Normal      = normal;
@@ -202,7 +202,7 @@ namespace OlegEngine
             Position    = position;
             Normal      = Vector3.Zero;
             Tangent     = Vector3.Zero;
-            Color       = Vector3.One;
+            Color       = new Vector3h(1);
             UV          = Vector2.Zero;
         }
 
@@ -211,7 +211,7 @@ namespace OlegEngine
             Position    = position;
             Normal      = normal;
             Tangent     = Vector3.Zero;
-            Color       = Vector3.One;
+            Color       = new Vector3h(1);
             UV          = Vector2.Zero;
         }
 
@@ -220,11 +220,11 @@ namespace OlegEngine
             Position    = position;
             Normal      = normal;
             Tangent     = Vector3.Zero;
-            Color       = Vector3.One;
+            Color       = new Vector3h(1);
             UV          = uv;
         }
 
-        public Vertex(Vector3 position, Vector3 normal, Vector2 uv, Vector3 color)
+        public Vertex(Vector3 position, Vector3 normal, Vector2 uv, Vector3h color)
         {
             Position    = position;
             Normal      = normal;
@@ -233,4 +233,47 @@ namespace OlegEngine
             UV          = uv;
         }
     }
+    /*
+    /// <summary>
+    /// Color class
+    /// It holds color information
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Color
+    {
+        public ushort R = ushort.MaxValue;
+        public ushort G;
+        public ushort B;
+        public ushort A;
+
+        public static Color White = new Color(ushort.MaxValue, ushort.MaxValue, ushort.MaxValue);
+
+        public Color(ushort shade)
+        {
+            R = G = B = shade;
+            A = ushort.MaxValue;
+        }
+
+        public Color(ushort r, ushort g, ushort b)
+        {
+            R = r;
+            G = g;
+            B = b;
+            A = ushort.MaxValue;
+        }
+
+        public Color(ushort r, ushort g, ushort b, ushort a)
+        {
+            R = r;
+            G = g;
+            B = b;
+            A = a;
+        }
+
+        public static explicit operator Color(System.Drawing.Color c)
+        {
+            return new Color(c.R, c.G, c.B);
+        }
+    }
+     * */
 }

@@ -75,7 +75,7 @@ namespace OlegEngine.GUI
                 verts[i * 4].UV.Y = (float)CharY / (float)ch.Height;
                 verts[i * 4].Position.X = (float)CurX + OffsetX;
                 verts[i * 4].Position.Y = (float)OffsetY;
-                verts[i * 4].Color = Vector3.One;
+                verts[i * 4].Color = (Vector3h)Vector3.One;
                 elements[i*4] = i*4;
 
                 //upper right
@@ -83,7 +83,7 @@ namespace OlegEngine.GUI
                 verts[i * 4 + 1].UV.Y = (float)CharY / (float)ch.Height;
                 verts[i * 4 + 1].Position.X = (float)Width + CurX + OffsetX;
                 verts[i * 4 + 1].Position.Y = (float)OffsetY;
-                verts[i * 4 + 1].Color = Vector3.One;
+                verts[i * 4 + 1].Color = (Vector3h)Vector3.One;
                 elements[i*4 + 1] = i*4 + 1;
 
                 //lower right
@@ -91,7 +91,7 @@ namespace OlegEngine.GUI
                 verts[i * 4 + 2].UV.Y = (float)(CharY + Height) / (float)ch.Height;
                 verts[i * 4 + 2].Position.X = (float)Width + CurX + OffsetX;
                 verts[i * 4 + 2].Position.Y = (float)Height + OffsetY;
-                verts[i * 4 + 2].Color = Vector3.One;
+                verts[i * 4 + 2].Color = (Vector3h)Vector3.One;
                 elements[i*4 + 2] = i*4 + 2;
 
                 //lower left
@@ -99,7 +99,7 @@ namespace OlegEngine.GUI
                 verts[i * 4 + 3].UV.Y = (float)(CharY + Height) / (float)ch.Height;
                 verts[i * 4 + 3].Position.X = (float)CurX + OffsetX;
                 verts[i * 4 + 3].Position.Y = (float)Height + OffsetY;
-                verts[i * 4 + 3].Color = Vector3.One;
+                verts[i * 4 + 3].Color = (Vector3h)Vector3.One;
                 elements[i*4 + 3] = i*4 + 3;
 
 
