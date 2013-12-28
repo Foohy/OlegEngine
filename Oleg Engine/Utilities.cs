@@ -21,13 +21,47 @@ namespace OlegEngine
         /// </summary>
         public static double Time { get; private set; }
         /// <summary>
+        /// The current time
+        /// This is not affacted by timescale or forced framerate
+        /// </summary>
+        public static double RealTime { get; private set; }
+
+        /// <summary>
         /// The amount of time the last frame took to render
         /// </summary>
         public static double Frametime { get; private set; }
         /// <summary>
+        /// The amount of time the last frame took to render
+        /// This is not affacted by timescale or forced framerate
+        /// </summary>
+        public static double RealFrametime { get; private set; }
+
+        /// <summary>
         /// The amount of time since the last 'think' event happened
         /// </summary>
         public static double ThinkTime { get; private set; }
+        /// <summary>
+        /// The amount of time since the last 'think' event happened
+        /// This is not affacted by timescale or forced framerate
+        /// </summary>
+        public static double RealThinkTime { get; private set; }
+
+        /// <summary>
+        /// If enabled, the engine will run on THIS fixed frametime
+        /// </summary>
+        public static double ForcedFrametime { get; set; }
+
+        /// <summary>
+        /// If true, the engine will run at a fixed frametime
+        /// See "Utilities.ForcedFrametime"
+        /// </summary>
+        public static bool ShouldForceFrametime { get; set; }
+
+        /// <summary>
+        /// The timescale the engine will run at. 
+        /// 1 = normal time
+        /// </summary>
+        public static float Timescale { get; set; }
 
         /// <summary>
         /// The current engine settings that are active
@@ -73,7 +107,7 @@ namespace OlegEngine
                 View.UpdateViewOrthoMatrices();
             }
         }
-        private static float _nearClip = 1.0f;
+        private static float _nearClip = 5.0f;
         /// <summary>
         /// Units to the far clipping plane
         /// </summary>
@@ -89,7 +123,7 @@ namespace OlegEngine
                 View.UpdateViewOrthoMatrices();
             }
         }
-        private static float _farClip = 256f;
+        private static float _farClip = 1024f;
 
         /// <summary>
         /// An array of cubemap direction targets, to make it easy to loop through 
@@ -107,13 +141,19 @@ namespace OlegEngine
         #region Timing information
         public static void Think(FrameEventArgs e)
         {
-            Time += e.Time;
-            ThinkTime = e.Time;
+            double timeChange = (ShouldForceFrametime ? ForcedFrametime : e.Time) * Timescale;
+            Time += timeChange;
+            ThinkTime = timeChange;
+
+            //These should not depend on stuff
+            RealTime += e.Time;
+            RealThinkTime = e.Time;
         }
 
         public static void Draw(FrameEventArgs e)
         {
-            Frametime = e.Time;
+            Frametime = (ShouldForceFrametime ? ForcedFrametime : e.Time) * Timescale;
+            RealFrametime = e.Time;
         }
         #endregion
 
