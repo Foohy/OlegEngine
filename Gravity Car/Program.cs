@@ -46,7 +46,7 @@ namespace Gravity_Car
         {
             base.OnLoad(e);
 
-            Levels.LevelManager.InitalizeLevel(new Levels.Level1());
+            Levels.LevelManager.InitalizeLevel(new Levels.FrustumCullTest());
         }
 
         /// <summary>
