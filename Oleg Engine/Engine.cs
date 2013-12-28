@@ -35,6 +35,10 @@ namespace OlegEngine
         /// </summary>
         public event Action<FrameEventArgs> OnRenderSceneTranslucent;
         /// <summary>
+        /// Called just as internal engine rendering has finished for this frame
+        /// </summary>
+        public event Action OnFrameFinish;
+        /// <summary>
         /// Called when the window is resized and the viewmatrix changes
         /// </summary>
         public event Action OnSceneResize;
@@ -185,7 +189,7 @@ namespace OlegEngine
 
             if (Utilities.EngineSettings.ShowFPS)
             {
-                AveragedFrametimes.Push(Utilities.Frametime);
+                AveragedFrametimes.Push(Utilities.RealFrametime);
 
                 double frametime = 0;
                 for (int i = 0; i < AveragedFrametimes.Count; i++)
@@ -195,8 +199,16 @@ namespace OlegEngine
 
                 frametime = frametime / (double)AveragedFrametimes.Count;
                 GUI.Surface.SetDrawColor(255, 255, 255);
-                GUI.Surface.DrawSimpleText("debug", string.Format("FPS: {0,3:N0} ({1:0.000}ms)", 1 / frametime, frametime * 1000), 10, 10);
+                string strFrametimeInfo = string.Format("FPS: {0,3:N0} ({1:0.000}ms)", 1 / frametime, frametime * 1000);
+                GUI.Surface.DrawSimpleText("debug", strFrametimeInfo, 10, 10);
                 GUI.Surface.DrawSimpleText("debug", string.Format("{0} of {1} meshes drawn", Mesh.MeshesDrawn, Mesh.MeshesTotal), 10, 25);
+
+                //Add a thing if our timing is going to be modified
+                if (Utilities.ShouldForceFrametime || Utilities.Timescale != 1)
+                {
+                    GUI.Surface.SetDrawColor(0, 255, 0);
+                    GUI.Surface.DrawSimpleText("debug", string.Format("Game FPS: {0,3:N0} ({1:0.000})", 1 / Utilities.Frametime, Utilities.Frametime * 1000), GUI.Surface.GetTextLength("debug", strFrametimeInfo) + 15, 10);
+                }
             }
         }
 
@@ -323,6 +335,8 @@ namespace OlegEngine
             Utilities.ViewMatrix = Matrix4.Identity;
 
             GUI.GUIManager.Draw();
+
+            if (OnFrameFinish != null) OnFrameFinish();
         }
 
         protected virtual void RenderSceneOpaque(FrameEventArgs e)
