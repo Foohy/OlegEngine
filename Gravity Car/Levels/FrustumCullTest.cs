@@ -138,7 +138,16 @@ namespace Gravity_Car.Levels
                 ShadowTechnique.Enabled = !ShadowTechnique.Enabled;
             }
 
-            if (e.Key == OpenTK.Input.Key.F12) //Debug print
+            if (e.Key == OpenTK.Input.Key.F5)
+                MovieUtilities.StartMovie(new MovieSettings("ingame_movie-" + DateTime.Now.ToString("yyyyMMddTHHmmss"), MovieType.ImageSequence));
+
+            if (e.Key == OpenTK.Input.Key.F6)
+                MovieUtilities.EndMovie();
+
+            if (e.Key == OpenTK.Input.Key.F12)
+                MovieUtilities.SaveScreenshot(DateTime.Now.ToString("yyyyMMddTHHmmss"));
+
+            if (e.Key == OpenTK.Input.Key.F9) //Debug print
             {
                 Console.WriteLine("==========================");
                 Console.WriteLine("Position: {0}", View.Player.Position);
@@ -146,6 +155,11 @@ namespace Gravity_Car.Levels
                 Console.WriteLine("ViewNormal: {0}", View.ViewNormal);
                 Console.WriteLine("ViewMatrix: {0}", View.ViewMatrix);
                 Console.WriteLine("==========================");
+            }
+
+            if (e.Key == OpenTK.Input.Key.Escape)
+            {
+                Input.LockMouse = !Input.LockMouse;
             }
         }
 
@@ -177,20 +191,44 @@ namespace Gravity_Car.Levels
 
             float timeOffset = (float)Utilities.Time + 10000f;
             Vector3 pos = new Vector3((float)Math.Cos(Utilities.Time) * 7, (float)Math.Sin(Utilities.Time)*10+10, (float)Math.Sin(Utilities.Time) * 7);
-            pointlight.SetPos(Vector3.Zero);
+            
+            Vector3 realCenter = new Vector3((float)Math.Sin(Utilities.Time), 0, (float)Math.Cos(Utilities.Time)) * 10;
+            pointlight.SetPos(realCenter);
 
             popcorn.mat = Resource.GetMaterial("engine/white");
-
+            popcorn.Scale = Vector3.One;
             for (float i = 0; i < 100; i+=0.05f)
             {
                 float spin = i + (timeOffset / (float)Math.Pow(i, 1.2f)) * 50;
                 float heightRand = (float)Math.Pow(i, 0.6f) * 10 -(float)Math.Sin(i * 10000) * 8;
                 Vector3 popPos = new Vector3((float)Math.Cos(spin) * i, heightRand, (float)Math.Sin(spin) * i);
-                popcorn.Position = popPos;
+                Vector3 offset = new Vector3((float)Math.Sin(i/10f + Utilities.Time), 0, (float)Math.Cos(i/10f + Utilities.Time)) * 10;
+                popcorn.Position = popPos + offset;
                 popcorn.Angles = new OlegEngine.Angle(0, spin, (timeOffset / i) * 1000 );
                 popcorn.Draw();
             }
-            
+
+            popcorn.Scale = Vector3.One/3;
+            for (float i = 0; i < 5; i += 0.05f)
+            {
+                //Utilities.Print((Utilities.Time % 10).ToString());
+
+                float spin = i + (timeOffset / (float)Math.Pow(i, 1.2f)) * 50;
+                //float heightRand = (float)Math.Pow(i, 0.6f) * 4 -(float)Math.Sin(i * 10000) * 3;
+                //Vector3 popPos = new Vector3((float)Math.Cos(spin) * i, heightRand, (float)Math.Sin(spin) * i);
+                float upAmt = ((float)Utilities.Time + (i*3)) % 10;
+                float spinAmt = (float)Math.Cos(i * 10000)*3;
+                Vector3 popPos = new Vector3((float)Math.Sin(-upAmt - spinAmt) * (upAmt/2 + 2), upAmt, (float)Math.Cos(-upAmt - spinAmt) * (upAmt/2 + 2)) * 10;
+                popcorn.Position = popPos + realCenter;
+                popcorn.Angles = new OlegEngine.Angle(0, spin, (timeOffset / i) * 1000);
+                popcorn.Color = new Vector3(i / 1, i / 1, i / 1);
+                popcorn.Scale = new Vector3( (float)Math.Sin( i * 10000 ) + 1.5f, (float)Math.Cos( i * 10000 ) + 1.5f, (float)Math.Sin( i * 1000 ) + 1.5f) / 3;
+                popcorn.Draw();
+            }
+            //Utilities.FarClip = 512;
+            Utilities.ShouldForceFrametime = true;
+            Utilities.ForcedFrametime = 0.016666666;
+            Utilities.Timescale = 1.0f;
             /*
             for (float x = -50; x < 50; x += 2)
             {
@@ -205,6 +243,9 @@ namespace Gravity_Car.Levels
             }
              * */
 
+
+            //MovieUtilities.StartMovie(new MovieSettings() { Filename = "dicks - the movie", Format = MovieType.ImageSequence });
+            //MovieUtilities.EndMovie();
             Graphics.ShouldDrawFrustum = false;
             Graphics.ShouldDrawBoundingSpheres = false;
             Graphics.ShouldDrawBoundingBoxes = false;
