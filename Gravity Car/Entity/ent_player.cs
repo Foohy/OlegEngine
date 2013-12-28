@@ -72,7 +72,7 @@ namespace Gravity_Car.Entity
 
             if (e.Key == Key.F9)
             {
-                this.SetMode(PlayerMode.NONE);
+                //this.SetMode(PlayerMode.NONE);
             }
         }
 
@@ -119,51 +119,23 @@ namespace Gravity_Car.Entity
             Zoom += Input.deltaZ * 0.7f;
             crZoom += (Zoom - crZoom) / 4;
 
-            float multiplier = 1;
-            if (Utilities.engine.Keyboard[OpenTK.Input.Key.ShiftLeft])
-            {
-                multiplier = 4;
-
-                if (Utilities.engine.Keyboard[OpenTK.Input.Key.W])
-                {
-                    //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(0, multiplier * 100));
-                }
-                
-            }
-            if (Utilities.engine.Keyboard[OpenTK.Input.Key.A])
-            {
-                //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(-5.0f, 0.0f));
-                //float amt = 70 * radius * multiplier;
-                //if (this.Physics.Body.AngularVelocity < 0) amt = amt * 4 * multiplier;
-                //this.Physics.Body.ApplyTorque(amt);
-            }
-            if (Utilities.engine.Keyboard[OpenTK.Input.Key.D])
-            {
-                //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(5.0f, 0.0f));
-                //float amt = -70 * radius * multiplier;
-                //if (this.Physics.Body.AngularVelocity > 0) amt = amt * 4 * multiplier;
-                //this.Physics.Body.ApplyTorque(amt);
-            }
-
-
-            if (Utilities.engine.Keyboard[OpenTK.Input.Key.Space] && Fraction < 0.001f)
-            {
-                //this.Physics.Body.ApplyForce(new Microsoft.Xna.Framework.Vector2(0, 200.0f));
-            }
-
         }
 
         public void CalcView()
         {
             GameWindow window = Utilities.engine;
 
-            float multiplier = 8;
+            float multiplier = 20;
             if (window.Keyboard[Key.LShift])
-                multiplier = 20;
+                multiplier = 60;
+
+            if (window.Keyboard[Key.ControlLeft])
+                multiplier = 8;
 
             Vector3 NewPos = this.Position;
-            //Calculate the new angle of the camera
-            this.SetAngle(this.Angles + new Angle(Input.deltaY / -15f, Input.deltaX / 15f, 0));
+            //Calculate the new angle of the camera, only if the mouse is locked
+            if (Input.LockMouse)
+                this.SetAngle(this.Angles + new Angle(Input.deltaY / -15f, Input.deltaX / 15f, 0));
 
             Vector3 Forward, Right, Up;
             this.Angles.AngleVectors(out Forward, out Up, out Right);
