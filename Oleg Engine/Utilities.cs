@@ -166,6 +166,8 @@ namespace OlegEngine
 
             //Create a global random variable that's easily accessable
             Rand = new Random();
+
+            Timescale = 1.0f;
         }
 
         public enum PrintCode
