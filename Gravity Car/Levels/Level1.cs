@@ -95,6 +95,8 @@ namespace Gravity_Car.Levels
             });
             FogTechnique.Enabled = true;
 
+            Utilities.ForcedFrametime = 0.002604167;
+
             Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
 
@@ -124,39 +126,33 @@ namespace Gravity_Car.Levels
             {
                 ShadowTechnique.Enabled = !ShadowTechnique.Enabled;
             }
-            if (e.Key == OpenTK.Input.Key.Q)
-            {
-                ent_testball ball = EntManager.Create<ent_testball>();
-                //ball.radius = rand.Next(0, 3000) / (float)1000;
-                ball.Spawn();
-                ball.SetPos(new Vector2(View.Player.Position.X, View.Player.Position.Y + 3.00f));
-                ball.RenderMode = BaseEntity.RenderModes.Translucent;
-            }
-            if (e.Key == OpenTK.Input.Key.F12) //Debug print
+
+            if (e.Key == OpenTK.Input.Key.F5)
+                MovieUtilities.StartMovie(new MovieSettings("ingame_movie-" + DateTime.Now.ToString("yyyyMMddTHHmmss"), MovieType.ImageSequence));
+
+            if (e.Key == OpenTK.Input.Key.F6)
+                MovieUtilities.EndMovie();
+
+            if (e.Key == OpenTK.Input.Key.F12)
+                MovieUtilities.SaveScreenshot(DateTime.Now.ToString("yyyyMMddTHHmmss"));
+
+            if (e.Key == OpenTK.Input.Key.F9) //Debug print
             {
                 Console.WriteLine("==========================");
                 Console.WriteLine("Position: {0}", View.Player.Position);
-                Console.WriteLine("Orientation: {0}", View.Angles);
+                Console.WriteLine("Angles: {0}", View.Angles);
                 Console.WriteLine("ViewNormal: {0}", View.ViewNormal);
-                Console.WriteLine("Matrix: {0}", View.ViewMatrix);
+                Console.WriteLine("ViewMatrix: {0}", View.ViewMatrix);
                 Console.WriteLine("==========================");
             }
-            /*
-            if (e.Key == OpenTK.Input.Key.F10)
+
+            if (e.Key == OpenTK.Input.Key.Escape)
             {
-                if (playerCar == null)
-                {
-                    playerCar = EntManager.Create<ent_car>();
-                    playerCar.SetPos(new Vector3(View.Player.Position.X, View.Player.Position.Y, 3.0f));
-                    playerCar.Spawn();
-                }
-                else
-                {
-                    playerCar.Remove();
-                    playerCar = null;
-                }
+                Input.LockMouse = !Input.LockMouse;
             }
-             * */
+
+            Utilities.ShouldForceFrametime = MovieUtilities.IsRecordingMovie;
+            
         }
 
         public override void Think(FrameEventArgs e)

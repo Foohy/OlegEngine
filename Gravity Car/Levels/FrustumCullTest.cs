@@ -72,7 +72,7 @@ namespace Gravity_Car.Levels
             pointlight.DiffuseIntensity = 0.85f;
             pointlight.Color = new Vector3(1.0f, 0.5f, 0.0f);
             pointlight.SetPos(new Vector3(-2.00f, 2.421f, -14.90f));
-            pointlight.Linear = 0.1f;
+            pointlight.Linear = 0.05f;
 
             spotlight = (ent_spotlight)EntManager.Create<ent_spotlight>();
             spotlight.Spawn();
@@ -83,8 +83,8 @@ namespace Gravity_Car.Levels
 
             //Make us some nice environmental lighting
             DirectionalLight light = new DirectionalLight();
-            light.AmbientIntensity = 0.4f;
-            light.DiffuseIntensity = 0.9f;
+            light.AmbientIntensity = 0.02f;
+            light.DiffuseIntensity = 0.07f;
             light.Color = new Vector3(0.133f, 0.149f, 0.176f);
             light.Direction = new Vector3(0.0f, -1.0f, 0.0f);
 
@@ -101,12 +101,14 @@ namespace Gravity_Car.Levels
             FogTechnique.SetFogParameters(new FogParams()
             {
                 Color = new Vector3(0.37254f, 0.368627f, 0.427450f),
-                Start = 20,
-                End = 200,
+                Start = 100,
+                End = 1024,
                 Density = 0.03f,
-                Type = FogParams.FogType.Exp2,
+                Type = FogParams.FogType.Linear,
             });
             FogTechnique.Enabled = true;
+
+            Utilities.ForcedFrametime = 0.002604167;
 
             Utilities.engine.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
@@ -161,6 +163,8 @@ namespace Gravity_Car.Levels
             {
                 Input.LockMouse = !Input.LockMouse;
             }
+
+            Utilities.ShouldForceFrametime = MovieUtilities.IsRecordingMovie;
         }
 
         public override void Think(FrameEventArgs e)
@@ -176,8 +180,6 @@ namespace Gravity_Car.Levels
 
                 SkyboxTechnique.SunVector = -View.Angles.Forward();
             }
-
-            FogTechnique.SetDensity(((float)Math.Sin(Utilities.Time/70)+1)/220);
         }
 
         private float fastRelDist( float x1, float z1, float x2, float z2 )
@@ -226,9 +228,9 @@ namespace Gravity_Car.Levels
                 popcorn.Draw();
             }
             //Utilities.FarClip = 512;
-            Utilities.ShouldForceFrametime = true;
-            Utilities.ForcedFrametime = 0.016666666;
-            Utilities.Timescale = 1.0f;
+            //Utilities.ShouldForceFrametime = false;
+            //Utilities.ForcedFrametime = 0.0016666666;
+            Utilities.Timescale = 1;// (float)Math.Sin(Utilities.RealTime) + 1;
             /*
             for (float x = -50; x < 50; x += 2)
             {
